@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "peekle",
       script: "./index.js",
-      instances: 0, // 고정값 설정 (CPU 코어 수에 따라 조정 가능)
+      instances: 1, // 고정값 설정 (CPU 코어 수에 따라 조정 가능)
       exec_mode: "cluster",
       // watch: true, // nodemon과 같은 기능
       // ignore_watch: ["node_modules", "logs", "public", "uploads"], // watch 대상에서 제외할 경로
