@@ -37,3 +37,5 @@ router.patch("/tickets/:ticketId/message/:messageId", emptyController);
  * 티켓 메시지 삭제
  */
 router.delete("/tickets/:ticketId/message/:messageId", emptyController);
+
+export default router;

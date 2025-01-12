@@ -58,3 +58,5 @@ router.get("/statistics/articles", emptyController);
  * 통계 - 이벤트 현황
  */
 router.get("/statistics/events", emptyController);
+
+export default router;

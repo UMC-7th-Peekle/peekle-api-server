@@ -27,3 +27,5 @@ router.patch("/category/:categoryId/:noticeId", emptyController);
  * delete /category/:categoryId/:noticeId - 공지사항 삭제
  */
 router.delete("/category/:categoryId/:noticeId", emptyController);
+
+export default router;
