@@ -1,0 +1,44 @@
+name: Start PM2 process
+
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: "PM2 start [script]"
+        required: true
+        default: "ecosystem.config.js"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: SSH 연결
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          cat >>~/.ssh/config <<END
+          Host ${{ secrets.SSH_HOST_NAME }}
+            HostName ${{ secrets.EC2_HOST }}
+            User ubuntu
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking no
+          END
+
+      - name: checkout한 코드를 복사
+        run: |
+          ssh ${{ secrets.SSH_HOST_NAME }} 'sudo mkdir -p /opt/app'
+          ssh ${{ secrets.SSH_HOST_NAME }} 'sudo chown ubuntu:ubuntu /opt/app'
+          scp -r ./[!.]* ${{ secrets.SSH_HOST_NAME }}:/opt/app
+
+      - name: 의존성 설치
+        run: |
+          ssh ${{ secrets.SSH_HOST_NAME }} 'npm install --prefix /opt/app/'
+
+      - name: PM2 start
+        run: |
+          ssh ${{ secrets.SSH_HOST_NAME }} 'pm2 start ${{ github.event.inputs.script }}'
