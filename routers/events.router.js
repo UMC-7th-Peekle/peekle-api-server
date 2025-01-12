@@ -22,3 +22,5 @@ router.patch("/:eventId/scrap", emptyController);
  * delete /:eventId/scrap - 이벤트 스크랩을 취소합니다.
  */
 router.delete("/:eventId/scrap", emptyController);
+
+export default router;

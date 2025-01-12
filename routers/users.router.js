@@ -1,3 +1,8 @@
+import { Router } from "express";
+import { emptyController } from "../controllers/empty.cotroller.js";
+
+const router = Router();
+
 /**
  * 내 정보 조회
  */
@@ -22,3 +27,5 @@ router.patch("/me/phone", emptyController);
  * 내가 동의한 약관 조회
  */
 router.get("/terms", emptyController);
+
+export default router;

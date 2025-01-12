@@ -62,3 +62,5 @@ router.post("/password/reset", emptyController);
  * 비밀번호를 변경합니다.
  */
 router.patch("/password/change", emptyController);
+
+export default router;
