@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
-import { SERVER } from "./config.json" with { type: "json" };
+import config from "./config.json" with { type: "json" };
 import logger from "../logger/logger.js";
 
-const { JWT_SECRET } = SERVER;
+const { JWT_SECRET } = config.SERVER;
 
 export const parseBearerFromHeader = (req, res, next) => {
   const authHeader = req.headers.authorization;

@@ -3,11 +3,11 @@
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import baseX from "base-x";
-import { SERVER } from "../config.json" with { type: "json" };
+import config from "../config.json" with { type: "json" };
 import logger from "../logger/logger";
 import { NotAllowedError, InvalidInputError } from "../errors";
 
-const { SALT_ROUNDS, CIPHER_SECRET_KEY } = SERVER;
+const { SALT_ROUNDS, CIPHER_SECRET_KEY } = config.SERVER;
 
 // Base62 문자 집합 정의
 const BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

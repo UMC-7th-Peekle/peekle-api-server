@@ -24,6 +24,7 @@
     "@aws-sdk/client-s3": "^3.717.0",
     "@aws-sdk/client-sns": "^3.716.0",
     "@aws-sdk/credential-provider-sso": "^3.716.0",
+    "@faker-js/faker": "^9.3.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "axios": "^1.7.7",
@@ -43,6 +44,7 @@
     "nodemailer": "^6.9.16",
     "openai": "^4.77.0",
     "sequelize": "^6.37.4",
+    "sequelize-auto": "^0.8.8",
     "socket.io": "^4.8.1",
     "winston": "^3.15.0"
   }

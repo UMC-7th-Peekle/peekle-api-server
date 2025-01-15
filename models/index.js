@@ -1,19 +1,19 @@
-const fs = require("fs");
-const path = require("path");
-const Sequelize = require("sequelize");
-const logger = require("../utils/logger/logger");
+import { Sequelize } from "sequelize";
+import initModels from "./database/init-models.js";
+import logger from "../utils/logger/logger.js";
+import config from "../config.json" with { type: "json" };
 
-const dbConfig = require("../config.json").DATABASE;
+const DATABASE = config.DATABASE;
 
 const sequelize = new Sequelize(
-  dbConfig.MYSQL_DATABASE,
-  dbConfig.MYSQL_USER,
-  dbConfig.MYSQL_PASSWORD,
+  DATABASE.MYSQL_DATABASE,
+  DATABASE.MYSQL_USER,
+  DATABASE.MYSQL_PASSWORD,
   {
-    host: dbConfig.MYSQL_HOST,
-    port: dbConfig.MYSQL_PORT,
+    host: DATABASE.MYSQL_HOST,
+    port: DATABASE.MYSQL_PORT,
     dialect: "mysql",
-    logging: (msg) => logger.debug(`[Sequelize ✨]\n${msg} ✨`),
+    logging: (msg) => logger.debug(`[Sequelize Log]: ${msg} ✨`),
     timezone: "+09:00",
     pool: {
       max: 10, // 최대 연결 수
@@ -24,38 +24,7 @@ const sequelize = new Sequelize(
   }
 );
 
-const db = {};
-logger.info("모델 갯수 :", Object.keys(db).length);
+const models = initModels(sequelize);
+models.sequelize = sequelize;
 
-const modelsDir = path.join(__dirname, "define");
-const modelFiles = fs.readdirSync(modelsDir);
-modelFiles
-  .filter((file) => {
-    return (
-      file.slice(-3) === ".js" &&
-      !file.startsWith(".") &&
-      !file.endsWith(".test.js")
-    );
-  })
-  .forEach((file) => {
-    const model = require(path.join(modelsDir, file));
-    model.init(sequelize);
-    db[model.name] = model;
-  });
-
-Object.keys(db).forEach((modelName) => {
-  if (db[modelName].init) {
-    db[modelName].init(sequelize);
-  }
-});
-
-Object.keys(db).forEach((modelName) => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
-  }
-});
-
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
-module.exports = db;
+export default models;
