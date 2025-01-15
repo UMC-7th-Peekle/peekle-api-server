@@ -1,9 +1,12 @@
-# 📂 service 함수들을 저장하는 폴더입니다. 🛠️  
+# 📂 service 함수들을 저장하는 폴더입니다. 🛠️
+
 repositories에 의존성을 가집니다.  
-controller의 각 기능들을 구현합니다.  
+controller의 각 기능들을 구현합니다.
+
 > 이번 프로젝트에서는 repositories를 사용하지 않습니다)
 
 예시 코드
+
 ```js
 const {
   User,
@@ -356,5 +359,4 @@ module.exports = {
   createUserAgreedTermsToDatabase,
   getCurrentTerms,
 };
-
 ```

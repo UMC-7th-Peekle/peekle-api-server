@@ -5,12 +5,13 @@ controller 함수들이 위치한 폴더입니다.
 파일명은 `*.*.controller.js` 형식을 지켜주세요.
 
 예를 들어, `/users` 와 `/auth` 엔드포인트가 있다면,  
-하위 폴더로 users와 auth 가 있어야 합니다.  
+하위 폴더로 users와 auth 가 있어야 합니다.
 
 또한, 한 폴더 내에서 파일명은 `세부명.엔드포인트명.controller.js` 여야 합니다.  
 ex) `login.users.controller.js`
 
 `login.auth.controller.js` 예시
+
 ```js
 // import는 대다수 생략되어 있습니다. 느낌만 참고해주세요!
 
@@ -71,6 +72,6 @@ const localLogin = async (req, res, next) => {
 };
 
 module.exports = {
-  localLogin
+  localLogin,
 };
 ```
