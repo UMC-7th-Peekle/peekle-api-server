@@ -1,26 +1,31 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Admins extends Model {
+export default class NoticeImages extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    adminId: {
+    imageId: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      field: 'admin_id'
+      field: 'image_id'
     },
-    userId: {
+    noticeId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
-        model: 'users',
-        key: 'user_id'
+        model: 'notices',
+        key: 'notice_id'
       },
-      field: 'user_id'
+      field: 'notice_id'
     },
-    permissions: {
+    imageUrl: {
+      type: DataTypes.STRING(512),
+      allowNull: false,
+      field: 'image_url'
+    },
+    sequence: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
@@ -38,7 +43,7 @@ export default class Admins extends Model {
     }
   }, {
     sequelize,
-    tableName: 'admins',
+    tableName: 'notice_images',
     timestamps: false,
     indexes: [
       {
@@ -46,14 +51,14 @@ export default class Admins extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "admin_id" },
+          { name: "image_id" },
         ]
       },
       {
-        name: "admins_users_user_id_fk",
+        name: "notice_images_notices_notice_id_fk",
         using: "BTREE",
         fields: [
-          { name: "user_id" },
+          { name: "notice_id" },
         ]
       },
     ]
