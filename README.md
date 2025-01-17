@@ -12,13 +12,15 @@
 
 ## How To ? 🛠️
 
-- 설치 및 실행 방법을 작성해주세요.
+- 설치 및 실행 방법을 작성할 부분입니다. (예정)
 
-## Before We Start ⚠️
+<!-- Jest에 의한 test coverage 100%가 목적입니다.
+이에 따라 test가 파일명에 들어가는 경우가 생길 것을 대비 삭제 처리합니다. -->
+<!-- ## Before We Start ⚠️
 
 `test.test.js`라는 파일은 `.gitignore`에 의해,
 git에 추적되지 않습니다. 여러가지 테스트가 필요할 땐 위와 같은 파일명을 사용해주세요.
-혹시라도 `test.js`라는 파일이 필요할 수도 있어 `test.test.js`로 명명했습니다.
+혹시라도 `test.js`라는 파일이 필요할 수도 있어 `test.test.js`로 명명했습니다. -->
 
 ## Conventions & Template 📋
 
@@ -43,24 +45,7 @@ preset 코드에 버그가 있을 경우 issue 생성하시어 남겨주시면 �
 Repository URL -> [Click](https://github.com/kyeoungwoon/nodejs-api-server-template)  
 made and owned by [@kyeoungwoon](https://github.com/kyeoungwoon) | [Naver Blog](https://blog.naver.com/kyeoungwoon)
 
-# Git Convention : Strategy 🗂️
-
-1. [Git Flow](#strategy-1--git-flow)
-2. [GitHub Flow #1](#strategy-2--github-flow-1)
-3. [GitHub Flow #2](#strategy-3--github-flow-2)
-
-### Strategy #1 : Git Flow 🌊
-
-- 규모가 큰 프로젝트에 적합합니다.
-- 브랜치 종류 : main, develop, feature, release, hotfix
-
-1. main :
-2. develop :
-3. feature :
-4. release :
-5. hotfix :
-
-### Strategy #2 : GitHub Flow #1 🌐
+# Git Convention : GitHub Flow 🌐
 
 - 규모가 작고 잦은 기능수정과 배포가 있는 프로젝트에 적합합니다.
 - 브랜치 종류 : main, develop, feature
@@ -83,37 +68,6 @@ made and owned by [@kyeoungwoon](https://github.com/kyeoungwoon) | [Naver Blog](
 
 - develop branch를 기준으로, 새로운 기능을 개발하는 branch 입니다.
 - 새로운 기능에 대한 bug fix는 feature branch 내에서 마친 후 develop branch로 PR을 생성해야 합니다.
-
-### Strategy #3 : GitHub Flow #2 🌟
-
-- GitHub Flow #1과 유사하지만, `develop` branch를 사용하지 않습니다.
-- `main` `feature` 두 브랜치 종류로 구성되며, 해커톤과 같이 빠르게 완성하는 프로젝트에 적합합니다.
-- `main`을 base로, `feature` 브랜치를 생성해서 지속적으로 `main`에 merge 하는 전략입니다.
-
-### Merge 및 Conflict 관련 tip 🔀
-
-#### 크게 두 가지 방법을 사용할 수 있습니다.
-
-#### 1. GitHub Web 이용하기 🌐
-
-`feature/login` branch를 `develop/user` branch에 merge 한다고 가정해 봅시다.
-
-- `feature/login` branch를 push 합니다.
-- GitHub 레포지토리 페이지에서 `Compare & Create Pull Request` 버튼이 생성됩니다.
-- 해당 기능을 클릭한 후, `base`와 `compare` branch를 각각 아래와 같이 보이게 설정합니다.
-- base: `develop/user` <- compare: `featture/login`과 같이 설정 후 사용하시면 됩니다.
-
-#### 2. CLI 이용하기 💻
-
-1번과 동일한 상황을 가정합니다.
-
-- `git switch develop/user` 를 통해 이동하고 `git pull origin develop/user`를 통해 최신 변경사항을 적용합니다.
-- `git merge feature/login`을 통해 merge를 시도합니다.
-- 자동 병합에 성공하면 그대로 `Merge: branch 'feature/login'`과 같이 commit을 남기고 push 해주시면 됩니다.
-- 자동 병합에 실패한 부분은 수동으로 conflict 해결해 주시고,
-- 가능하면 해결한 부분에 주석으로 어떤 부분에 conflict가 발생하였고, 어떤 방식으로 해결하였는지 작성해주시면 좋습니다.
-
-##### Git 전략들에 대해서 더 알아보고 싶다면 : [잘 정리해놓으신 분이 있습니다](https://sungjk.github.io/2023/02/20/branch-strategy.html)
 
 # Git Convention : Commit 📝
 
@@ -183,14 +137,11 @@ made and owned by [@kyeoungwoon](https://github.com/kyeoungwoon) | [Naver Blog](
 
 ## 변수명
 
-- Snake Case를 사용합니다.
-  - eg. `user_id`, `event_id`
-- 팀원간 협의 후 Camel Case 또한 사용 가능합니다. 중요한 부분은 컨벤션의 통일입니다.
-  - 다만, Database의 컬럼명들이 Snake Case로 작성되었기 때문에 Query문 작성 시 유의가 필요합니다.
-- JSON 객체를 생성할 떄는, `{ user_id : user_id }` **(X)** `{ user_id }` **(O)** 와 같이 작성해주세요.
-  - JSON 객체 생성 시 변수명만 입력하면, 자바스크립트는 자동으로 `{ 변수명: 변수값 }` 형태로 객체를 생성하는 점을 이용합니다. (객체 축약 표기법)
+- 아래 예외를 제외한 모든 경우에 Camel Case를 사용합니다.
 - 상수값에 해당하는 변수명은 전부 대문자 및 snake case로 작성되어야 합니다.
   - 환경변수 등이 해당합니다. eg. `AWS_SECRET_KEY`, `API_KEY` 등
+- JSON 객체 안에서도 Camel Case를 사용합니다.
+- DB Query문을 작성할 때도 ORM을 통해 Camel Case로 변환하여 사용하셔야 합니다.
 
 ## 파일명
 
@@ -201,7 +152,7 @@ made and owned by [@kyeoungwoon](https://github.com/kyeoungwoon) | [Naver Blog](
 
 ## 폴더명
 
-- 폴더명은 길어질 경우 `-`를 활용하여 구분합니다. (kebab case)
+- 폴더명은 되도록 한 단어를 사용하되, 길어질 경우 `-`를 활용하여 구분합니다. (kebab case)
 - eg. `my-page`, `user-info`
 
 ## Error Handling ⚠️
@@ -243,9 +194,10 @@ class AlreadyExistError extends Error {
 
 #### _MySQL을 기준으로 설명합니다._
 
-- 테이블명과 컬럼명 등 모든 변수명은 반드시 snake case를 사용하여야 합니다.
-- PK값은 `{table명}_id` 와 같은 형식이여야 합니다.
-  - eg. `user_oauth` 테이블의 PK 컬럼 명은 `user_oauth_id`
+- 테이블명과 컬럼명 등 모든 변수명은 반드시 snake case를 사용하여야 합니다. (ERD 생성 시를 말하는 것이며, MySQL은 대소문자를 구분하지 않습니다.)
+- PK값은 `{table명}_id` 와 같은 형식이여야 합니다. 너무 길어질 경우 PK인 값임을 알 수 있도록 축약하여 사용도 가능합니다.
+  - eg1. `user_oauth` 테이블의 PK 컬럼 명은 `user_oauth_id`
+  - eg2. user_profile_images 테이블의 PK -> image_id
   - `bigint` 자료형을 사용하고, auto increment을 사용하여야 합니다.
   - 반정규화 (비정규화, denormailzation)로 인해 테이블이 분할된 경우에도, id값을 따로 작성하는 것을 추천합니다.
 - 모든 테이블에는 `created_at`과 `updated_at`이 있어야 합니다.
@@ -254,7 +206,7 @@ class AlreadyExistError extends Error {
   - `updated_at`은 `on_update`에 `current_timestamp(6)`이 적용되어 있어야 합니다.
 - 정규화 규칙을 되도록이면 따르는 것을 추천합니다.
 - 같은 내용의 Query를 여러번 날리는 것 보다는, `JOIN`이나 `BETWEEN` 등으로 한번에 가져와서 `Node.js`단에서 처리하는 것을 권합니다.
-- `image`등 파일은 `url`만을 저장해야 합니다. `binary data`를 직접적으로 저장하는 행위는 지양해야 할 1순위 입니다.
+- `image`등 파일은 `url`이나 `uuid`등을 저장하고, `binary data`를 직접 저장하는 일은 피해주세요.
 
 ## import / export 📦
 
@@ -320,81 +272,24 @@ export const createNewUser = async (data) => {
 
 # Project Architecture 🏗️
 
+## routes
+
+- 엔드포인트별로 controller를 묶는 역할을 하는 router 파일들을 작성합니다.
+- /routes/index.js 에서 모든 router들을 모아서 export 합니다.
+
 ## controllers
 
 - 각 엔드포인트의 응답을 핸들링합니다.
+- try - catch를 통해 catch한 error를 next를 이용해 index.js (가장 상단) 영역으로 에러 핸들링의 역할을 넘겨야 합니다.
 - service에 의존적입니다.
 
 ## service
 
 - `controllers`에서 활용할 기능 등을 위한 폴더입니다.
+- 의존성을 가지지 않으며, DB에 쿼리를 날리는 작업 또한 service로 분류됩니다.
 - 입력값 validation이나 error handling 등을 담당합니다.
-
-## repositories
-
-- Database 입출력을 담당합니다.
-- 한 함수는 한 Query만을 담당해야 합니다.
-- `try-catch`는 되도록 적용하지 않습니다.
-  - request/response 형식 통일 부분을 참고하여, error 발생 시 next(err) 등으로 middleware가 에러를 캐치하는 로직으로 구현하여야 하며, DB 접속 오류가 아닌 이상 `repositories`단에서 에러가 나지 않도록 충분한 입력값 검증 후에 호풀하여야 합니다.
-- `sequelize`와 같은 ORM을 사용할 때에는 repositories에서 리턴값을 가공하지 않고, `attributes`설정 등으로 query단에서 가공하여야 합니다.
-  - eg.
-  ```javascript
-  const getUserIdByLoginId async (login_id) => {
-    return await User.findOne({
-      where : {
-        login_id : login_id
-        },
-      attributes: ["user_id"]
-      })
-    }
-  ```
 
 ## models
 
-- ORM 사용 시 model 정의를 위한 폴더입니다.
-- sequelize 기준으로, sequelize.define이 아닌 class User Extends Model 과 같은 class 형식으로 작성하여야 합니다.
-
-```javascript
-class User extends Model {
-  static init(sequelize) {
-    5;
-    super.init(
-      {
-        user_id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true,
-        },
-
-        // 기타 컬럼들 ...
-
-        created_at: {
-          type: DataTypes.DATE(6),
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-        },
-        updated_at: {
-          type: DataTypes.DATE(6),
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-        },
-      },
-      {
-        sequelize,
-        tableName: "user",
-        timestamps: false,
-      }
-    );
-  }
-
-  static associate(models) {
-    // 관계형 정의 필요
-    User.hasMany(models.Question, { foreignKey: "questioned_user_id" });
-  }
-}
-```
-
-## presets
-
-- 자주 쓰이는 기능들에 대한 코드 preset 입니다.
-- 자유롭게 변형해서 쓰시면 됩니다.
+- Seqelize의 model 정의를 위한 폴더입니다.
+- /models/index.js 에서 model로 named export 되는 객체를 import 하여 그 안에 있는 Sequelize Model 객체를 활용합니다.

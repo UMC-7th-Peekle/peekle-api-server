@@ -27,15 +27,15 @@ import { specs } from "./utils/swagger/swagger.js";
 //import { corsOptions /*, sslOptions */ } from "./options";
 
 // Routers는 이 주석 아래에 import 해주시면 됩니다.
-// ex) const exampleRouter = require("./routers/example.router"); // commonJS
-// ex) import * as exampleRouter from "./routers/example.router"; // ES6
-import adminRouter from "./routers/admin.router.js";
-import authRouter from "./routers/auth.router.js";
-import communityRouter from "./routers/community.router.js";
-import eventsRouter from "./routers/events.router.js";
-import noticesRouter from "./routers/notices.router.js";
-import ticketsRouter from "./routers/tickets.router.js";
-import usersRouter from "./routers/users.router.js";
+// ex) const exampleRouter = require("./routes/example.router"); // commonJS
+// ex) import * as exampleRouter from "./routes/example.router"; // ES6
+import adminRouter from "./routes/admin.router.js";
+import authRouter from "./routes/auth.router.js";
+import communityRouter from "./routes/community.router.js";
+import eventsRouter from "./routes/events.router.js";
+import noticesRouter from "./routes/notices.router.js";
+import ticketsRouter from "./routes/tickets.router.js";
+import usersRouter from "./routes/users.router.js";
 
 // Socket.io Router는 이 주석 아래에 import 해주시면 됩니다.
 // ex) const exampleSocketRouter = require("./routes/example.socket.router"); // commonJS

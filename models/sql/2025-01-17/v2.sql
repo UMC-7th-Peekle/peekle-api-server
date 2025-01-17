@@ -55,23 +55,10 @@ create table event_category
     updated_at  datetime(6) default CURRENT_TIMESTAMP(6) not null
 );
 
-create table event_schedules
-(
-    schedule_id     bigint auto_increment
-        primary key,
-    repeat_type     enum ('daily', 'weekly', 'monthly', 'once') not null,
-    repeat_end_date date                                        null,
-    start_date      date                                        not null,
-    end_date        date                                        null,
-    start_time      time                                        null,
-    end_time        time                                        null
-);
-
 create table events
 (
     event_id          bigint auto_increment
         primary key,
-    schedule_id       bigint                                   not null,
     title             varchar(128)                             not null,
     content           text                                     null,
     price             int                                      not null,
@@ -82,9 +69,6 @@ create table events
     application_end   datetime                                 null,
     created_at        datetime(6) default CURRENT_TIMESTAMP(6) not null,
     updated_at        datetime(6) default CURRENT_TIMESTAMP(6) not null,
-    constraint events_ibfk_1
-        foreign key (schedule_id) references event_schedules (schedule_id)
-            on update cascade,
     constraint events_ibfk_2
         foreign key (category_id) references event_category (category_id)
             on update cascade
@@ -107,11 +91,27 @@ create table event_images
 create index event_images_events_event_id_fk
     on event_images (event_id);
 
+create table event_schedules
+(
+    schedule_id     bigint auto_increment
+        primary key,
+    event_id        bigint                                                          not null,
+    repeat_type     enum ('none', 'daily', 'weekly', 'monthly', 'yearly', 'custom') not null,
+    repeat_end_date date                                                            null,
+    is_all_day      tinyint(1)                                                      not null,
+    custom_text     varchar(512)                                                    not null,
+    start_date      date                                                            not null,
+    end_date        date                                                            null,
+    start_time      time                                                            null,
+    end_time        time                                                            null,
+    created_at      timestamp(6) default CURRENT_TIMESTAMP(6)                       not null,
+    updated_at      timestamp(6) default CURRENT_TIMESTAMP(6)                       not null on update CURRENT_TIMESTAMP(6),
+    constraint event_schedules_events_event_id_fk
+        foreign key (event_id) references events (event_id)
+);
+
 create index events_event_category_category_id_fk
     on events (category_id);
-
-create index events_event_schedules_schedule_id_fk
-    on events (schedule_id);
 
 create table notice_category
 (
@@ -143,6 +143,7 @@ create table users
     name                      varchar(128)                             not null,
     nickname                  varchar(128)                             not null,
     birthdate                 date                                     not null,
+    gender                    enum ('male', 'female')                  not null,
     phone                     varchar(20)                              not null,
     email                     varchar(512)                             not null,
     last_nickname_change_date date                                     not null,
@@ -247,7 +248,7 @@ create index article_likes_users_user_id_fk
 
 create table event_scraps
 (
-    event_scrap_id bigint                                   not null
+    event_scrap_id bigint auto_increment
         primary key,
     event_id       bigint                                   not null,
     user_id        bigint                                   not null,
@@ -288,16 +289,20 @@ create table notices
 
 create table notice_images
 (
-    image_id   bigint                                    not null
+    image_id   bigint auto_increment
         primary key,
-    notice_id  bigint                                    not null,
-    image_url  varchar(512)                              not null,
-    sequence   int                                       not null,
-    created_at timestamp(6) default CURRENT_TIMESTAMP(6) not null on update CURRENT_TIMESTAMP(6),
-    updated_at timestamp(6) default CURRENT_TIMESTAMP(6) not null on update CURRENT_TIMESTAMP(6),
-    constraint notice_images_notices_notice_id_fk
+    notice_id  bigint                                   not null,
+    image_url  varchar(512)                             not null,
+    sequence   int                                      not null,
+    created_at datetime(6) default CURRENT_TIMESTAMP(6) not null,
+    updated_at datetime(6) default CURRENT_TIMESTAMP(6) not null,
+    constraint notice_images_ibfk_1
         foreign key (notice_id) references notices (notice_id)
+            on update cascade
 );
+
+create index notice_images_notices_notice_id_fk
+    on notice_images (notice_id);
 
 create index notices_admins_admin_id_fk
     on notices (admin_id);
@@ -415,12 +420,13 @@ create table user_restrictions
 (
     user_restriction_id bigint auto_increment
         primary key,
-    user_id             bigint                                   not null,
-    admin_id            bigint                                   not null,
-    reason              text                                     null,
-    ends_at             date                                     null,
-    created_at          datetime(6) default CURRENT_TIMESTAMP(6) not null,
-    updated_at          datetime(6) default CURRENT_TIMESTAMP(6) not null,
+    user_id             bigint                                         not null,
+    admin_id            bigint                                         not null,
+    type                enum ('suspend', 'ban', 'canceled', 'expired') not null,
+    reason              text                                           null,
+    ends_at             date                                           null,
+    created_at          datetime(6) default CURRENT_TIMESTAMP(6)       not null,
+    updated_at          datetime(6) default CURRENT_TIMESTAMP(6)       not null,
     constraint user_restrictions_ibfk_1
         foreign key (user_id) references users (user_id)
             on update cascade,
