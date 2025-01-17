@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node index.js",
     "dev": "nodemon index.js --host 0.0.0.0",
     "format": "prettier --write .",
@@ -15,8 +15,10 @@
   "license": "MIT",
   "description": "backend server for spectogether",
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.7",
     "prettier": "^3.4.2",
+    "supertest": "^7.0.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },

@@ -1,8 +1,13 @@
-const jwt = require("jsonwebtoken");
-const logger = require("../logger"); // 로거 설정 경로에 맞게 수정
-const { UnauthorizedError, NotAllowedError } = require("../errors");
-const { decrypt62 } = require("../utils/encrypt.util");
-const { JWT_SECRET } = require("../config.json").SERVER;
+import jwt from "jsonwebtoken";
+
+import logger from "../utils/logger/logger.js";
+import config from "../config.json" with { type: "json" };
+import {
+  TokenError,
+  NotAllowedError,
+  UnauthorizedError,
+} from "../utils/errors/errors.js";
+const { JWT_SECRET } = config.SERVER;
 
 /**
  * Bearer 토큰을 추출하고 검증하는 미들웨어
@@ -10,41 +15,48 @@ const { JWT_SECRET } = require("../config.json").SERVER;
 const authenticateAccessToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (authHeader && authHeader.startsWith("Bearer ")) {
+  // Authorization 헤더가 없는 경우
+  // 401 반환
+  if (!authHeader)
+    next(new UnauthorizedError("Authorization 헤더가 제공되지 않았습니다."));
+  // Bearer Token인지 확인하기
+  if (authHeader.startsWith("Bearer ")) {
     const token = authHeader.split(" ")[1];
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
       if (err) {
-        logger.warn(`[authenticateAccessToken] 토큰 검증 실패: ${err.message}`);
-        next(
-          new NotAllowedError({
-            message: "토큰이 유효하지 않습니다.",
-            jwt_message: err.message,
-          })
+        logger.debug(
+          `[authenticateAccessToken] 토큰 검증 실패: ${err.message}`
         );
+
+        if (err.name === "TokenExpiredError") {
+          next(new TokenError("만료된 토큰입니다."));
+        } else if (err.name === "JsonWebTokenError") {
+          next(new TokenError("토큰이 올바르지 않습니다."));
+        } else if (err.name === "NotBeforeError") {
+          next(new TokenError("아직 유효하지 않은 토큰입니다."));
+        } else {
+          next(new TokenError("알 수 없는 JWT 에러가 발생했습니다."));
+        }
         return;
       }
-
-      let { user_id, name, nickname } = user;
 
       // payload 안의 user_id를 암호화하여 전달했을 경우 복호화
       // user_id = parseInt(decrypt62(user_id));
 
       req.user = {
-        user_id,
-        name,
-        nickname,
+        userId: user.userId,
       }; // 검증된 사용자 정보를 요청 객체에 추가
       next();
     });
   } else {
-    logger.error("[authenticateAccessToken] 인증 헤더가 누락되었습니다.");
     next(new UnauthorizedError("Authorization이 제공되지 않았습니다."));
   }
 };
 
-// 일단은 만드는 김에 같이 만들긴 했는데
-// handleReissueToken에서 이미 따로 작성을 한 상태라 사용될지는 모르곘음
+/**
+ * RefreshToken을 검증하는 미들웨어
+ */
 const authenticateRefreshToken = (req, res, next) => {
   const refreshToken = req.cookies.PEEKLE_RT;
 
@@ -53,22 +65,24 @@ const authenticateRefreshToken = (req, res, next) => {
     next(new UnauthorizedError("RefreshToekn이 제공되지 않았습니다."));
   }
 
-  jwt.verify(refreshToken, JWT_SECRET, (err, user) => {
+  jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      logger.error(`[authenticateRefreshToken] 토큰 검증 실패: ${err.message}`);
-      next(
-        new NotAllowedError({
-          message: "토큰이 유효하지 않습니다.",
-          jwt_message: err.message,
-        })
-      );
+      logger.debug(`[authenticateAccessToken] 토큰 검증 실패: ${err.message}`);
+
+      if (err.name === "TokenExpiredError") {
+        next(new TokenError("만료된 토큰입니다."));
+      } else if (err.name === "JsonWebTokenError") {
+        next(new TokenError("토큰이 올바르지 않습니다."));
+      } else if (err.name === "NotBeforeError") {
+        next(new TokenError("아직 유효하지 않은 토큰입니다."));
+      } else {
+        next(new TokenError("알 수 없는 JWT 에러가 발생했습니다."));
+      }
+      return;
     }
 
-    let { user_id } = user;
-    user_id = parseInt(decrypt62(user_id));
-
     req.user = {
-      user_id,
+      userId: user.userId,
     }; // 검증된 사용자 정보를 요청 객체에 추가
     next();
   });
