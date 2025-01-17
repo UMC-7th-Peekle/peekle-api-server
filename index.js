@@ -24,18 +24,9 @@ import {
 
 import swaggerUi from "swagger-ui-express";
 import { specs } from "./utils/swagger/swagger.js";
-//import { corsOptions /*, sslOptions */ } from "./options";
 
-// Routers는 이 주석 아래에 import 해주시면 됩니다.
-// ex) const exampleRouter = require("./routes/example.router"); // commonJS
-// ex) import * as exampleRouter from "./routes/example.router"; // ES6
-import adminRouter from "./routes/admin.router.js";
-import authRouter from "./routes/auth.router.js";
-import communityRouter from "./routes/community.router.js";
-import eventsRouter from "./routes/events.router.js";
-import noticesRouter from "./routes/notices.router.js";
-import ticketsRouter from "./routes/tickets.router.js";
-import usersRouter from "./routes/users.router.js";
+// Router import , /routes/index.js에서 Router들을 1차적으로 모아서 export 합니다.
+import routers from "./routes/index.js";
 
 // Socket.io Router는 이 주석 아래에 import 해주시면 됩니다.
 // ex) const exampleSocketRouter = require("./routes/example.socket.router"); // commonJS
@@ -48,7 +39,7 @@ app.use(responseHandler);
 
 app.use(cookieParser());
 app.use(cors(corsOptions));
-app.use(morgan("dev"));
+app.use(morgan("dev")); // morgan logger
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -58,13 +49,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // 이 주석 하단에 Router들을 use 해주시면 됩니다.
 // ex) app.use("/example", exampleRouter);
-app.use("/admin", adminRouter);
-app.use("/auth", authRouter);
-app.use("/community", communityRouter);
-app.use("/events", eventsRouter);
-app.use("/notices", noticesRouter);
-app.use("/tickets", ticketsRouter);
-app.use("/users", usersRouter);
+app.use("/", routers);
 
 // 에러 핸들러는 최하단에 위치해야 하는 미들웨어입니다. 절대 순서를 변경하지 마세요.
 app.use(errorHandler);
