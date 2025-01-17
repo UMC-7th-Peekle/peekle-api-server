@@ -29,6 +29,10 @@ export default class ArticleComments extends Model {
       },
       field: 'parent_comment_id'
     },
+    status: {
+      type: DataTypes.ENUM('active','deleted','reported'),
+      allowNull: false
+    },
     authorId: {
       type: DataTypes.BIGINT,
       allowNull: false,

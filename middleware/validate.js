@@ -1,4 +1,4 @@
-const { InvalidInputError } = require("../errors");
+import { AjvError } from "../utils/errors/errors.js";
 
 /**
  * 요청 데이터를 주어진 스키마로 검증하는 미들웨어 생성기.
@@ -11,9 +11,7 @@ const validate = (schema) => {
 
     if (!isValid) {
       const errorDetails = formatErrors(schema.errors);
-      return next(
-        new InvalidInputError("유효하지 않은 입력입니다.", errorDetails)
-      );
+      return next(new AjvError("유효하지 않은 입력입니다.", errorDetails));
     }
 
     next();

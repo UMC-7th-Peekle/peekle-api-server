@@ -73,6 +73,24 @@ export class UnauthorizedError extends CustomError {
 }
 
 /**
+ * JWT 토큰에 문제가 있는 경우
+ */
+export class TokenError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "CHECK_JWT_TOKEN", 401, data);
+  }
+}
+
+/**
+ * request 형식이 올바르지 않은 경우
+ */
+export class AjvError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "AJV_INVALID_INPUT", 400, data);
+  }
+}
+
+/**
  * 디버깅용
  */
 export class UnknownError extends CustomError {
