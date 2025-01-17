@@ -1,11 +1,12 @@
 // Written by Kyeoung Woon Park https://github.com/kyeoungwoon
+// Template Repository: https://github.com/kyeoungwoon/nodejs-api-server-template
 
 // npm 패키지 import
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import path from "node:path";
+import path from "path";
 import http from "http";
 // import https from "https"; // https를 사용해야 하는 경우 사용하면 됩니다.
 // import { Server } from "socket.io"; // socket을 사용하려면 주석 해제
@@ -30,7 +31,7 @@ import routers from "./routes/index.js";
 
 // Socket.io Router는 이 주석 아래에 import 해주시면 됩니다.
 // ex) const exampleSocketRouter = require("./routes/example.socket.router"); // commonJS
-// ex) import * as exampleSocketRouter from "./routes/example.socket.router"; // ES6
+// ex) import exampleSocketRouter from "./routes/example.socket.router"; // ES6
 
 // ** 중요 ** 미들웨어 순서를 변경할 때는 신경써서 작업해 주세요.
 const app = express();
@@ -47,8 +48,7 @@ app.use(express.urlencoded({ extended: false }));
 // Swagger 설정
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-// 이 주석 하단에 Router들을 use 해주시면 됩니다.
-// ex) app.use("/example", exampleRouter);
+// Router 연결
 app.use("/", routers);
 
 // 에러 핸들러는 최하단에 위치해야 하는 미들웨어입니다. 절대 순서를 변경하지 마세요.

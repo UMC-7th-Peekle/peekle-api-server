@@ -46,7 +46,7 @@ const authenticateAccessToken = (req, res, next) => {
 // 일단은 만드는 김에 같이 만들긴 했는데
 // handleReissueToken에서 이미 따로 작성을 한 상태라 사용될지는 모르곘음
 const authenticateRefreshToken = (req, res, next) => {
-  const refreshToken = req.cookies.SPECTOGETHER_RT;
+  const refreshToken = req.cookies.PEEKLE_RT;
 
   if (!refreshToken) {
     logger.error("[authenticateRefreshToken] 쿠키에 RefreshToken이 없습니다.");
