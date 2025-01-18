@@ -12,7 +12,7 @@ export default class Reports extends Model {
       field: 'report_id'
     },
     type: {
-      type: DataTypes.ENUM('user','article','comment'),
+      type: DataTypes.ENUM('user','article','comment','event'),
       allowNull: false
     },
     targetId: {
