@@ -1,26 +1,18 @@
 import { Router } from "express";
-import { emptyController } from "../controllers/empty.cotroller.js";
+import { notImplementedController } from "../controllers/empty.cotroller.js";
 
 const router = Router();
 
-/**
- * get /?scrapped=true&query=검색어 - 이벤트 목록을 가져옵니다. scrapped가 true이면 스크랩한 이벤트 목록을 가져옵니다. query가 있으면 검색어를 포함하는 이벤트 목록을 가져옵니다.
- */
-router.get("/", emptyController);
+// 이벤트 목록 조회
+// query를 통해 scrapped 여부, category, page, size를 받을 수 있음
+router.get("/", notImplementedController);
+router.get("/:eventId", notImplementedController);
 
-/**
- * get /:eventId - 이벤트 상세 정보를 가져옵니다.
- */
-router.get("/:eventId", emptyController);
+// 이벤트 스크랩하기
+router.post("/:eventId/scrap", notImplementedController);
+router.delete("/:eventId/scrap", notImplementedController);
 
-/**
- * patch /:eventId/scrap - 이벤트를 스크랩합니다.
- */
-router.patch("/:eventId/scrap", emptyController);
-
-/**
- * delete /:eventId/scrap - 이벤트 스크랩을 취소합니다.
- */
-router.delete("/:eventId/scrap", emptyController);
+// 이벤트 신고하기
+router.post("/:eventId/report", notImplementedController);
 
 export default router;
