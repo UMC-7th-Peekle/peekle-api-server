@@ -22,7 +22,6 @@ import _TicketMessages from  "./TicketMessages.js";
 import _Tickets from  "./Tickets.js";
 import _UserBlocks from  "./UserBlocks.js";
 import _UserFilters from  "./UserFilters.js";
-import _UserLocal from  "./UserLocal.js";
 import _UserOauth from  "./UserOauth.js";
 import _UserRestrictions from  "./UserRestrictions.js";
 import _UserTerms from  "./UserTerms.js";
@@ -52,7 +51,6 @@ export default function initModels(sequelize) {
   const Tickets = _Tickets.init(sequelize, DataTypes);
   const UserBlocks = _UserBlocks.init(sequelize, DataTypes);
   const UserFilters = _UserFilters.init(sequelize, DataTypes);
-  const UserLocal = _UserLocal.init(sequelize, DataTypes);
   const UserOauth = _UserOauth.init(sequelize, DataTypes);
   const UserRestrictions = _UserRestrictions.init(sequelize, DataTypes);
   const UserTerms = _UserTerms.init(sequelize, DataTypes);
@@ -115,8 +113,6 @@ export default function initModels(sequelize) {
   Users.hasMany(UserBlocks, { as: "blockedUserUserBlocks", foreignKey: "blockedUserId"});
   UserFilters.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserFilters, { as: "userFilters", foreignKey: "userId"});
-  UserLocal.belongsTo(Users, { as: "user", foreignKey: "userId"});
-  Users.hasOne(UserLocal, { as: "userLocal", foreignKey: "userId"});
   UserOauth.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserOauth, { as: "userOauths", foreignKey: "userId"});
   UserRestrictions.belongsTo(Users, { as: "user", foreignKey: "userId"});
@@ -147,7 +143,6 @@ export default function initModels(sequelize) {
     Tickets,
     UserBlocks,
     UserFilters,
-    UserLocal,
     UserOauth,
     UserRestrictions,
     UserTerms,

@@ -7,6 +7,7 @@ import {
 import {
   AlreadyExistsError,
   InvalidCodeError,
+  InvalidInputError,
   NotExistsError,
   TimeOutError,
   TooManyRequest,
@@ -54,16 +55,24 @@ export const sendTokenToPhone = async ({ phone }) => {
   return encrypt62(record.sessionId);
 };
 
-export const verifyToken = async ({ id, token }) => {
+export const verifyToken = async ({ id, token, phone }) => {
   // 1. DB에 존재하는 인증 세션인지 조회
   const decryptedId = decrypt62(id);
   logger.debug(`[verifyToken] decryptedId: ${decryptedId}`);
+
   const record = await db.VerificationCode.findByPk(decryptedId, {
     attributes: ["sessionId", "attempts", "code", "createdAt"],
+    where: {
+      isVerified: false,
+    },
   });
-  // 1-1. 존재하지 않는 세션인 경우 에러 리턴S
+  // 1-1. 존재하지 않는 세션인 경우 에러 리턴
   if (!record) {
     throw new NotExistsError("존재하지 않는 인증 세션입니다.");
+  }
+
+  if (record.identifierValue !== phone) {
+    throw new InvalidInputError("인증하려는 전화번호가 아닙니다.");
   }
 
   // 2. 인증 시간 (5분을 초과하지는 않았는지 확인)
@@ -112,4 +121,20 @@ export const verifyToken = async ({ id, token }) => {
     // 추후 일괄적으로 삭제하는 로직을 구성할 필요가 있습니다.
     return true;
   }
+};
+
+export const getPhoneBySessionId = async ({ id }) => {
+  const decryptedId = decrypt62(id);
+  const record = await db.VerificationCode.findByPk(decryptedId, {
+    attributes: ["identifierValue"],
+    where: {
+      isVerified: true,
+    },
+  });
+
+  if (!record) {
+    throw new InvalidInputError("잘못된 인증 세션 ID 입니다.");
+  }
+
+  return record.identifierValue;
 };

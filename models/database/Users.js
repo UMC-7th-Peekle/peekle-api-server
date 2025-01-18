@@ -37,7 +37,7 @@ export default class Users extends Model {
     },
     lastNicknameChangeDate: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
       field: 'last_nickname_change_date'
     },
     profileImage: {
@@ -47,11 +47,13 @@ export default class Users extends Model {
     },
     status: {
       type: DataTypes.ENUM('active','dormant','terminated'),
-      allowNull: false
+      allowNull: false,
+      defaultValue: "active"
     },
     lastActivityDate: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE(6),
       allowNull: false,
+      defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)"),
       field: 'last_activity_date'
     },
     dormantDate: {

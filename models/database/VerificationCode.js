@@ -25,6 +25,12 @@ export default class VerificationCode extends Model {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    isVerified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: 0,
+      field: 'is_verified'
+    },
     code: {
       type: DataTypes.STRING(6),
       allowNull: false
