@@ -27,6 +27,7 @@ import _UserOauth from  "./UserOauth.js";
 import _UserRestrictions from  "./UserRestrictions.js";
 import _UserTerms from  "./UserTerms.js";
 import _Users from  "./Users.js";
+import _VerificationCode from  "./VerificationCode.js";
 
 export default function initModels(sequelize) {
   const Admins = _Admins.init(sequelize, DataTypes);
@@ -56,6 +57,7 @@ export default function initModels(sequelize) {
   const UserRestrictions = _UserRestrictions.init(sequelize, DataTypes);
   const UserTerms = _UserTerms.init(sequelize, DataTypes);
   const Users = _Users.init(sequelize, DataTypes);
+  const VerificationCode = _VerificationCode.init(sequelize, DataTypes);
 
   Notices.belongsTo(Admins, { as: "admin", foreignKey: "adminId"});
   Admins.hasMany(Notices, { as: "notices", foreignKey: "adminId"});
@@ -150,5 +152,6 @@ export default function initModels(sequelize) {
     UserRestrictions,
     UserTerms,
     Users,
+    VerificationCode,
   };
 }
