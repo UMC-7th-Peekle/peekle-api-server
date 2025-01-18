@@ -60,18 +60,26 @@ export const verifyToken = async ({ id, token, phone }) => {
   const decryptedId = decrypt62(id);
   logger.debug(`[verifyToken] decryptedId: ${decryptedId}`);
 
-  const record = await db.VerificationCode.findByPk(decryptedId, {
+  const record = await db.VerificationCode.findOne({
     attributes: ["sessionId", "attempts", "code", "createdAt"],
     where: {
+      sessionId: decryptedId,
       isVerified: false,
     },
   });
+  logger.debug(`[verifyToken] record: ${JSON.stringify(record, null, 2)}`);
   // 1-1. 존재하지 않는 세션인 경우 에러 리턴
   if (!record) {
-    throw new NotExistsError("존재하지 않는 인증 세션입니다.");
+    throw new NotExistsError(
+      "이미 인증되었거나, 존재하지 않는 인증 세션입니다."
+    );
   }
 
+  // 1-2. 인증하려는 전화번호가 일치하는지 확인
   if (record.identifierValue !== phone) {
+    logger.error(
+      `[verifyToken] 인증 세션과 다른 전화번호로 인증을 시도하였습니다. sessionId: ${decryptedId}, phone: ${phone}, identifierValue: ${record.identifierValue}`
+    );
     throw new InvalidInputError("인증하려는 전화번호가 아닙니다.");
   }
 
@@ -125,9 +133,10 @@ export const verifyToken = async ({ id, token, phone }) => {
 
 export const getPhoneBySessionId = async ({ id }) => {
   const decryptedId = decrypt62(id);
-  const record = await db.VerificationCode.findByPk(decryptedId, {
+  const record = await db.VerificationCode.findOne({
     attributes: ["identifierValue"],
     where: {
+      sessionId: decryptedId,
       isVerified: true,
     },
   });
