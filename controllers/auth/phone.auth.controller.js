@@ -33,8 +33,8 @@ export const verifyToken = async (req, res, next) => {
   try {
     const { phoneVerificationSessionId, phoneVerificationCode } = req.body;
     await phoneService.verifyToken({
-      phoneVerificationSessionId,
-      phoneVerificationCode,
+      id: phoneVerificationSessionId,
+      token: phoneVerificationCode,
     });
     return res.status(200).success({ message: "인증에 성공했습니다." });
   } catch (error) {

@@ -7,6 +7,7 @@ import {
 import {
   AlreadyExistsError,
   InvalidCodeError,
+  NotExistsError,
   TimeOutError,
   TooManyRequest,
 } from "../../utils/errors/errors.js";
@@ -60,7 +61,7 @@ export const verifyToken = async ({ id, token }) => {
   const record = await db.VerificationCode.findByPk(decryptedId, {
     attributes: ["sessionId", "attempts", "code", "createdAt"],
   });
-  // 1-1. 존재하지 않는 세션인 경우 에러 리턴
+  // 1-1. 존재하지 않는 세션인 경우 에러 리턴S
   if (!record) {
     throw new NotExistsError("존재하지 않는 인증 세션입니다.");
   }
@@ -90,7 +91,7 @@ export const verifyToken = async ({ id, token }) => {
   // 4. 토큰 비교
   if (record.code !== token) {
     // 4-1. 토큰이 일치하지 않는 경우 attempts 증가 후 에러 리턴
-    record.attempt += 1;
+    record.attempts += 1;
     await record.save();
     throw new InvalidCodeError("인증 코드가 일치하지 않습니다.", {
       currentAttempts: record.attempts,

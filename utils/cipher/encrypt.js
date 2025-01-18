@@ -94,7 +94,7 @@ export const decrypt62 = (encryptedText) => {
     return decrypted.toString("utf8");
   } catch (err) {
     logger.error(`복호화 오류: ${err.message}`, { stack: err.stack });
-    throw new InvalidInputError("올바르지 않은 입력값입니다.");
+    throw new CipherError("올바르지 않은 입력값입니다.");
   }
 };
 
