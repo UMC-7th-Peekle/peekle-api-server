@@ -2,7 +2,7 @@ import models from "../../models/index.js";
 
 const PROFILE_IMAGE_DEFAULT = "sample.jpg";
 
-const register = async (data) => {
+export const register = async (data) => {
   const newUserData = {
     name: data.name,
     nickname: data.nickname,

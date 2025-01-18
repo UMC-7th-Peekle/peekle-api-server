@@ -131,7 +131,7 @@ export const verifyToken = async ({ id, token, phone }) => {
   }
 };
 
-export const getPhoneBySessionId = async ({ id }) => {
+export const getPhoneBySessionId = async ({ id, phone }) => {
   const decryptedId = decrypt62(id);
   const record = await db.VerificationCode.findOne({
     attributes: ["identifierValue"],
@@ -142,7 +142,13 @@ export const getPhoneBySessionId = async ({ id }) => {
   });
 
   if (!record) {
-    throw new InvalidInputError("잘못된 인증 세션 ID 입니다.");
+    throw new InvalidInputError(
+      "인증되지 않았거나, 존재하지 않는 세션 ID 입니다."
+    );
+  }
+
+  if (record.identifierValue !== phone) {
+    throw new InvalidInputError("인증되지 않은 전화번호 입니다.");
   }
 
   return record.identifierValue;
