@@ -1,3 +1,17 @@
+# Validator
+
+하단 예시는 CommonJS로 작성된 validation schema file 입니다.  
+controller의 구분과 동일한 수준으로 하위 폴더를 나누어 관리해주세요.  
+각 Endpoint 마다 적용되는 validator 특성 상 `./validator` 안에 파일들만 존재하면 난잡해집니다.
+
+image upload를 다루는 multer의 경우에, multipart/form-data를 활용하게 될 텐데  
+multer에서 자동으로 req.body에 나머지 텍스트 데이터는 넣어주니 동일하게 검증하면 되겠습니다.
+
+대신 미들웨어 순서가 multer가 먼저 와야 한다는 점은 잊으면 안됩니다.
+
+여기서 작성한 schema는 거의 수정 없이 swagger schema를 작성할 때 사용될 수 있으니 신경써서 작업해주세요.
+
+```js
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
 
@@ -147,3 +161,4 @@ module.exports = {
   resetPassword,
   changePassword,
 };
+```

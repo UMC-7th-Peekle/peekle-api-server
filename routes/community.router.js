@@ -1,61 +1,51 @@
 import { Router } from "express";
-import { emptyController } from "../controllers/empty.cotroller.js";
+import { notImplementedController } from "../controllers/empty.cotroller.js";
 
 const router = Router();
 
-/**
- * communityId에 해당하는 게시판의 게시글들을 가져옵니다, 좋아요 누른 게시글만 가져올 수도 있습니다
- */
-router.get("/:communityId", emptyController);
+// 관리자 메뉴 : 게시판 생성
+router.post("/", notImplementedController);
 
-/**
- * 검색어를 포함하는 게시글을 가져옵니다
- */
-router.get("/:communityId/search", emptyController);
+// 게시글 조회
+router.get("/:communityId", notImplementedController);
+router.get("/:communityId/search", notImplementedController);
 
-/**
- * communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 가져옵니다
- */
-router.get("/:communityId/:articleId", emptyController);
+// 게시글 생성, 수정, 삭제
+router.get("/:communityId/articles/:articleId", notImplementedController);
+router.post("/:communityId/articles", notImplementedController);
+router.patch("/:communityId/articles/:articleId", notImplementedController);
+router.delete("/:communityId/articles/:articleId", notImplementedController);
 
-/**
- * communityId에 해당하는 게시판에 게시글을 추가합니다
- */
-router.post("/:communityId", emptyController);
+// 게시글 좋아요 및 좋아요 취소
+router.post("/:communityId/articles/:articleId/like", notImplementedController);
+router.delete(
+  "/:communityId/articles/:articleId/like",
+  notImplementedController
+);
 
-/**
- * communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 수정합니다
- */
-router.patch("/:communityId/:articleId", emptyController);
+// 댓글 생성, 수정, 삭제, 대댓글
+router.post(
+  "/:communityId/articles/:articleId/comments",
+  notImplementedController
+);
+router.patch(
+  "/:communityId/articles/:articleId/comments/:commentId",
+  notImplementedController
+);
+router.delete(
+  "/:communityId/articles/:articleId/comments/:commentId",
+  notImplementedController
+);
 
-/**
- * communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 삭제합니다
- */
-router.delete("/:communityId/:articleId", emptyController);
+router.post(
+  "/:communityId/articles/:articleId/comments/:commentId/reply",
+  notImplementedController
+);
 
-/**
- * article에 좋아요 표시 및 취소
- */
-router.patch("/:communityId/:articleId/like", emptyController);
-
-/**
- * article에 댓글을 추가합니다
- */
-router.post("/:communityId/:articleId/comments", emptyController);
-
-/**
- * article에 댓글을 수정합니다. 대댓글도 포함
- */
-router.patch("/:communityId/:articleId/comments/:commentId", emptyController);
-
-/**
- * article에 댓글을 삭제합니다
- */
-router.delete("/:communityId/:articleId/comments/:commentId", emptyController);
-
-/**
- * article에 댓글에 대댓글을 추가합니다
- */
-router.post("/:communityId/:articleId/comments/:commentId", emptyController);
+// 게시글 신고
+router.post(
+  "/:communityId/articles/:articleId/report",
+  notImplementedController
+);
 
 export default router;

@@ -1,38 +1,38 @@
 import _sequelize from "sequelize";
 const { Model, Sequelize } = _sequelize;
 
-export default class Terms extends Model {
+export default class Reports extends Model {
   static init(sequelize, DataTypes) {
     return super.init(
       {
-        termId: {
+        reportId: {
           autoIncrement: true,
           type: DataTypes.BIGINT,
           allowNull: false,
           primaryKey: true,
-          field: "term_id",
+          field: "report_id",
         },
-        title: {
-          type: DataTypes.STRING(512),
-          allowNull: true,
-        },
-        content: {
-          type: DataTypes.TEXT,
+        type: {
+          type: DataTypes.ENUM("user", "article", "comment"),
           allowNull: false,
         },
-        isRequired: {
-          type: DataTypes.BOOLEAN,
+        targetId: {
+          type: DataTypes.BIGINT,
           allowNull: false,
-          field: "is_required",
+          field: "target_id",
         },
-        status: {
-          type: DataTypes.ENUM("active", "inactive", "pending"),
+        reportedUserId: {
+          type: DataTypes.BIGINT,
           allowNull: false,
+          references: {
+            model: "users",
+            key: "user_id",
+          },
+          field: "reported_user_id",
         },
-        version: {
-          type: DataTypes.INTEGER,
+        reason: {
+          type: DataTypes.STRING(1024),
           allowNull: false,
-          defaultValue: 0,
         },
         createdAt: {
           type: DataTypes.DATE(6),
@@ -49,14 +49,19 @@ export default class Terms extends Model {
       },
       {
         sequelize,
-        tableName: "terms",
+        tableName: "reports",
         timestamps: false,
         indexes: [
           {
             name: "PRIMARY",
             unique: true,
             using: "BTREE",
-            fields: [{ name: "term_id" }],
+            fields: [{ name: "report_id" }],
+          },
+          {
+            name: "reports_users_user_id_fk",
+            using: "BTREE",
+            fields: [{ name: "reported_user_id" }],
           },
         ],
       }

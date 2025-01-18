@@ -1,38 +1,44 @@
 import _sequelize from "sequelize";
 const { Model, Sequelize } = _sequelize;
 
-export default class Articles extends Model {
+export default class UserBlocks extends Model {
   static init(sequelize, DataTypes) {
     return super.init(
       {
-        articleId: {
+        blockId: {
           autoIncrement: true,
           type: DataTypes.BIGINT,
           allowNull: false,
           primaryKey: true,
-          field: "article_id",
+          field: "block_id",
         },
-        title: {
+        blockerUserId: {
+          type: DataTypes.BIGINT,
+          allowNull: false,
+          comment: "차단을 하는 사람",
+          references: {
+            model: "users",
+            key: "user_id",
+          },
+          field: "blocker_user_id",
+        },
+        blockedUserId: {
+          type: DataTypes.BIGINT,
+          allowNull: false,
+          comment: "차단 당한 사람",
+          references: {
+            model: "users",
+            key: "user_id",
+          },
+          field: "blocked_user_id",
+        },
+        reason: {
           type: DataTypes.STRING(512),
           allowNull: false,
         },
-        content: {
-          type: DataTypes.TEXT,
+        status: {
+          type: DataTypes.ENUM("active", "deleted"),
           allowNull: false,
-        },
-        authorId: {
-          type: DataTypes.BIGINT,
-          allowNull: false,
-          field: "author_id",
-        },
-        communityId: {
-          type: DataTypes.BIGINT,
-          allowNull: false,
-          references: {
-            model: "communities",
-            key: "community_id",
-          },
-          field: "community_id",
         },
         createdAt: {
           type: DataTypes.DATE(6),
@@ -49,24 +55,24 @@ export default class Articles extends Model {
       },
       {
         sequelize,
-        tableName: "articles",
+        tableName: "user_blocks",
         timestamps: false,
         indexes: [
           {
             name: "PRIMARY",
             unique: true,
             using: "BTREE",
-            fields: [{ name: "article_id" }],
+            fields: [{ name: "block_id" }],
           },
           {
-            name: "articles_communities_community_id_fk",
+            name: "user_blocks_users_user_id_fk",
             using: "BTREE",
-            fields: [{ name: "community_id" }],
+            fields: [{ name: "blocker_user_id" }],
           },
           {
-            name: "community_article_user_user_id_fk",
+            name: "user_blocks_users_user_id_fk_2",
             using: "BTREE",
-            fields: [{ name: "author_id" }],
+            fields: [{ name: "blocked_user_id" }],
           },
         ],
       }

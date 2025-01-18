@@ -1,2 +1,2 @@
-export const emptyController = (req, res) =>
-  res.status(418).success({ message: "I'm a teapot" });
+export const notImplementedController = (req, res) =>
+  res.status(501).success({ message: "아직 구현되지 않은 기능입니다." });

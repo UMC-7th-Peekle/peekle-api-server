@@ -1,31 +1,24 @@
 import { Router } from "express";
-import { emptyController } from "../controllers/empty.cotroller.js";
+import { notImplementedController } from "../controllers/empty.cotroller.js";
 
 const router = Router();
 
-/**
- * 내 정보 조회
- */
-router.get("/me", emptyController);
+// 사용자 정보 조회
+router.get("/me", notImplementedController);
+router.get("/terms", notImplementedController);
 
-/**
- * 내 정보 수정 (닉네임)
- */
-router.patch("/me/nickname", emptyController);
+// 사용자 정보 수정
+router.patch("/me/nickname", notImplementedController);
+router.patch("/me/profile-image", notImplementedController);
+router.delete("/me/profile-image", notImplementedController);
+router.patch("/me/phone", notImplementedController);
 
-/**
- * 내 정보 수정 (프로필 이미지)
- */
-router.patch("/me/profile-image", emptyController);
+// 사용자 차단, 신고
+router.get("/block", notImplementedController);
+router.post("/:userId/block", notImplementedController);
+router.delete("/:userId/block", notImplementedController);
 
-/**
- * 내 정보 수정 (전화번호)
- */
-router.patch("/me/phone", emptyController);
-
-/**
- * 내가 동의한 약관 조회
- */
-router.get("/terms", emptyController);
+// 사용자 신고
+router.post("/:userId/report", notImplementedController);
 
 export default router;
