@@ -1,32 +1,39 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Tickets extends Model {
+export default class VerificationCode extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    ticketId: {
+    sessionId: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      field: 'ticket_id'
+      field: 'session_id'
     },
-    title: {
-      type: DataTypes.STRING(512),
-      allowNull: false
-    },
-    status: {
-      type: DataTypes.ENUM('open','closed','in_progress','deleted'),
-      allowNull: false
-    },
-    createdUserId: {
-      type: DataTypes.BIGINT,
+    identifierType: {
+      type: DataTypes.ENUM('phone','email'),
       allowNull: false,
-      references: {
-        model: 'users',
-        key: 'user_id'
-      },
-      field: 'created_user_id'
+      field: 'identifier_type'
+    },
+    identifierValue: {
+      type: DataTypes.STRING(512),
+      allowNull: false,
+      field: 'identifier_value'
+    },
+    attempts: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    isVerified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: 0,
+      field: 'is_verified'
+    },
+    code: {
+      type: DataTypes.STRING(6),
+      allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -42,7 +49,7 @@ export default class Tickets extends Model {
     }
   }, {
     sequelize,
-    tableName: 'tickets',
+    tableName: 'verification_code',
     timestamps: false,
     indexes: [
       {
@@ -50,14 +57,7 @@ export default class Tickets extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "ticket_id" },
-        ]
-      },
-      {
-        name: "tickets_users_user_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "created_user_id" },
+          { name: "session_id" },
         ]
       },
     ]

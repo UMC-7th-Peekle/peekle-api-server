@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { emptyController } from "../controllers/empty.cotroller.js";
+import articleController from "../controllers/article.contoller.js";
+
 
 const router = Router();
 
@@ -16,22 +18,22 @@ router.get("/:communityId/search", emptyController);
 /**
  * communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 가져옵니다
  */
-router.get("/:communityId/:articleId", emptyController);
+router.get("/:communityId/articles/:articleId", articleController.getArticleById);
 
 /**
  * communityId에 해당하는 게시판에 게시글을 추가합니다
  */
-router.post("/:communityId", emptyController);
+router.post("/:communityId/articles", articleController.createArticle);
 
 /**
  * communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 수정합니다
  */
-router.patch("/:communityId/:articleId", emptyController);
+router.patch("/:communityId/articles/:articleId", articleController.updateArticle); // jwtMiddleware 추가해야 함
 
 /**
  * communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 삭제합니다
  */
-router.delete("/:communityId/:articleId", emptyController);
+router.delete("/:communityId/articles/:articleId", articleController.deleteArticle); // jwtMiddleware 추가해야 함
 
 /**
  * article에 좋아요 표시 및 취소

@@ -12,7 +12,7 @@ const routers = Router();
 
 routers.use("/admin", adminRouter);
 routers.use("/auth", authRouter);
-routers.use("/communities", communityRouter);
+routers.use("/community", communityRouter);
 routers.use("/events", eventsRouter);
 routers.use("/notices", noticesRouter);
 routers.use("/tickets", ticketsRouter);

@@ -28,14 +28,14 @@ export default class TicketMessages extends Model {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    createdBy: {
+    createdUserId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
         model: 'users',
         key: 'user_id'
       },
-      field: 'created_by'
+      field: 'created_user_id'
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -73,7 +73,7 @@ export default class TicketMessages extends Model {
         name: "ticket_messages_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "created_by" },
+          { name: "created_user_id" },
         ]
       },
     ]

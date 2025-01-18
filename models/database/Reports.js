@@ -1,32 +1,37 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Tickets extends Model {
+export default class Reports extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    ticketId: {
+    reportId: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      field: 'ticket_id'
+      field: 'report_id'
     },
-    title: {
-      type: DataTypes.STRING(512),
+    type: {
+      type: DataTypes.ENUM('user','article','comment','event'),
       allowNull: false
     },
-    status: {
-      type: DataTypes.ENUM('open','closed','in_progress','deleted'),
-      allowNull: false
+    targetId: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      field: 'target_id'
     },
-    createdUserId: {
+    reportedUserId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
         model: 'users',
         key: 'user_id'
       },
-      field: 'created_user_id'
+      field: 'reported_user_id'
+    },
+    reason: {
+      type: DataTypes.STRING(1024),
+      allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -42,7 +47,7 @@ export default class Tickets extends Model {
     }
   }, {
     sequelize,
-    tableName: 'tickets',
+    tableName: 'reports',
     timestamps: false,
     indexes: [
       {
@@ -50,14 +55,14 @@ export default class Tickets extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "ticket_id" },
+          { name: "report_id" },
         ]
       },
       {
-        name: "tickets_users_user_id_fk",
+        name: "reports_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "created_user_id" },
+          { name: "reported_user_id" },
         ]
       },
     ]

@@ -15,16 +15,18 @@ import _Events from  "./Events.js";
 import _NoticeCategory from  "./NoticeCategory.js";
 import _NoticeImages from  "./NoticeImages.js";
 import _Notices from  "./Notices.js";
+import _Reports from  "./Reports.js";
 import _Terms from  "./Terms.js";
 import _TicketMessageImages from  "./TicketMessageImages.js";
 import _TicketMessages from  "./TicketMessages.js";
 import _Tickets from  "./Tickets.js";
+import _UserBlocks from  "./UserBlocks.js";
 import _UserFilters from  "./UserFilters.js";
-import _UserLocal from  "./UserLocal.js";
 import _UserOauth from  "./UserOauth.js";
 import _UserRestrictions from  "./UserRestrictions.js";
 import _UserTerms from  "./UserTerms.js";
 import _Users from  "./Users.js";
+import _VerificationCode from  "./VerificationCode.js";
 
 export default function initModels(sequelize) {
   const Admins = _Admins.init(sequelize, DataTypes);
@@ -42,16 +44,18 @@ export default function initModels(sequelize) {
   const NoticeCategory = _NoticeCategory.init(sequelize, DataTypes);
   const NoticeImages = _NoticeImages.init(sequelize, DataTypes);
   const Notices = _Notices.init(sequelize, DataTypes);
+  const Reports = _Reports.init(sequelize, DataTypes);
   const Terms = _Terms.init(sequelize, DataTypes);
   const TicketMessageImages = _TicketMessageImages.init(sequelize, DataTypes);
   const TicketMessages = _TicketMessages.init(sequelize, DataTypes);
   const Tickets = _Tickets.init(sequelize, DataTypes);
+  const UserBlocks = _UserBlocks.init(sequelize, DataTypes);
   const UserFilters = _UserFilters.init(sequelize, DataTypes);
-  const UserLocal = _UserLocal.init(sequelize, DataTypes);
   const UserOauth = _UserOauth.init(sequelize, DataTypes);
   const UserRestrictions = _UserRestrictions.init(sequelize, DataTypes);
   const UserTerms = _UserTerms.init(sequelize, DataTypes);
   const Users = _Users.init(sequelize, DataTypes);
+  const VerificationCode = _VerificationCode.init(sequelize, DataTypes);
 
   Notices.belongsTo(Admins, { as: "admin", foreignKey: "adminId"});
   Admins.hasMany(Notices, { as: "notices", foreignKey: "adminId"});
@@ -97,14 +101,18 @@ export default function initModels(sequelize) {
   Users.hasMany(ArticleLikes, { as: "articleLikes", foreignKey: "likedUserId"});
   EventScraps.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(EventScraps, { as: "eventScraps", foreignKey: "userId"});
-  TicketMessages.belongsTo(Users, { as: "createdByUser", foreignKey: "createdBy"});
-  Users.hasMany(TicketMessages, { as: "ticketMessages", foreignKey: "createdBy"});
-  Tickets.belongsTo(Users, { as: "createdByUser", foreignKey: "createdBy"});
-  Users.hasMany(Tickets, { as: "tickets", foreignKey: "createdBy"});
+  Reports.belongsTo(Users, { as: "reportedUser", foreignKey: "reportedUserId"});
+  Users.hasMany(Reports, { as: "reports", foreignKey: "reportedUserId"});
+  TicketMessages.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
+  Users.hasMany(TicketMessages, { as: "ticketMessages", foreignKey: "createdUserId"});
+  Tickets.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
+  Users.hasMany(Tickets, { as: "tickets", foreignKey: "createdUserId"});
+  UserBlocks.belongsTo(Users, { as: "blockerUser", foreignKey: "blockerUserId"});
+  Users.hasMany(UserBlocks, { as: "userBlocks", foreignKey: "blockerUserId"});
+  UserBlocks.belongsTo(Users, { as: "blockedUser", foreignKey: "blockedUserId"});
+  Users.hasMany(UserBlocks, { as: "blockedUserUserBlocks", foreignKey: "blockedUserId"});
   UserFilters.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserFilters, { as: "userFilters", foreignKey: "userId"});
-  UserLocal.belongsTo(Users, { as: "user", foreignKey: "userId"});
-  Users.hasOne(UserLocal, { as: "userLocal", foreignKey: "userId"});
   UserOauth.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserOauth, { as: "userOauths", foreignKey: "userId"});
   UserRestrictions.belongsTo(Users, { as: "user", foreignKey: "userId"});
@@ -128,15 +136,17 @@ export default function initModels(sequelize) {
     NoticeCategory,
     NoticeImages,
     Notices,
+    Reports,
     Terms,
     TicketMessageImages,
     TicketMessages,
     Tickets,
+    UserBlocks,
     UserFilters,
-    UserLocal,
     UserOauth,
     UserRestrictions,
     UserTerms,
     Users,
+    VerificationCode,
   };
 }

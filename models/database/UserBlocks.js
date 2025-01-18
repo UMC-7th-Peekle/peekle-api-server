@@ -1,32 +1,43 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Tickets extends Model {
+export default class UserBlocks extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    ticketId: {
+    blockId: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      field: 'ticket_id'
+      field: 'block_id'
     },
-    title: {
-      type: DataTypes.STRING(512),
-      allowNull: false
-    },
-    status: {
-      type: DataTypes.ENUM('open','closed','in_progress','deleted'),
-      allowNull: false
-    },
-    createdUserId: {
+    blockerUserId: {
       type: DataTypes.BIGINT,
       allowNull: false,
+      comment: "차단을 하는 사람",
       references: {
         model: 'users',
         key: 'user_id'
       },
-      field: 'created_user_id'
+      field: 'blocker_user_id'
+    },
+    blockedUserId: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      comment: "차단 당한 사람",
+      references: {
+        model: 'users',
+        key: 'user_id'
+      },
+      field: 'blocked_user_id'
+    },
+    reason: {
+      type: DataTypes.STRING(512),
+      allowNull: false
+    },
+    status: {
+      type: DataTypes.ENUM('active','deleted'),
+      allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -42,7 +53,7 @@ export default class Tickets extends Model {
     }
   }, {
     sequelize,
-    tableName: 'tickets',
+    tableName: 'user_blocks',
     timestamps: false,
     indexes: [
       {
@@ -50,14 +61,21 @@ export default class Tickets extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "ticket_id" },
+          { name: "block_id" },
         ]
       },
       {
-        name: "tickets_users_user_id_fk",
+        name: "user_blocks_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "created_user_id" },
+          { name: "blocker_user_id" },
+        ]
+      },
+      {
+        name: "user_blocks_users_user_id_fk_2",
+        using: "BTREE",
+        fields: [
+          { name: "blocked_user_id" },
         ]
       },
     ]
