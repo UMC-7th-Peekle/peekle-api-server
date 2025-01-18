@@ -27,7 +27,7 @@ export default class VerificationCode extends Model {
     },
     code: {
       type: DataTypes.STRING(6),
-      allowNull: true
+      allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE(6),

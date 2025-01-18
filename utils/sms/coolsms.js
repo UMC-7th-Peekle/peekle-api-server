@@ -63,8 +63,6 @@ export const sdkSendSMS = async (to, text) => {
   }
 };
 
-sdkSendSMS("01093448561", "테스트 메시지입니다.");
-
 export const sdkGetBalance = async () => {
   try {
     const result = await messageService.getBalance();

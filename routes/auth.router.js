@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { notImplementedController } from "../controllers/empty.cotroller.js";
 
+import * as phoneController from "../controllers/auth/phone.auth.controller.js";
+
 const router = Router();
 
 // 회원가입
@@ -14,8 +16,8 @@ router.delete("/logout", notImplementedController);
 router.get("/token/reissue", notImplementedController);
 
 // 전화번호 인증
-router.post("/phone/unique", notImplementedController);
-router.post("/phone/send", notImplementedController);
-router.post("/phone/verify", notImplementedController);
+router.post("/phone/unique", phoneController.phoneUnique);
+router.post("/phone/send", phoneController.sendTokenToPhone);
+router.post("/phone/verify", phoneController.verifyToken);
 
 export default router;
