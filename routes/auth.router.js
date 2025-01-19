@@ -3,6 +3,7 @@ import { notImplementedController } from "../controllers/empty.cotroller.js";
 
 import * as phoneController from "../controllers/auth/phone.auth.controller.js";
 import * as registerController from "../controllers/auth/register.auth.controller.js";
+import * as loginController from "../controllers/auth/login.auth.controller.js";
 
 const router = Router();
 
@@ -11,10 +12,13 @@ router.get("/terms", notImplementedController);
 router.post("/register/local", registerController.register);
 
 // 로그인, 로그아웃, 토큰 관리
-router.post("/login/local", notImplementedController);
+router.post("/login/local", loginController.localLogin);
+router.delete("/logout", loginController.logout);
+router.get("/token/reissue", loginController.reissueToken);
+
+// kakao 로그인
+router.get("/login/kakao", notImplementedController);
 router.get("/login/kakao/callback", notImplementedController);
-router.delete("/logout", notImplementedController);
-router.get("/token/reissue", notImplementedController);
 
 // 전화번호 인증
 router.post("/phone/unique", phoneController.phoneUnique);

@@ -55,6 +55,9 @@ export const sendTokenToPhone = async ({ phone }) => {
   return encrypt62(record.sessionId);
 };
 
+/**
+ * 인증 세션 ID, 전화번호, 토큰값을 받아서 인증을 처리합니다
+ */
 export const verifyToken = async ({ id, token, phone }) => {
   // 1. DB에 존재하는 인증 세션인지 조회
   const decryptedId = decrypt62(id);
@@ -131,7 +134,10 @@ export const verifyToken = async ({ id, token, phone }) => {
   }
 };
 
-export const getPhoneBySessionId = async ({ id, phone }) => {
+/**
+ * 인증 세션 ID와 전화번호를 받아서 그 진위여부를 판단합니다.
+ */
+export const getAndVerifyPhoneBySessionId = async ({ id, phone }) => {
   const decryptedId = decrypt62(id);
   const record = await db.VerificationCode.findOne({
     attributes: ["identifierValue"],

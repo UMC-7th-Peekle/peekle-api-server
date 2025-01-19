@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { encrypt62 } from "../utils/cipher/encrypt.js";
 import { createAccessToken } from "../utils/tokens/create.jwt.tokens.js";
+import { testLogin } from "../controllers/auth/login.auth.controller.js";
 
 const router = Router();
 
@@ -17,5 +18,7 @@ router.get("/accesstoken/:userId", (req, res) => {
     accessToken: createAccessToken(userId),
   });
 });
+
+router.get("/login/:userId", testLogin);
 
 export default router;

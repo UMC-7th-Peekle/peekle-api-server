@@ -7,12 +7,13 @@ import {
   NotAllowedError,
   UnauthorizedError,
 } from "../utils/errors/errors.js";
+import models from "../models/index.js";
 const { JWT_SECRET } = config.SERVER;
 
 /**
  * Bearer 토큰을 추출하고 검증하는 미들웨어
  */
-const authenticateAccessToken = (req, res, next) => {
+export const authenticateAccessToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   // Authorization 헤더가 없는 경우
@@ -57,7 +58,7 @@ const authenticateAccessToken = (req, res, next) => {
 /**
  * RefreshToken을 검증하는 미들웨어
  */
-const authenticateRefreshToken = (req, res, next) => {
+export const authenticateRefreshToken = async (req, res, next) => {
   const refreshToken = req.cookies.PEEKLE_RT;
 
   if (!refreshToken) {
@@ -84,11 +85,25 @@ const authenticateRefreshToken = (req, res, next) => {
     req.user = {
       userId: user.userId,
     }; // 검증된 사용자 정보를 요청 객체에 추가
-    next();
   });
-};
 
-module.exports = {
-  authenticateAccessToken,
-  authenticateRefreshToken,
+  // JWT token에 있는 userId가 DB와 일치하는지 확인하기
+
+  // TODO : redis 등의 캐시 서버를 추가로 운용,
+  // 성능 개선을 수치화해서 처리하기.
+  const db = await models.RefreshTokens.findOne({
+    attributes: ["userId"],
+    where: {
+      userId: req.user.userId,
+      token: refreshToken,
+    },
+  });
+
+  if (!db) {
+    logger.error("[authenticateRefreshToken] Malformed RefreshToken");
+    next(new NotAllowedError("RefreshToken이 일치하지 않습니다."));
+    return;
+  }
+
+  next();
 };
