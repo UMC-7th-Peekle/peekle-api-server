@@ -1,20 +1,14 @@
 // Description: 게시글 관련 조회, 생성, 수정, 삭제와 관련된 컨트롤러 파일입니다.
-import articleService from "../services/article.service.js";
+import articleCrudService from "../../services/community/article.crud.community.service.js";
+import { logError } from "../../utils/handlers/error.logger.js";
 
 // 게시글 조회
 export const getArticleById = async (req, res, next) => {
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
 
-    const article = await articleService.getArticleById(communityId, articleId); // 게시글 조회
+    const article = await articleCrudService.getArticleById(communityId, articleId); // 게시글 조회
 
-    if (!article) {
-      // 게시글이 존재하지 않는 경우
-      return res.status(204).json({
-        // 204: No Content
-        message: "게시글이 존재하지 않습니다",
-      });
-    }
     // 게시글이 존재하는 경우
     return res.status(200).json({
       // 200: OK
@@ -22,6 +16,11 @@ export const getArticleById = async (req, res, next) => {
       article,
     });
   } catch (error) {
+    if (error.message === "게시글이 존재하지 않습니다") {
+      // 204: No Content
+      return res.status(404).json({ message: error.message }); // 204는 에러가 아닌데 에러 핸들러로 해야할까?
+    }
+    logError(error);
     next(error); // 에러 핸들러로 전달
   }
 };
@@ -29,12 +28,13 @@ export const getArticleById = async (req, res, next) => {
 // 게시글 생성
 export const createArticle = async (req, res, next) => {
   try {
+    // 사용자 인증 검증 & 형식 검증 필요
     const { communityId } = req.params; // URL에서 communityId 추출
     const { title, content } = req.body; // Request body에서 title, content 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const article = await articleService.createArticle(
+    const article = await articleCrudService.createArticle(
       communityId,
       authorId,
       title,
@@ -45,19 +45,21 @@ export const createArticle = async (req, res, next) => {
       message: "게시글 작성 성공",
     });
   } catch (error) {
+    logError(error);
     next(error); // 에러 핸들러로 전달
   }
 };
 
 // 게시글 수정
 export const updateArticle = async (req, res, next) => {
+  // 사용자 인증 검증 & 입력 형식 검증 필요
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
     const { title, content } = req.body; // Request body에서 title, content 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const article = await articleService.updateArticle(
+    const article = await articleCrudService.updateArticle(
       communityId,
       articleId,
       authorId,
@@ -69,23 +71,26 @@ export const updateArticle = async (req, res, next) => {
       message: "게시글 수정 성공",
     });
   } catch (error) {
+    logError(error);
     next(error); // 에러 핸들러로 전달
   }
 };
 
 // 게시글 삭제
 export const deleteArticle = async (req, res, next) => {
+  // 사용자 인증 검증 필요
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
-    await articleService.deleteArticle(communityId, articleId, authorId); // 게시글 삭제
+    await articleCrudService.deleteArticle(communityId, articleId, authorId); // 게시글 삭제
 
     return res.status(200).json({
       message: "게시글 삭제 성공",
     });
   } catch (error) {
+    logError(error);
     next(error); // 에러 핸들러로 전달
   }
 };
