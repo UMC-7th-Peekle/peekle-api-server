@@ -42,7 +42,7 @@ export const getArticles = async (communityId, { limit, cursor = null }) => {
 /**
  * communityId에 해당하는 게시판의 게시글들 중 검색어를 포함하는 게시글을 가져옵니다
  */
-export const searchArticles = async (communityId, keyword, { limit, cursor = null }) => {
+export const searchArticles = async (communityId, query, { limit, cursor = null }) => {
   try {
     // 검색어 형식 검증
 
@@ -51,7 +51,7 @@ export const searchArticles = async (communityId, keyword, { limit, cursor = nul
       where: {
         communityId,
         title: {
-          [Op.like]: `%${keyword}%`, // 검색어 포함된 제목 검색
+          [Op.like]: `%${query}%`, // 검색어 포함된 제목 검색
         },
         ...(cursor && { createdAt: { [Op.lt]: cursor } }), // 커서 조건 추가
       },

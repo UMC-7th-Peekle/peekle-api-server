@@ -37,7 +37,7 @@ export const getArticles = async (req, res, next) => {
 export const searchArticles = async (req, res, next) => {
   try {
     const { communityId } = req.params; // URL에서 communityId 추출
-    const { keyword } = req.query; // Query에서 search 추출
+    const { query } = req.query; // Query에서 search 추출
     const { limit, cursor } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
 
     // 페이지네이션 기본값 설정
@@ -48,7 +48,7 @@ export const searchArticles = async (req, res, next) => {
 
     const { articles, nextCursor } = await articleReadService.searchArticles(
       communityId,
-      keyword,
+      query,
       paginationOptions
     );
     return res.status(200).json({
