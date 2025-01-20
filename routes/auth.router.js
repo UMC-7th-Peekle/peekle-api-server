@@ -26,7 +26,7 @@ router.get(
 );
 
 // 테스트 로그인
-router.get("/login/:userId", loginController.testLogin);
+router.get("/login/test/:userId", loginController.testLogin);
 
 // kakao 로그인
 router.get("/login/kakao", kakaoController.kakaoLogin);
