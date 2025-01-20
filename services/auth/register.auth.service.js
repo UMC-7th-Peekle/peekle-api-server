@@ -82,3 +82,9 @@ export const oauthRegister = async (data) => {
 
   return;
 };
+
+export const getTerms = async () => {
+  const terms = await models.Terms.findAll();
+
+  return terms;
+};

@@ -10,7 +10,7 @@ import { authenticateRefreshToken } from "../middleware/authenticate.jwt.js";
 const router = Router();
 
 // 회원가입
-router.get("/terms", notImplementedController);
+router.get("/terms", registerController.getTerms);
 router.post("/register/local", registerController.register);
 
 // 테스트용 회원가입
