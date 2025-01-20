@@ -1,9 +1,10 @@
-import e, { Router } from "express";
+import { Router } from "express";
 import { emptyController } from "../controllers/empty.cotroller.js";
 import articleCrudController from "../controllers/community/article.crud.community.contoller.js";
 import articleReadContoller from "../controllers/community/article.read.community.controller.js";
 import commentController from "../controllers/community/comment.community.contorller.js";
 import articleLikeController from "../controllers/community/article.like.community.controller.js";
+import commentLikeController from "../controllers/community/comment.like.community.controller.js";
 
 const router = Router();
 
@@ -98,16 +99,16 @@ router.post(
  * 댓글에 좋아요 표시합니다.
  */
 router.post(
-  "/community/:community/articles/:articleId/comments/:commentId/like",
-  emptyController
+  "/:community/articles/:articleId/comments/:commentId/like",
+  commentLikeController.likeComment
 );
 
 /**
  * 댓글 좋아요를 취소합니다.
  */
 router.delete(
-  "/community/:community/articles/:articleId/comments/:commentId/like",
-  emptyController
+  "/:community/articles/:articleId/comments/:commentId/like",
+  commentLikeController.unlikeComment
 );
 
 export default router;
