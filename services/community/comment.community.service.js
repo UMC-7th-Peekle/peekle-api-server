@@ -11,7 +11,7 @@ import db from "../../models/index.js";
  * communityId, articleId에 해당하는 게시글에 댓글을 추가합니다
  */
 export const createComment = async ({
-  communityId,
+  communityId,  // 현재는 사용하지는 않음
   articleId,
   authorId,
   content,
@@ -40,7 +40,7 @@ export const createComment = async ({
  * communityId, articleId, commentId에 해당하는 댓글을 수정합니다
  */
 export const updateComment = async ({
-  communityId,
+  communityId, // 현재는 사용하지는 않음
   articleId,
   commentId,
   authorId,
@@ -76,7 +76,7 @@ export const updateComment = async ({
  * communityId, articleId, commentId에 해당하는 댓글을 삭제합니다.
  */
 export const deleteComment = async ({
-  communityId,
+  communityId, // 현재는 사용하지는 않음
   articleId,
   commentId,
   authorId,

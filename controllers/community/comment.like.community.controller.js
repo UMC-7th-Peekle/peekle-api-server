@@ -15,7 +15,7 @@ export const likeComment = async (req, res, next) => {
       articleId,
       commentId,
       likedUserId,
-    }); // 댓글 좋아요
+    }); // 댓글 좋아요 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
 
     return res.status(201).json({
       message: "댓글 좋아요 성공",
@@ -34,7 +34,7 @@ export const unlikeComment = async (req, res, next) => {
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var likedUserId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const like = await commentLikeService.unlikeComment({
+    await commentLikeService.unlikeComment({
       communityId,
       articleId,
       commentId,

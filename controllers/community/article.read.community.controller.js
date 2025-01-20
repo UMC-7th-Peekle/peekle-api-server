@@ -19,11 +19,11 @@ export const getArticles = async (req, res, next) => {
       paginationOptions
     );
 
-    // 게시글이 없는 경우 204 응답
+    // 게시글이 없는 경우
     if (articles.length === 0) {
       return res.status(204).send(); // 응답 본문 없이 204 반환
     }
-    // 게시글이 있는 경우 200 응답
+    // 게시글이 있는 경우
     return res.status(200).json({
       message: "게시글 목록 조회 성공",
       articles,
@@ -56,11 +56,11 @@ export const searchArticles = async (req, res, next) => {
       paginationOptions
     );
 
-    // 게시글이 없는 경우 204 응답
+    // 게시글이 없는 경우
     if (articles.length === 0) {
       return res.status(204).send(); // 응답 본문 없이 204 반환
     }
-    // 게시글이 있는 경우 200 응답
+    // 게시글이 있는 경우
     return res.status(200).json({
       message: "게시글 목록 조회 성공",
       articles,

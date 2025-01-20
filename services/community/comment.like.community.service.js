@@ -80,14 +80,14 @@ export const unlikeComment = async ({
     }
 
     // 좋아요 삭제
-    const like = await db.ArticleCommentLikes.destroy({
+    await db.ArticleCommentLikes.destroy({
       where: {
         commentId,
         likedUserId,
       },
     });
 
-    return { like };
+    return;
   } catch (error) {
     throw error;
   }

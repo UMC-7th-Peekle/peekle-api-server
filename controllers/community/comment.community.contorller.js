@@ -45,7 +45,7 @@ export const updateComment = async (req, res, next) => {
       commentId,
       authorId,
       content,
-    }); // 댓글 수정
+    }); // 댓글 수정 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
 
     return res.status(200).json({
       message: "댓글 수정 성공",
@@ -96,7 +96,7 @@ export const createCommentReply = async (req, res, next) => {
       authorId,
       content,
       isAnonymous,
-    }); // 대댓글 생성
+    }); // 대댓글 생성 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
 
     return res.status(201).json({
       message: "대댓글 작성 성공",

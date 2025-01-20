@@ -14,7 +14,6 @@ export const getArticleById = async (req, res, next) => {
 
     // 게시글이 존재하는 경우
     return res.status(200).json({
-      // 200: OK
       message: "게시글 조회 성공",
       article,
     });
@@ -40,7 +39,7 @@ export const createArticle = async (req, res, next) => {
       title,
       content,
       isAnonymous,
-    }); // 게시글 생성
+    }); // 게시글 생성 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
 
     return res.status(201).json({
       message: "게시글 작성 성공",
@@ -67,7 +66,7 @@ export const updateArticle = async (req, res, next) => {
       authorId,
       title,
       content,
-    }); // 게시글 수정
+    }); // 게시글 수정 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
 
     return res.status(200).json({
       message: "게시글 수정 성공",

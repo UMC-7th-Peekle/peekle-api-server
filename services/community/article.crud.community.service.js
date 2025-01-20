@@ -25,12 +25,14 @@ export const getArticleById = async ({ communityId, articleId }) => {
       throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
     }
 
+    // 댓글 조회
     const comments = await db.ArticleComments.findAll({
       where: {
         articleId,
       },
     });
 
+    // 게시글 및 댓글 반환
     return { article, comments };
   } catch (error) {
     throw error;
@@ -56,7 +58,6 @@ export const createArticle = async ({
       content,
       isAnonymous,
     });
-    // 로그인 되지 않은 사용자의 경우 UnathorizedError 발생
     return { article };
   } catch (error) {
     throw error;
@@ -114,7 +115,6 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
   await article.destroy();
 };
 
-// 모든 메서드를 하나의 객체로 묶어 default export
 export default {
   getArticleById,
   createArticle,
