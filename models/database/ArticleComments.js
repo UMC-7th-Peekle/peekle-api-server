@@ -42,7 +42,12 @@ export default class ArticleComments extends Model {
       },
       field: 'author_id'
     },
-    comment: {
+    isAnonymous: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      field: 'is_anonymous'
+    },
+    content: {
       type: DataTypes.STRING(1024),
       allowNull: false
     },

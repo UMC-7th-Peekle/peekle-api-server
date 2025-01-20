@@ -1,37 +1,55 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Articles extends Model {
+export default class Peekling extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    articleId: {
+    peeklingId: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      field: 'article_id'
+      field: 'peekling_id'
     },
     title: {
-      type: DataTypes.STRING(512),
+      type: DataTypes.STRING(20),
       allowNull: false
     },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false
+    description: {
+      type: DataTypes.STRING(1000),
+      allowNull: true
     },
-    authorId: {
-      type: DataTypes.BIGINT,
+    minPeople: {
+      type: DataTypes.INTEGER,
       allowNull: false,
-      field: 'author_id'
+      field: 'min_people'
     },
-    communityId: {
+    maxPeople: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'max_people'
+    },
+    schedule: {
+      type: DataTypes.DATE(6),
+      allowNull: false
+    },
+    categoryId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
-        model: 'communities',
-        key: 'community_id'
+        model: 'peekling_category',
+        key: 'category_id'
       },
-      field: 'community_id'
+      field: 'category_id'
+    },
+    createdUserId: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      references: {
+        model: 'users',
+        key: 'user_id'
+      },
+      field: 'created_user_id'
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -44,15 +62,10 @@ export default class Articles extends Model {
       allowNull: false,
       defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)"),
       field: 'updated_at'
-    },
-    isAnonymous: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      field: 'is_anonymous'
     }
   }, {
     sequelize,
-    tableName: 'articles',
+    tableName: 'peekling',
     timestamps: false,
     indexes: [
       {
@@ -60,21 +73,21 @@ export default class Articles extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "article_id" },
+          { name: "peekling_id" },
         ]
       },
       {
-        name: "articles_communities_community_id_fk",
+        name: "peekling_peekling_category_category_id_fk",
         using: "BTREE",
         fields: [
-          { name: "community_id" },
+          { name: "category_id" },
         ]
       },
       {
-        name: "community_article_user_user_id_fk",
+        name: "peekling_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "author_id" },
+          { name: "created_user_id" },
         ]
       },
     ]

@@ -6,7 +6,6 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import path from "path";
 import http from "http";
 // import https from "https"; // https를 사용해야 하는 경우 사용하면 됩니다.
 // import { Server } from "socket.io"; // socket을 사용하려면 주석 해제

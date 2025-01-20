@@ -3,9 +3,14 @@
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import baseX from "base-x";
-import config from "../config.json" with { type: "json" };
-import logger from "../logger/logger";
-import { NotAllowedError, InvalidInputError } from "../errors";
+import config from "../../config.json" with { type: "json" };
+
+import logger from "../logger/logger.js";
+import {
+  CipherError,
+  InvalidInputError,
+  NotAllowedError,
+} from "../errors/errors.js";
 
 const { SALT_ROUNDS, CIPHER_SECRET_KEY } = config.SERVER;
 
@@ -18,7 +23,7 @@ const ALGORITHM = "aes-256-cbc";
 
 // CIPHER_SECRET_KEY 검증
 if (!/^[0-9a-fA-F]{64}$/.test(CIPHER_SECRET_KEY)) {
-  throw new Error(
+  throw new CipherError(
     "CIPHER_SECRET_KEY must be a 64-character hexadecimal string."
   );
 }
@@ -26,7 +31,7 @@ if (!/^[0-9a-fA-F]{64}$/.test(CIPHER_SECRET_KEY)) {
 const key = Buffer.from(CIPHER_SECRET_KEY, "hex");
 
 if (key.length !== 32) {
-  throw new Error(
+  throw new CipherError(
     "CIPHER_SECRET_KEY must be 32 bytes (64 hex characters) long."
   );
 }
@@ -73,7 +78,9 @@ export const decrypt62 = (encryptedText) => {
     const combined = BASE62_ENCODER.decode(encryptedText);
 
     if (combined.length < 16) {
-      throw new Error("암호문이 너무 짧습니다. 유효하지 않은 데이터입니다.");
+      throw new CipherError(
+        "암호문이 너무 짧습니다. 유효하지 않은 데이터입니다."
+      );
     }
 
     // IV와 암호문 분리
@@ -87,7 +94,7 @@ export const decrypt62 = (encryptedText) => {
     return decrypted.toString("utf8");
   } catch (err) {
     logger.error(`복호화 오류: ${err.message}`, { stack: err.stack });
-    throw new InvalidInputError("올바르지 않은 입력값입니다.");
+    throw new CipherError("올바르지 않은 입력값입니다.");
   }
 };
 

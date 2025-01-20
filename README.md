@@ -137,7 +137,7 @@ made and owned by [@kyeoungwoon](https://github.com/kyeoungwoon) | [Naver Blog](
 - 폴더명은 되도록 한 단어를 사용하되, 길어질 경우 `-`를 활용하여 구분합니다. (kebab case)
 - eg. `my-page`, `user-info`
 
-## Error Handling ⚠️
+## Error Handling
 
 - `class CustomError extends Error`와 같이, JavaScript 기본 Error 객체를 extend 하여 Custom Error를 작성하여야 합니다.
 - Error는 세분화하여 각각 에러를 할당하는 것이 아닌, 대분류로 관리하여 reason으로 세부사항을 알 수 있도록 하여야 합니다.

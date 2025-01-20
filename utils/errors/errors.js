@@ -98,3 +98,36 @@ export class UnknownError extends CustomError {
     super(reason, "UNKNOWN_ERROR", 500, data);
   }
 }
+
+/**
+ * 전화번호 인증시간 만료
+ */
+export class TimeOutError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "SESSION_TIMEOUT", 400, data);
+  }
+}
+/**
+ * 전화번호 최대 인증가능 횟수 초과
+ */
+export class TooManyRequest extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "TOO_MANY_ATTEMPTS", 429, data);
+  }
+}
+/**
+ * 전화번호 인증코드 불일치
+ */
+export class InvalidCodeError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "INVALID_CODE", 400, data);
+  }
+}
+/**
+ * Cipher 오류
+ */
+export class CipherError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "CIPHER_ERROR", 503, data);
+  }
+}

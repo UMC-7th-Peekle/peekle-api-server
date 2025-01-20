@@ -51,6 +51,15 @@ export default class Events extends Model {
       allowNull: true,
       field: 'application_end'
     },
+    createdUserId: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      references: {
+        model: 'users',
+        key: 'user_id'
+      },
+      field: 'created_user_id'
+    },
     createdAt: {
       type: DataTypes.DATE(6),
       allowNull: false,
@@ -62,6 +71,11 @@ export default class Events extends Model {
       allowNull: false,
       defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)"),
       field: 'updated_at'
+    },
+    columnName: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      field: 'column_name'
     }
   }, {
     sequelize,
@@ -74,6 +88,13 @@ export default class Events extends Model {
         using: "BTREE",
         fields: [
           { name: "event_id" },
+        ]
+      },
+      {
+        name: "events_users_user_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "created_user_id" },
         ]
       },
       {
