@@ -3,6 +3,7 @@ import { logError } from "../../utils/handlers/error.logger.js";
 
 /**
  * event_scraps 테이블에 주어진 event_Id와 JWT로 주어진 사용자 Id를 바탕으로 튜플을 추가
+ * 특정 이벤트 스크랩
  */
 export const newScrap = async (req, res, next) => {
   try {
@@ -21,6 +22,10 @@ export const newScrap = async (req, res, next) => {
   }
 };
 
+/**
+ * event_scraps 테이블에서 주어진 event_Id와 JWT로 주어진 사용자 Id를 바탕으로 튜플을 제거
+ * 특정 이벤트를 스크랩 취소
+ */
 export const deleteScrap = async (req, res, next) => {
   try {
     const { eventId } = req.params;
