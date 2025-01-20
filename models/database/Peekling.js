@@ -1,50 +1,55 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class ArticleComments extends Model {
+export default class Peekling extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    commentId: {
+    peeklingId: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      field: 'comment_id'
+      field: 'peekling_id'
     },
-    articleId: {
+    title: {
+      type: DataTypes.STRING(20),
+      allowNull: false
+    },
+    description: {
+      type: DataTypes.STRING(1000),
+      allowNull: true
+    },
+    minPeople: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'min_people'
+    },
+    maxPeople: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'max_people'
+    },
+    schedule: {
+      type: DataTypes.DATE(6),
+      allowNull: false
+    },
+    categoryId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
-        model: 'articles',
-        key: 'article_id'
+        model: 'peekling_category',
+        key: 'category_id'
       },
-      field: 'article_id'
+      field: 'category_id'
     },
-    parentCommentId: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      references: {
-        model: 'article_comments',
-        key: 'comment_id'
-      },
-      field: 'parent_comment_id'
-    },
-    status: {
-      type: DataTypes.ENUM('active','deleted','reported'),
-      allowNull: false
-    },
-    authorId: {
+    createdUserId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
         model: 'users',
         key: 'user_id'
       },
-      field: 'author_id'
-    },
-    content: {
-      type: DataTypes.STRING(1024),
-      allowNull: false
+      field: 'created_user_id'
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -60,7 +65,7 @@ export default class ArticleComments extends Model {
     }
   }, {
     sequelize,
-    tableName: 'article_comments',
+    tableName: 'peekling',
     timestamps: false,
     indexes: [
       {
@@ -68,28 +73,21 @@ export default class ArticleComments extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "comment_id" },
+          { name: "peekling_id" },
         ]
       },
       {
-        name: "article_comments_article_comments_comment_id_fk",
+        name: "peekling_peekling_category_category_id_fk",
         using: "BTREE",
         fields: [
-          { name: "parent_comment_id" },
+          { name: "category_id" },
         ]
       },
       {
-        name: "article_comments_articles_article_id_fk",
+        name: "peekling_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "article_id" },
-        ]
-      },
-      {
-        name: "article_comments_users_user_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "author_id" },
+          { name: "created_user_id" },
         ]
       },
     ]

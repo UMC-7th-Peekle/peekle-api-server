@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import config from "../../config.json" with { type: "json" };
+import models from "../../models/index.js";
 const { JWT_SECRET } = config.SERVER;
 
 /**
@@ -20,8 +21,16 @@ export const createAccessToken = ({ userId }) => {
  * @param {int} userId
  * @returns {string} - Refresh Token
  */
-export const createRefreshToken = ({ userId }) => {
-  return jwt.sign({ userId }, JWT_SECRET, {
+export const createRefreshToken = async ({ userId }) => {
+  // 해당 세션의 JWT 하나만 지우는 방법?
+  const token = jwt.sign({ userId }, JWT_SECRET, {
     expiresIn: "7d",
   });
+
+  return await models.RefreshTokens.create({
+    userId,
+    token,
+  });
+
+  return db.token;
 };
