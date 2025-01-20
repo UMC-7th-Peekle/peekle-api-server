@@ -68,7 +68,7 @@ export const testRegister = async (req, res, next) => {
       birhdate: req.body.birthdate || "2000-01-01",
       gender: req.body.gender || "male",
       phone: req.body.phone || "112",
-      email: req.body.email || "email",
+      // email: req.body.email || "email",
       profileImage: req.body.profileImage || null,
     };
 

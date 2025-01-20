@@ -57,6 +57,11 @@ export default class ArticleComments extends Model {
       allowNull: false,
       defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)"),
       field: 'updated_at'
+    },
+    isAnonymous: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      field: 'is_anonymous'
     }
   }, {
     sequelize,
