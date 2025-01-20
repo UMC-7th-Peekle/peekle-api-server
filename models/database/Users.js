@@ -33,10 +33,6 @@ export default class Users extends Model {
       allowNull: false,
       unique: "users_pk"
     },
-    email: {
-      type: DataTypes.STRING(512),
-      allowNull: false
-    },
     lastNicknameChangeDate: {
       type: DataTypes.DATEONLY,
       allowNull: true,

@@ -2,7 +2,7 @@ import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 const { sequelize } = models;
 
-const PROFILE_IMAGE_DEFAULT = "sample.jpg";
+const PROFILE_IMAGE_DEFAULT = "peekle_default_profile_image.jpg";
 
 export const register = async (data) => {
   // transaction 추가
@@ -15,7 +15,7 @@ export const register = async (data) => {
       birthdate: data.birthdate,
       gender: data.gender,
       phone: data.phone,
-      email: data.email,
+      // email: data.email, // email 삭제 - PM 가라사대 필요없다!
       profileImage: data.profileImage || PROFILE_IMAGE_DEFAULT,
     };
 
