@@ -21,10 +21,7 @@ export const getArticles = async (communityId, { limit, cursor = null }) => {
       limit, // limit 개수만큼 조회
     });
 
-    if (articles.length === 0) {
-      // 게시글이 존재하지 않는 경우
-      throw new Error("게시글이 존재하지 않습니다"); // 204
-    }
+  
 
     // 다음 커서 계산: 현재 페이지에 게시글이 하나 이상 있으면 게시글의 마지막 항목의 createdAt을 다음 커서로 사용
     const nextCursor =
@@ -59,10 +56,7 @@ export const searchArticles = async (communityId, query, { limit, cursor = null 
       limit, // limit 개수만큼 조회
     });
 
-    if (articles.length === 0) {
-      // 게시글이 존재하지 않는 경우
-      throw new Error("게시글이 존재하지 않습니다"); // 204
-    }
+
     // 다음 커서 계산: 마지막 게시글의 createdAt 값
     const nextCursor =
       articles.length > 0 ? articles[articles.length - 1].createdAt : null;

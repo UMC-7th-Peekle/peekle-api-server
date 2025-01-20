@@ -19,15 +19,18 @@ export const getArticles = async (req, res, next) => {
       paginationOptions
     );
 
+    // 게시글이 없는 경우 204 응답
+    if (articles.length === 0) {
+      return res.status(204).send(); // 응답 본문 없이 204 반환
+    }
+    // 게시글이 있는 경우 200 응답
     return res.status(200).json({
       message: "게시글 목록 조회 성공",
       articles,
       nextCursor,
     });
+    
   } catch (error) {
-    if (error.message === "게시글이 존재하지 않습니다") {
-      return res.status(204).json({ message: error.message }); // 204는 에러가 아닌데 에러 핸들러로 해야할까?
-    }
     logError(error);
     next(error); // 에러 핸들러로 전달
   }
@@ -51,15 +54,18 @@ export const searchArticles = async (req, res, next) => {
       query,
       paginationOptions
     );
+
+    // 게시글이 없는 경우 204 응답
+    if (articles.length === 0) {
+      return res.status(204).send(); // 응답 본문 없이 204 반환
+    }
+    // 게시글이 있는 경우 200 응답
     return res.status(200).json({
       message: "게시글 목록 조회 성공",
       articles,
       nextCursor,
     });
   } catch (error) {
-    if (error.message === "게시글이 존재하지 않습니다") {
-      return res.status(204).json({ message: error.message }); // 204는 에러가 아닌데 에러 핸들러로 해야할까?
-    }
     logError(error);
     next(error); // 에러 핸들러로 전달
   }

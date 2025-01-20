@@ -18,7 +18,7 @@ export const getArticleById = async (req, res, next) => {
   } catch (error) {
     if (error.message === "게시글이 존재하지 않습니다") {
       // 204: No Content
-      return res.status(404).json({ message: error.message }); // 204는 에러가 아닌데 에러 핸들러로 해야할까?
+      return res.status(404).json({ message: error.message }); 
     }
     logError(error);
     next(error); // 에러 핸들러로 전달
