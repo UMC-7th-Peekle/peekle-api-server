@@ -64,7 +64,13 @@ export const verifyToken = async ({ id, token, phone }) => {
   logger.debug(`[verifyToken] decryptedId: ${decryptedId}`);
 
   const record = await db.VerificationCode.findOne({
-    attributes: ["sessionId", "attempts", "code", "createdAt"],
+    attributes: [
+      "sessionId",
+      "attempts",
+      "code",
+      "identifierValue",
+      "createdAt",
+    ],
     where: {
       sessionId: decryptedId,
       isVerified: false,
