@@ -1,41 +1,20 @@
 import { Router } from "express";
-import { emptyController } from "../controllers/empty.cotroller.js";
+import { notImplementedController } from "../controllers/empty.cotroller.js";
 
 const router = Router();
 
-/**
- * 내 티켓 가져오기
- */
-router.get("/", emptyController);
+// tickets 조회
+router.get("/", notImplementedController);
+router.get("/:ticketId", notImplementedController);
 
-/**
- * 티켓 생성
- */
-router.post("/", emptyController);
+// tickets 생성, 수정, 삭제
+router.post("/", notImplementedController);
+router.patch("/:ticketId", notImplementedController);
+router.delete("/:ticketId", notImplementedController);
 
-/**
- * 티켓 삭제
- */
-router.delete("/tickets/:ticketId", emptyController);
-
-/**
- * 티켓 정보 가져오기
- */
-router.get("/tickets/:ticketId", emptyController);
-
-/**
- * 티켓 메시지 추가
- */
-router.post("/tickets/:ticketId/message", emptyController);
-
-/**
- * 티켓 메시지 수정
- */
-router.patch("/tickets/:ticketId/message/:messageId", emptyController);
-
-/**
- * 티켓 메시지 삭제
- */
-router.delete("/tickets/:ticketId/message/:messageId", emptyController);
+// tickets 메시지 생성, 수정, 삭제
+router.post("/:ticketId/message", notImplementedController);
+router.patch("/:ticketId/message/:messageId", notImplementedController);
+router.delete("/:ticketId/message/:messageId", notImplementedController);
 
 export default router;

@@ -1,9 +1,6 @@
-name: Restart PM2 process
+name: Start PM2 process Manually
 
 on:
-  push:
-    branches:
-      - develop/*
   workflow_dispatch:
 
 jobs:
@@ -16,13 +13,14 @@ jobs:
       - name: SSH 연결
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
           cat >>~/.ssh/config <<END
           Host ${{ secrets.SSH_HOST_NAME }}
-            HostName ${{ secrets.EC2_HOST }}
-            User ubuntu
+            HostName ${{ secrets.SERVER_HOST }}
+            User ${{ secrets.SERVER_USER }}
+            Port ${{ secrets.SERVER_PORT }}
             IdentityFile ~/.ssh/id_rsa
             StrictHostKeyChecking no
           END
@@ -39,4 +37,4 @@ jobs:
 
       - name: Restart PM2
         run: |
-          ssh ${{ secrets.SSH_HOST_NAME }} 'pm2 restart peekle'
+          ssh ${{ secrets.SSH_HOST_NAME }} 'pm2 start ecosystem.config.cjs'

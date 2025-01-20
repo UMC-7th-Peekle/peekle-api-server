@@ -14,6 +14,8 @@
 
 - 설치 및 실행 방법을 작성할 부분입니다. (예정)
 
+commit 및 push 전에 `npm run format`을 통해 prettier 포맷팅을 적용해주세요.
+
 <!-- Jest에 의한 test coverage 100%가 목적입니다.
 이에 따라 test가 파일명에 들어가는 경우가 생길 것을 대비 삭제 처리합니다. -->
 <!-- ## Before We Start ⚠️
@@ -22,33 +24,13 @@
 git에 추적되지 않습니다. 여러가지 테스트가 필요할 땐 위와 같은 파일명을 사용해주세요.
 혹시라도 `test.js`라는 파일이 필요할 수도 있어 `test.test.js`로 명명했습니다. -->
 
-## Conventions & Template 📋
-
-- GitHub Issue Template
-- Git 전략 : Git Flow, GitHub Flow
-- Code 작성 컨벤션 : 변수, 함수, 파일, 폴더 명명법
-- docker 및 docker-compose 파일 : 빠르고 쉬운 배포
-- CI/CD (GitHub Actions) : 개인서버 용 CI/CD (SSH 이용), AWS 용 CI/CD
-- 다양한 기능에 대한 preset : 로그인, 채팅, 게시판
-- .gitignore : `Windows`, `macOS`, `Linux`, `node`, `dotenv` 기준 + `config.json`, `*.pem`
-
-대중적인 구조는 있지만, 세부적인 부분은 개발자 개인의 취향입니다.  
-개인적으로 프로젝트나 해커톤에서 활용하기 위해 작성하였기에,  
-제 개인의 취향에 맞게 적용되어 있고, 시간이 지남에 따라 맞다고 생각하는 것이 바뀌며  
-템플릿을 수정할 수 있습니다.
-
-템플릿은 여러분의 취향에 맞게 수정하여 사용해주시고, 도움이 되셨다면 ⭐ 한번만 부탁드립니다.  
-preset 코드에 버그가 있을 경우 issue 생성하시어 남겨주시면 확인 후 반영하겠습니다.
-
-감사합니다.
-
-Repository URL -> [Click](https://github.com/kyeoungwoon/nodejs-api-server-template)  
+Template Repository URL -> [Click](https://github.com/kyeoungwoon/nodejs-api-server-template)  
 made and owned by [@kyeoungwoon](https://github.com/kyeoungwoon) | [Naver Blog](https://blog.naver.com/kyeoungwoon)
 
 # Git Convention : GitHub Flow 🌐
 
-- 규모가 작고 잦은 기능수정과 배포가 있는 프로젝트에 적합합니다.
 - 브랜치 종류 : main, develop, feature
+- MVP 개발 완료 전까지는 develop branch를 사용하지 않고, `main`과 `feature` 브랜치만 유지합니다.
 
 #### 1. main
 
@@ -66,6 +48,7 @@ made and owned by [@kyeoungwoon](https://github.com/kyeoungwoon) | [Naver Blog](
 
 #### 3. feature
 
+- 이 프로젝트는 issue를 통해 branch를 생성합니다. 따라서 브랜치 명은 반드시 `feature/{issue번호}-{feature명}` 과 같은 방식이여야 합니다. eg.) `feature/1-sample`
 - develop branch를 기준으로, 새로운 기능을 개발하는 branch 입니다.
 - 새로운 기능에 대한 bug fix는 feature branch 내에서 마친 후 develop branch로 PR을 생성해야 합니다.
 
@@ -126,14 +109,13 @@ made and owned by [@kyeoungwoon](https://github.com/kyeoungwoon) | [Naver Blog](
 - Camel Case를 사용합니다.
   - eg. `getUserByUserId`, `getEventByDateAndUserId`
 - 길이가 길어지더라도 기능을 명확하게 명시해 주세요.
-- 함수명은 겹쳐도 됩니다.
+- 함수명은 겹쳐도 되지만, Import/Export에 유의해 주세요.
   - 하단에 import/export 관련 컨벤션 설명에서 더 자세히 알 수 있지만, 아래의 간단한 예시를 참고해주세요.
   - `user.service.js` 에 `createNewUser` 과 `user.repository.js`에 `createNewUser`이 동시에 존재하여도 됩니다.
   - service에서 사용 시에는 `userRepository.createNewUser`
   - controller에서 사용할 떄는 `userController.createNewUser`와 같이 사용합니다.
-- routes 폴더에서 `express.Router()`로 정의하는 변수명은 해당 파일명과 일치하여야 합니다.
-  - eg. `auth.router.js` 파일의 경우에는 `const authRouter = express.Router();` 와 같이!
-  - `authRouter.get("/", handleXX)`, `userRouter.get("/", handleYY)`
+- routes 폴더에서 `express.Router()`로 정의하는 변수명은 router로 통일합니다.
+  - eg. `const router = express.Router();`
 
 ## 변수명
 
@@ -155,7 +137,7 @@ made and owned by [@kyeoungwoon](https://github.com/kyeoungwoon) | [Naver Blog](
 - 폴더명은 되도록 한 단어를 사용하되, 길어질 경우 `-`를 활용하여 구분합니다. (kebab case)
 - eg. `my-page`, `user-info`
 
-## Error Handling ⚠️
+## Error Handling
 
 - `class CustomError extends Error`와 같이, JavaScript 기본 Error 객체를 extend 하여 Custom Error를 작성하여야 합니다.
 - Error는 세분화하여 각각 에러를 할당하는 것이 아닌, 대분류로 관리하여 reason으로 세부사항을 알 수 있도록 하여야 합니다.

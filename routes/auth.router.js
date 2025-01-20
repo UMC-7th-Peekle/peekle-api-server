@@ -1,66 +1,40 @@
 import { Router } from "express";
-import { emptyController } from "../controllers/empty.cotroller.js";
+import { notImplementedController } from "../controllers/empty.cotroller.js";
+
+import * as phoneController from "../controllers/auth/phone.auth.controller.js";
+import * as registerController from "../controllers/auth/register.auth.controller.js";
+import * as loginController from "../controllers/auth/login.auth.controller.js";
+import * as kakaoController from "../controllers/auth/kakao.auth.controller.js";
+import { authenticateRefreshToken } from "../middleware/authenticate.jwt.js";
 
 const router = Router();
 
-/**
- * 로컬 회원가입을 처리합니다.
- */
-router.post("/register/local", emptyController);
+// 회원가입
+router.get("/terms", registerController.getTerms);
+router.post("/register/local", registerController.register);
 
-/**
- * 약관을 조회합니다.
- */
-router.get("/terms", emptyController);
+// 테스트용 회원가입
+router.post("/register/test", registerController.testRegister);
 
-/**
- * 로컬 로그인을 처리합니다.
- */
-router.post("/login/local", emptyController);
+// 로그인, 로그아웃, 토큰 관리
+router.post("/login/local", loginController.localLogin);
+router.delete("/logout", loginController.logout);
+router.get(
+  "/token/reissue",
+  authenticateRefreshToken,
+  loginController.reissueToken
+);
 
-/**
- * 카카오 로그인을 처리합니다.
- */
-router.post("/login/kakao", emptyController);
+// 테스트 로그인
+router.get("/login/test/:userId", loginController.testLogin);
 
-/**
- * 카카오 로그인 콜백을 처리합니다.
- */
-router.post("/login/kakao/callback", emptyController);
+// kakao 로그인
+router.get("/login/kakao", kakaoController.kakaoLogin);
+router.get("/login/kakao/callback", kakaoController.kakaoCallback);
 
-/**
- * 휴대폰 중복 여부를 확인합니다.
- */
-router.post("/phone/unique", emptyController);
-
-/**
- * 휴대폰 인증번호를 전송합니다.
- */
-router.post("/phone/send", emptyController);
-
-/**
- * 휴대폰 인증번호를 확인합니다.
- */
-router.post("/phone/verify", emptyController);
-
-/**
- * 토큰을 재발급합니다.
- */
-router.get("/token/reissue", emptyController);
-
-/**
- * 로그아웃을 처리합니다.
- */
-router.delete("/logout", emptyController);
-
-/**
- * 비밀번호를 초기화합니다.
- */
-router.post("/password/reset", emptyController);
-
-/**
- * 비밀번호를 변경합니다.
- */
-router.patch("/password/change", emptyController);
+// 전화번호 인증
+router.post("/phone/unique", phoneController.phoneUnique);
+router.post("/phone/send", phoneController.sendTokenToPhone);
+router.post("/phone/verify", phoneController.verifyToken);
 
 export default router;

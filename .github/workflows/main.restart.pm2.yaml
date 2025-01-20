@@ -1,12 +1,10 @@
-name: Start PM2 process
+name: Restart PM2 process
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      script:
-        description: "PM2 start [script]"
-        required: true
-        default: "ecosystem.config.js"
 
 jobs:
   deploy:
@@ -18,13 +16,14 @@ jobs:
       - name: SSH 연결
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
           cat >>~/.ssh/config <<END
           Host ${{ secrets.SSH_HOST_NAME }}
-            HostName ${{ secrets.EC2_HOST }}
-            User ubuntu
+            HostName ${{ secrets.SERVER_HOST }}
+            User ${{ secrets.SERVER_USER }}
+            Port ${{ secrets.SERVER_PORT }}
             IdentityFile ~/.ssh/id_rsa
             StrictHostKeyChecking no
           END
@@ -39,6 +38,6 @@ jobs:
         run: |
           ssh ${{ secrets.SSH_HOST_NAME }} 'npm install --prefix /opt/app/'
 
-      - name: PM2 start
+      - name: Restart PM2
         run: |
-          ssh ${{ secrets.SSH_HOST_NAME }} 'pm2 start ${{ github.event.inputs.script }}'
+          ssh ${{ secrets.SSH_HOST_NAME }} 'pm2 restart peekle'
