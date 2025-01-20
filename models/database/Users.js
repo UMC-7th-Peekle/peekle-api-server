@@ -17,7 +17,8 @@ export default class Users extends Model {
     },
     nickname: {
       type: DataTypes.STRING(128),
-      allowNull: false
+      allowNull: false,
+      unique: "users_pk_2"
     },
     birthdate: {
       type: DataTypes.DATEONLY,
@@ -98,6 +99,14 @@ export default class Users extends Model {
         using: "BTREE",
         fields: [
           { name: "phone" },
+        ]
+      },
+      {
+        name: "users_pk_2",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "nickname" },
         ]
       },
     ]

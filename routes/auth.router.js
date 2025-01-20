@@ -11,12 +11,17 @@ const router = Router();
 // 회원가입
 router.get("/terms", notImplementedController);
 router.post("/register/local", registerController.register);
+
+// 테스트용 회원가입
 router.post("/register/test", registerController.testRegister);
 
 // 로그인, 로그아웃, 토큰 관리
 router.post("/login/local", loginController.localLogin);
 router.delete("/logout", loginController.logout);
 router.get("/token/reissue", loginController.reissueToken);
+
+// 테스트 로그인
+router.get("/login/:userId", loginController.testLogin);
 
 // kakao 로그인
 router.get("/login/kakao", kakaoController.kakaoLogin);
