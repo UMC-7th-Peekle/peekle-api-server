@@ -132,7 +132,7 @@ export const verifyToken = async ({ id, token, phone }) => {
     // 전화번호를 조회하는 기능을 사용할 수 없음에 따라 변경합니다.
 
     // 4-4. 사용자의 전화번호를 인증 처리
-    record.is_verified = true;
+    record.isVerified = true;
     await record.save();
 
     // 추후 일괄적으로 삭제하는 로직을 구성할 필요가 있습니다.
