@@ -70,7 +70,10 @@ export const testLogin = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
+    loginService.checkCookie({ cookie: req.cookies.PEEKLE_RT });
     // 로그아웃 처리
+    await loginService.logout({ token: req.cookies.PEEKLE_RT });
+
     return res.status(200).clearCookie("PEEKLE_RT").success({
       message: "로그아웃 되었습니다.",
     });
@@ -82,7 +85,6 @@ export const logout = async (req, res, next) => {
 
 export const reissueToken = async (req, res, next) => {
   try {
-    // 토큰 재발급 처리
     // RT 검증하고 AT 발급하면 됨
     return res.status(200).success({
       message: "토큰이 재발급 되었습니다.",
