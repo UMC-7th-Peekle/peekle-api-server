@@ -83,3 +83,22 @@ export const testRegister = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getTerms = async (req, res, next) => {
+  try {
+    const terms = await registerService.getTerms();
+
+    if (terms.length === 0) {
+      return res.status(204).success({
+        message: "조회할 약관이 없습니다.",
+      });
+    }
+
+    return res.status(200).success({
+      terms,
+    });
+  } catch (error) {
+    logError(error);
+    next(error);
+  }
+};
