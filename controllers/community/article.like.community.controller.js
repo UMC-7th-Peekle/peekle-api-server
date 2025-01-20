@@ -10,11 +10,11 @@ export const likeArticle = async (req, res, next) => {
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var likedUserId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const like = await articleLikeService.likeArticle(
+    const like = await articleLikeService.likeArticle({
       communityId,
       articleId,
-      likedUserId
-    ); // 게시글 좋아요
+      likedUserId,
+    }); // 게시글 좋아요
 
     return res.status(201).json({
       message: "게시글 좋아요 성공",
@@ -33,11 +33,11 @@ export const unlikeArticle = async (req, res, next) => {
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var likedUserId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const like = await articleLikeService.unlikeArticle(
+    const like = await articleLikeService.unlikeArticle({
       communityId,
       articleId,
-      likedUserId
-    ); // 게시글 좋아요 취소
+      likedUserId,
+    }); // 게시글 좋아요 취소
 
     return res.status(200).json({
       message: "게시글 좋아요 취소 성공",

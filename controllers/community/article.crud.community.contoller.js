@@ -3,12 +3,14 @@ import articleCrudService from "../../services/community/article.crud.community.
 import { logError } from "../../utils/handlers/error.logger.js";
 
 // 게시글 조회
-// 댓글 가져오는 로직 추가해야 함
 export const getArticleById = async (req, res, next) => {
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
 
-    const article = await articleCrudService.getArticleById(communityId, articleId); // 게시글 조회
+    const article = await articleCrudService.getArticleById({
+      communityId,
+      articleId,
+    }); // 게시글 조회
 
     // 게시글이 존재하는 경우
     return res.status(200).json({
@@ -26,19 +28,19 @@ export const getArticleById = async (req, res, next) => {
 export const createArticle = async (req, res, next) => {
   try {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-    // 사용자 인증 검증 
+    // 사용자 인증 검증
     const { communityId } = req.params; // URL에서 communityId 추출
     const { title, content, isAnonymous } = req.body; // Request body에서 title, content 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const article = await articleCrudService.createArticle(
+    const article = await articleCrudService.createArticle({
       communityId,
       authorId,
       title,
       content,
-      isAnonymous
-    ); // 게시글 생성
+      isAnonymous,
+    }); // 게시글 생성
 
     return res.status(201).json({
       message: "게시글 작성 성공",
@@ -52,20 +54,20 @@ export const createArticle = async (req, res, next) => {
 // 게시글 수정
 export const updateArticle = async (req, res, next) => {
   // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-  // 사용자 인증 검증 
+  // 사용자 인증 검증
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
     const { title, content } = req.body; // Request body에서 title, content 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const article = await articleCrudService.updateArticle(
+    const article = await articleCrudService.updateArticle({
       communityId,
       articleId,
       authorId,
       title,
-      content
-    ); // 게시글 수정
+      content,
+    }); // 게시글 수정
 
     return res.status(200).json({
       message: "게시글 수정 성공",
@@ -84,7 +86,11 @@ export const deleteArticle = async (req, res, next) => {
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
-    await articleCrudService.deleteArticle(communityId, articleId, authorId); // 게시글 삭제
+    await articleCrudService.deleteArticle({
+      communityId,
+      articleId,
+      authorId,
+    }); // 게시글 삭제
 
     return res.status(200).json({
       message: "게시글 삭제 성공",

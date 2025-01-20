@@ -12,13 +12,13 @@ export const createComment = async (req, res, next) => {
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const comment = await commentService.createComment(
+    const comment = await commentService.createComment({
       communityId,
       articleId,
       authorId,
       content,
-      isAnonymous
-    ); // 댓글 생성
+      isAnonymous,
+    }); // 댓글 생성
 
     return res.status(201).json({
       message: "댓글 작성 성공",
@@ -39,13 +39,13 @@ export const updateComment = async (req, res, next) => {
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const comment = await commentService.updateComment(
+    const comment = await commentService.updateComment({
       communityId,
       articleId,
       commentId,
       authorId,
-      content
-    ); // 댓글 수정
+      content,
+    }); // 댓글 수정
 
     return res.status(200).json({
       message: "댓글 수정 성공",
@@ -64,12 +64,12 @@ export const deleteComment = async (req, res, next) => {
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
-    await commentService.deleteComment(
+    await commentService.deleteComment({
       communityId,
       articleId,
       commentId,
-      authorId
-    ); // 댓글 삭제
+      authorId,
+    }); // 댓글 삭제
 
     return res.status(200).json({
       message: "댓글 삭제 성공",
@@ -90,13 +90,13 @@ export const createCommentReply = async (req, res, next) => {
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const comment = await commentService.createCommentReply(
+    const comment = await commentService.createCommentReply({
       articleId,
       commentId,
       authorId,
       content,
-      isAnonymous
-    ); // 대댓글 생성
+      isAnonymous,
+    }); // 대댓글 생성
 
     return res.status(201).json({
       message: "대댓글 작성 성공",

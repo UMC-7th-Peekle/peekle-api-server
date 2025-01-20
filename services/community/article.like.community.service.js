@@ -9,7 +9,7 @@ import db from "../../models/index.js";
 /**
  * 게시글 좋아요를 추가합니다
  */
-export const likeArticle = async (communityId, articleId, likedUserId) => {
+export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
   try {
     // 사용자 인증 검증 필요
     // 게시글 조회
@@ -44,7 +44,7 @@ export const likeArticle = async (communityId, articleId, likedUserId) => {
       likedUserId,
     });
 
-    return like;
+    return { like };
   } catch (error) {
     throw error;
   }
@@ -53,7 +53,11 @@ export const likeArticle = async (communityId, articleId, likedUserId) => {
 /**
  * 게시글 좋아요를 취소합니다
  */
-export const unlikeArticle = async (communityId, articleId, likedUserId) => {
+export const unlikeArticle = async ({
+  communityId,
+  articleId,
+  likedUserId,
+}) => {
   try {
     // 사용자 인증 검증 필요
     // 게시글 조회
@@ -77,7 +81,7 @@ export const unlikeArticle = async (communityId, articleId, likedUserId) => {
       },
     });
 
-    return like;
+    return { like };
   } catch (error) {
     throw error;
   }

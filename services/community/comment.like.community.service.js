@@ -9,12 +9,12 @@ import db from "../../models/index.js";
 /**
  * 댓글 좋아요를 추가합니다
  */
-export const likeComment = async (
+export const likeComment = async ({
   communityId,
   articleId,
   commentId,
-  likedUserId
-) => {
+  likedUserId,
+}) => {
   try {
     // 사용자 인증 검증 필요
     // 댓글 조회
@@ -49,22 +49,21 @@ export const likeComment = async (
       likedUserId,
     });
 
-    return like;
+    return { like };
   } catch (error) {
     throw error;
   }
 };
 
-
 /**
  * 댓글 좋아요를 취소합니다
  */
-export const unlikeComment = async (
+export const unlikeComment = async ({
   communityId,
   articleId,
   commentId,
-  likedUserId
-) => {
+  likedUserId,
+}) => {
   try {
     // 사용자 인증 검증 필요
     // 댓글 조회
@@ -88,13 +87,11 @@ export const unlikeComment = async (
       },
     });
 
-    return like;
+    return { like };
   } catch (error) {
     throw error;
   }
-}
-
-
+};
 
 export default {
   likeComment,

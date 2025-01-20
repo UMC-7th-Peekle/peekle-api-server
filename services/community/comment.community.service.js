@@ -10,13 +10,13 @@ import db from "../../models/index.js";
 /**
  * communityId, articleId에 해당하는 게시글에 댓글을 추가합니다
  */
-export const createComment = async (
+export const createComment = async ({
   communityId,
   articleId,
   authorId,
   content,
-  isAnonymous = true
-) => {
+  isAnonymous = true,
+}) => {
   try {
     // 사용자 인증 검증 & 형식 검증 필요
     // 댓글 생성
@@ -30,7 +30,7 @@ export const createComment = async (
       isAnonymous,
     });
 
-    return comment;
+    return { comment };
   } catch (error) {
     throw error;
   }
@@ -39,13 +39,13 @@ export const createComment = async (
 /**
  * communityId, articleId, commentId에 해당하는 댓글을 수정합니다
  */
-export const updateComment = async (
+export const updateComment = async ({
   communityId,
   articleId,
   commentId,
   authorId,
-  content
-) => {
+  content,
+}) => {
   try {
     // 사용자 인증 검증 & 형식 검증 필요
     // 댓글 조회
@@ -66,7 +66,7 @@ export const updateComment = async (
     // 댓글 수정
     await comment.update({ content });
 
-    return comment;
+    return { comment };
   } catch (error) {
     throw error;
   }
@@ -75,12 +75,12 @@ export const updateComment = async (
 /**
  * communityId, articleId, commentId에 해당하는 댓글을 삭제합니다.
  */
-export const deleteComment = async (
+export const deleteComment = async ({
   communityId,
   articleId,
   commentId,
-  authorId
-) => {
+  authorId,
+}) => {
   try {
     // 사용자 인증 검증 필요
     // 댓글 조회
@@ -101,8 +101,6 @@ export const deleteComment = async (
 
     // 댓글 삭제
     await comment.destroy();
-
-    return comment;
   } catch (error) {
     throw error;
   }
@@ -111,13 +109,13 @@ export const deleteComment = async (
 /**
  * communityId, articleId, commentId에 해당하는 댓글에 대댓글을 작성합니다
  */
-export const createCommentReply = async (
+export const createCommentReply = async ({
   articleId,
   commentId,
   authorId,
   content,
-  isAnonymous = true
-) => {
+  isAnonymous = true,
+}) => {
   try {
     // 사용자 인증 검증 & 형식 검증 필요
     // 댓글 생성
@@ -130,14 +128,14 @@ export const createCommentReply = async (
       authorId,
       content,
       status,
-      isAnonymous
+      isAnonymous,
     });
 
     if (!comment) {
       throw new NotExistsError("댓글이 존재하지 않습니다");
     }
 
-    return comment;
+    return { comment };
   } catch (error) {
     throw error;
   }

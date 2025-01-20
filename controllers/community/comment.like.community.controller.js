@@ -6,16 +6,16 @@ import { logError } from "../../utils/handlers/error.logger.js";
 export const likeComment = async (req, res, next) => {
   try {
     // 사용자 인증 검증 필요
-    const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출 
+    const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var likedUserId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const like = await commentLikeService.likeComment(
+    const like = await commentLikeService.likeComment({
       communityId,
       articleId,
       commentId,
-      likedUserId
-    ); // 댓글 좋아요
+      likedUserId,
+    }); // 댓글 좋아요
 
     return res.status(201).json({
       message: "댓글 좋아요 성공",
@@ -30,16 +30,16 @@ export const likeComment = async (req, res, next) => {
 export const unlikeComment = async (req, res, next) => {
   try {
     // 사용자 인증 검증 필요
-    const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출 
+    const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var likedUserId = 1; // 임시로 사용자 ID를 1로 설정
 
-    const like = await commentLikeService.unlikeComment(
+    const like = await commentLikeService.unlikeComment({
       communityId,
       articleId,
       commentId,
-      likedUserId
-    ); // 댓글 좋아요 취소
+      likedUserId,
+    }); // 댓글 좋아요 취소
 
     return res.status(200).json({
       message: "댓글 좋아요 취소 성공",
@@ -50,8 +50,7 @@ export const unlikeComment = async (req, res, next) => {
   }
 };
 
-
 export default {
   likeComment,
   unlikeComment,
-}
+};
