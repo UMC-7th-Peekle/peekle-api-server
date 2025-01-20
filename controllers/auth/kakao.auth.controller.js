@@ -53,6 +53,8 @@ export const kakaoCallback = async (req, res, next) => {
         })
       );
     }
+
+    console.error("peekleUser", peekleUser);
     // 4-2. DB에 사용자 정보가 있다면 토큰 발급
     const accessToken = createAccessToken({ userId: peekleUser.id });
     const refreshToken = await createRefreshToken({ userId: peekleUser.id });
