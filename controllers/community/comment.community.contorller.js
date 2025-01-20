@@ -8,7 +8,7 @@ export const createComment = async (req, res, next) => {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
     // 사용자 인증 검증
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
-    const { content } = req.body; // Request body에서 content 추출
+    const { content, isAnonymous } = req.body; // Request body에서 content 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
@@ -16,7 +16,8 @@ export const createComment = async (req, res, next) => {
       communityId,
       articleId,
       authorId,
-      content
+      content,
+      isAnonymous
     ); // 댓글 생성
 
     return res.status(201).json({
@@ -85,7 +86,7 @@ export const createCommentReply = async (req, res, next) => {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
     // 사용자 인증 검증
     const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
-    const { content } = req.body; // Request body에서 content 추출
+    const { content, isAnonymous } = req.body; // Request body에서 content 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
@@ -93,7 +94,8 @@ export const createCommentReply = async (req, res, next) => {
       articleId,
       commentId,
       authorId,
-      content
+      content,
+      isAnonymous
     ); // 대댓글 생성
 
     return res.status(201).json({

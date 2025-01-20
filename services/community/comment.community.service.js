@@ -14,7 +14,8 @@ export const createComment = async (
   communityId,
   articleId,
   authorId,
-  content
+  content,
+  isAnonymous = true
 ) => {
   try {
     // 사용자 인증 검증 & 형식 검증 필요
@@ -26,6 +27,7 @@ export const createComment = async (
       authorId,
       content,
       status,
+      isAnonymous,
     });
 
     return comment;
@@ -116,7 +118,8 @@ export const createCommentReply = async (
   articleId,
   commentId,
   authorId,
-  content
+  content,
+  isAnonymous = true
 ) => {
   try {
     // 사용자 인증 검증 & 형식 검증 필요
@@ -130,6 +133,7 @@ export const createCommentReply = async (
       authorId,
       content,
       status,
+      isAnonymous
     });
 
     if (!comment) {

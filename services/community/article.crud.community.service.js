@@ -40,7 +40,7 @@ export const getArticleById = async (communityId, articleId) => {
 /**
  * communityId에 해당하는 게시판에 게시글을 추가합니다
  */
-export const createArticle = async (communityId, authorId, title, content) => {
+export const createArticle = async (communityId, authorId, title, content, isAnonymous = true) => {
   try {
     // 게시글 생성
     const article = await db.Articles.create({
@@ -48,6 +48,7 @@ export const createArticle = async (communityId, authorId, title, content) => {
       authorId,
       title,
       content,
+      isAnonymous,
     });
     // 로그인 되지 않은 사용자의 경우 UnathorizedError 발생
     return article;

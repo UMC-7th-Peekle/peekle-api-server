@@ -15,6 +15,9 @@ import _Events from  "./Events.js";
 import _NoticeCategory from  "./NoticeCategory.js";
 import _NoticeImages from  "./NoticeImages.js";
 import _Notices from  "./Notices.js";
+import _Peekling from  "./Peekling.js";
+import _PeeklingCategory from  "./PeeklingCategory.js";
+import _PeeklingImages from  "./PeeklingImages.js";
 import _RefreshTokens from  "./RefreshTokens.js";
 import _Reports from  "./Reports.js";
 import _Terms from  "./Terms.js";
@@ -45,6 +48,9 @@ export default function initModels(sequelize) {
   const NoticeCategory = _NoticeCategory.init(sequelize, DataTypes);
   const NoticeImages = _NoticeImages.init(sequelize, DataTypes);
   const Notices = _Notices.init(sequelize, DataTypes);
+  const Peekling = _Peekling.init(sequelize, DataTypes);
+  const PeeklingCategory = _PeeklingCategory.init(sequelize, DataTypes);
+  const PeeklingImages = _PeeklingImages.init(sequelize, DataTypes);
   const RefreshTokens = _RefreshTokens.init(sequelize, DataTypes);
   const Reports = _Reports.init(sequelize, DataTypes);
   const Terms = _Terms.init(sequelize, DataTypes);
@@ -87,6 +93,10 @@ export default function initModels(sequelize) {
   NoticeCategory.hasMany(Notices, { as: "notices", foreignKey: "categoryId"});
   NoticeImages.belongsTo(Notices, { as: "notice", foreignKey: "noticeId"});
   Notices.hasMany(NoticeImages, { as: "noticeImages", foreignKey: "noticeId"});
+  PeeklingImages.belongsTo(Peekling, { as: "peekling", foreignKey: "peeklingId"});
+  Peekling.hasMany(PeeklingImages, { as: "peeklingImages", foreignKey: "peeklingId"});
+  Peekling.belongsTo(PeeklingCategory, { as: "category", foreignKey: "categoryId"});
+  PeeklingCategory.hasMany(Peekling, { as: "peeklings", foreignKey: "categoryId"});
   UserTerms.belongsTo(Terms, { as: "term", foreignKey: "termId"});
   Terms.hasMany(UserTerms, { as: "userTerms", foreignKey: "termId"});
   TicketMessageImages.belongsTo(TicketMessages, { as: "ticketMessage", foreignKey: "ticketMessageId"});
@@ -105,6 +115,8 @@ export default function initModels(sequelize) {
   Users.hasMany(EventScraps, { as: "eventScraps", foreignKey: "userId"});
   Events.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
   Users.hasMany(Events, { as: "events", foreignKey: "createdUserId"});
+  Peekling.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
+  Users.hasMany(Peekling, { as: "peeklings", foreignKey: "createdUserId"});
   RefreshTokens.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(RefreshTokens, { as: "refreshTokens", foreignKey: "userId"});
   Reports.belongsTo(Users, { as: "reportedUser", foreignKey: "reportedUserId"});
@@ -142,6 +154,9 @@ export default function initModels(sequelize) {
     NoticeCategory,
     NoticeImages,
     Notices,
+    Peekling,
+    PeeklingCategory,
+    PeeklingImages,
     RefreshTokens,
     Reports,
     Terms,

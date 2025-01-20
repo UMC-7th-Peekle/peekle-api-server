@@ -91,17 +91,17 @@ export default class Events extends Model {
         ]
       },
       {
-        name: "events_event_category_category_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "category_id" },
-        ]
-      },
-      {
         name: "events_users_user_id_fk",
         using: "BTREE",
         fields: [
           { name: "created_user_id" },
+        ]
+      },
+      {
+        name: "events_event_category_category_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "category_id" },
         ]
       },
     ]

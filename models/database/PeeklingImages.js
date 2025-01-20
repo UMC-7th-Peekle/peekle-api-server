@@ -1,37 +1,33 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Articles extends Model {
+export default class PeeklingImages extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    articleId: {
+    imageId: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      field: 'article_id'
+      field: 'image_id'
     },
-    title: {
+    imageUrl: {
       type: DataTypes.STRING(512),
-      allowNull: false
-    },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false
-    },
-    authorId: {
-      type: DataTypes.BIGINT,
       allowNull: false,
-      field: 'author_id'
+      field: 'image_url'
     },
-    communityId: {
+    sequence: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    peeklingId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
-        model: 'communities',
-        key: 'community_id'
+        model: 'peekling',
+        key: 'peekling_id'
       },
-      field: 'community_id'
+      field: 'peekling_id'
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -44,15 +40,10 @@ export default class Articles extends Model {
       allowNull: false,
       defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)"),
       field: 'updated_at'
-    },
-    isAnonymous: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      field: 'is_anonymous'
     }
   }, {
     sequelize,
-    tableName: 'articles',
+    tableName: 'peekling_images',
     timestamps: false,
     indexes: [
       {
@@ -60,21 +51,14 @@ export default class Articles extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "article_id" },
+          { name: "image_id" },
         ]
       },
       {
-        name: "articles_communities_community_id_fk",
+        name: "peekling_images_peekling_peekling_id_fk",
         using: "BTREE",
         fields: [
-          { name: "community_id" },
-        ]
-      },
-      {
-        name: "community_article_user_user_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "author_id" },
+          { name: "peekling_id" },
         ]
       },
     ]
