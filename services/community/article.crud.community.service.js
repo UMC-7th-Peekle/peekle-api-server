@@ -80,14 +80,10 @@ export const updateArticle = async (
   }
 
   // 게시글 수정
-  if (title) {
-    article.title = title;
-  }
-  if (content) {
-    article.content = content;
-  }
-
-  await article.save(); // 수정된 내용 저장
+  await article.update({
+    title,
+    content,
+  });
 
   return article;
 };

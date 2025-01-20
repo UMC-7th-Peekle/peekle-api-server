@@ -64,10 +64,7 @@ export const updateComment = async (
       throw new NotAllowedError("댓글 작성자만 수정할 수 있습니다");
     }
     // 댓글 수정
-    if (content) {
-      comment.content = content;
-    }
-    await comment.save();
+    await comment.update({ content });
 
     return comment;
   } catch (error) {
