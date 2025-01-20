@@ -15,7 +15,7 @@ export const newReport = async(req, res, next) => {
     const report = await reportService.newReport(eventId, reportedUserId, reason);
 
     if (report) {   // 201
-      return res.status(201).sucess({ "message": "Report created successfully" });
+      return res.status(201).sucess({ message: "Report created successfully" });
     }
   } catch (error) {
         logError(error);

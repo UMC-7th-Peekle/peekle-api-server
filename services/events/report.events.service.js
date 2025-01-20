@@ -1,8 +1,7 @@
 import {
-  InvalidInputError,
   UnauthorizedError,
   NotAllowedError,
-  AlreadyExistsError,
+  AlreadyExistsError
 } from "../../utils/errors/errors.js";
 import db from "../../models/index.js";
 
@@ -17,9 +16,6 @@ export const newReport = async (eventId, reportedUserId, reason) => {
   }
 
   // 잘못된 요청 reason 누락 400
-  if (!reason) {
-    throw new InvalidInputError("잘못된 요청입니다.");
-  }
 
   // 신고 권한 (자기자신 신고할 경우 에러) 403
   const auth = await db.Events.findOne({
