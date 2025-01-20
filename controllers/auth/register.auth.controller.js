@@ -2,7 +2,6 @@ import { getAndVerifyPhoneBySessionId } from "../../services/auth/phone.auth.ser
 import { logError } from "../../utils/handlers/error.logger.js";
 import * as registerService from "../../services/auth/register.auth.service.js";
 import * as phoneService from "../../services/auth/phone.auth.service.js";
-import { InvalidInputError } from "../../utils/errors/errors.js";
 
 export const register = async (req, res, next) => {
   try {
@@ -16,6 +15,34 @@ export const register = async (req, res, next) => {
 
     // 해당 전화번호가 unique한지 확인
     await phoneService.checkPhoneUnique({ phone: req.body.phone });
+
+    // 회원가입 처리
+    await registerService.register(req.body);
+
+    // TODO : terms 처리를 안하고 있음.
+
+    return res.status(201).success({
+      message: "회원가입이 완료되었습니다.",
+    });
+  } catch (error) {
+    logError(error);
+    next(error);
+  }
+};
+
+export const testRegister = async (req, res, next) => {
+  try {
+    // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
+
+    let data = {
+      name: req.body.name || "TestUser",
+      nickname: req.body.nickname || "TestNickname",
+      birhdate: req.body.birthdate || "2000-01-01",
+      gender: req.body.gender || "male",
+      phone: req.body.phone || "112",
+      email: req.body.email || "email",
+      profileImage: req.body.profileImage || null,
+    };
 
     // 회원가입 처리
     await registerService.register(req.body);
