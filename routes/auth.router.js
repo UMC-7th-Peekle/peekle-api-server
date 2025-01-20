@@ -5,6 +5,7 @@ import * as phoneController from "../controllers/auth/phone.auth.controller.js";
 import * as registerController from "../controllers/auth/register.auth.controller.js";
 import * as loginController from "../controllers/auth/login.auth.controller.js";
 import * as kakaoController from "../controllers/auth/kakao.auth.controller.js";
+import { authenticateRefreshToken } from "../middleware/authenticate.jwt.js";
 
 const router = Router();
 
@@ -18,7 +19,11 @@ router.post("/register/test", registerController.testRegister);
 // 로그인, 로그아웃, 토큰 관리
 router.post("/login/local", loginController.localLogin);
 router.delete("/logout", loginController.logout);
-router.get("/token/reissue", loginController.reissueToken);
+router.get(
+  "/token/reissue",
+  authenticateRefreshToken,
+  loginController.reissueToken
+);
 
 // 테스트 로그인
 router.get("/login/:userId", loginController.testLogin);
