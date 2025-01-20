@@ -28,7 +28,7 @@ const existEvent = async (eventId) => {
 };
 
 export const newScrap = async (eventId, userId) => {
-  // 중첩되어있는 부분 함수로 호출출
+  // 중첩되어있는 부분 함수로 호출
   await checkUser(userId);
   await existEvent(eventId);
 
@@ -51,7 +51,7 @@ export const newScrap = async (eventId, userId) => {
 };
 
 export const deleteScrap = async (eventId, userId) => {
-  // 중첩되어있는 부분 함수로 호출출
+  // 중첩되어있는 부분 함수로 호출
   await checkUser(userId);
   await existEvent(eventId);
 

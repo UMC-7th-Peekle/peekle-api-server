@@ -16,6 +16,9 @@ export const newReport = async (eventId, reportedUserId, reason) => {
   }
 
   // 잘못된 요청 reason 누락 400
+  /**
+   * 아직 Ajv로 유효성 검사 안했어요
+   */
 
   // 신고 권한 (자기자신 신고할 경우 에러) 403
   const auth = await db.Events.findOne({
@@ -36,7 +39,7 @@ export const newReport = async (eventId, reportedUserId, reason) => {
   });
 
   if (existReport) {   // 해당 이벤트가 신고 상태이면
-    throw new AlreadyExistsError("동일 대상에 대한 중복 신고");
+    throw new AlreadyExistsError("이미 신고한 이벤트입니다.");
   }
 
   // 해당 이벤트 신고하기
