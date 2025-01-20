@@ -42,7 +42,7 @@ export default class ArticleComments extends Model {
       },
       field: 'author_id'
     },
-    comment: {
+    content: {
       type: DataTypes.STRING(1024),
       allowNull: false
     },

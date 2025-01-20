@@ -3,6 +3,7 @@ import articleCrudService from "../../services/community/article.crud.community.
 import { logError } from "../../utils/handlers/error.logger.js";
 
 // 게시글 조회
+// 댓글 가져오는 로직 추가해야 함
 export const getArticleById = async (req, res, next) => {
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
@@ -16,10 +17,6 @@ export const getArticleById = async (req, res, next) => {
       article,
     });
   } catch (error) {
-    if (error.message === "게시글이 존재하지 않습니다") {
-      // 204: No Content
-      return res.status(404).json({ message: error.message }); 
-    }
     logError(error);
     next(error); // 에러 핸들러로 전달
   }

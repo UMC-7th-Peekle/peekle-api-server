@@ -2,6 +2,8 @@ import { Router } from "express";
 import { emptyController } from "../controllers/empty.cotroller.js";
 import articleCrudController from "../controllers/community/article.crud.community.contoller.js";
 import articleReadContoller from "../controllers/community/article.read.community.controller.js";
+import commentController from "../controllers/community/comment.community.contorller.js";
+
 const router = Router();
 
 /**
@@ -51,21 +53,21 @@ router.patch("/:communityId/:articleId/like", emptyController);
 /**
  * article에 댓글을 추가합니다
  */
-router.post("/:communityId/:articleId/comments", emptyController);
+router.post("/:communityId/articles/:articleId/comments", commentController.createComment);
 
 /**
  * article에 댓글을 수정합니다. 대댓글도 포함
  */
-router.patch("/:communityId/:articleId/comments/:commentId", emptyController);
+router.patch("/:communityId/articles/:articleId/comments/:commentId", commentController.updateComment);
 
 /**
  * article에 댓글을 삭제합니다
  */
-router.delete("/:communityId/:articleId/comments/:commentId", emptyController);
+router.delete("/:communityId/articles/:articleId/comments/:commentId", commentController.deleteComment);
 
 /**
  * article에 댓글에 대댓글을 추가합니다
  */
-router.post("/:communityId/:articleId/comments/:commentId", emptyController);
+router.post("/:communityId/articles/:articleId/comments/:commentId", commentController.createCommentReply);
 
 export default router;

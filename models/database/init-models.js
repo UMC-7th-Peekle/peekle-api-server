@@ -15,6 +15,7 @@ import _Events from  "./Events.js";
 import _NoticeCategory from  "./NoticeCategory.js";
 import _NoticeImages from  "./NoticeImages.js";
 import _Notices from  "./Notices.js";
+import _RefreshTokens from  "./RefreshTokens.js";
 import _Reports from  "./Reports.js";
 import _Terms from  "./Terms.js";
 import _TicketMessageImages from  "./TicketMessageImages.js";
@@ -44,6 +45,7 @@ export default function initModels(sequelize) {
   const NoticeCategory = _NoticeCategory.init(sequelize, DataTypes);
   const NoticeImages = _NoticeImages.init(sequelize, DataTypes);
   const Notices = _Notices.init(sequelize, DataTypes);
+  const RefreshTokens = _RefreshTokens.init(sequelize, DataTypes);
   const Reports = _Reports.init(sequelize, DataTypes);
   const Terms = _Terms.init(sequelize, DataTypes);
   const TicketMessageImages = _TicketMessageImages.init(sequelize, DataTypes);
@@ -101,6 +103,10 @@ export default function initModels(sequelize) {
   Users.hasMany(ArticleLikes, { as: "articleLikes", foreignKey: "likedUserId"});
   EventScraps.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(EventScraps, { as: "eventScraps", foreignKey: "userId"});
+  Events.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
+  Users.hasMany(Events, { as: "events", foreignKey: "createdUserId"});
+  RefreshTokens.belongsTo(Users, { as: "user", foreignKey: "userId"});
+  Users.hasMany(RefreshTokens, { as: "refreshTokens", foreignKey: "userId"});
   Reports.belongsTo(Users, { as: "reportedUser", foreignKey: "reportedUserId"});
   Users.hasMany(Reports, { as: "reports", foreignKey: "reportedUserId"});
   TicketMessages.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
@@ -136,6 +142,7 @@ export default function initModels(sequelize) {
     NoticeCategory,
     NoticeImages,
     Notices,
+    RefreshTokens,
     Reports,
     Terms,
     TicketMessageImages,
