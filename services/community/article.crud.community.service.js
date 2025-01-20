@@ -25,7 +25,13 @@ export const getArticleById = async (communityId, articleId) => {
       throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
     }
 
-    return article;
+    const comments = await db.ArticleComments.findAll({
+      where: {
+        articleId,
+      },
+    });
+
+    return { article, comments };
   } catch (error) {
     throw error;
   }
