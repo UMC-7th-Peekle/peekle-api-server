@@ -1,8 +1,9 @@
-import { Router } from "express";
+import e, { Router } from "express";
 import { emptyController } from "../controllers/empty.cotroller.js";
 import articleCrudController from "../controllers/community/article.crud.community.contoller.js";
 import articleReadContoller from "../controllers/community/article.read.community.controller.js";
 import commentController from "../controllers/community/comment.community.contorller.js";
+import articleLikeController from "../controllers/community/article.like.community.controller.js";
 
 const router = Router();
 
@@ -46,28 +47,67 @@ router.delete(
 ); // jwtMiddleware 추가해야 함
 
 /**
- * article에 좋아요 표시 및 취소
+ * article에 좋아요 표시합니다.
  */
-router.patch("/:communityId/:articleId/like", emptyController);
+router.post(
+  "/:communityId/articles/:articleId/like",
+  articleLikeController.likeArticle
+);
+
+/**
+ * article에 좋아요를 취소합니다.
+ */
+router.delete(
+  "/:communityId/articles/:articleId/like",
+  articleLikeController.unlikeArticle
+);
 
 /**
  * article에 댓글을 추가합니다
  */
-router.post("/:communityId/articles/:articleId/comments", commentController.createComment);
+router.post(
+  "/:communityId/articles/:articleId/comments",
+  commentController.createComment
+);
 
 /**
  * article에 댓글을 수정합니다. 대댓글도 포함
  */
-router.patch("/:communityId/articles/:articleId/comments/:commentId", commentController.updateComment);
+router.patch(
+  "/:communityId/articles/:articleId/comments/:commentId",
+  commentController.updateComment
+);
 
 /**
  * article에 댓글을 삭제합니다
  */
-router.delete("/:communityId/articles/:articleId/comments/:commentId", commentController.deleteComment);
+router.delete(
+  "/:communityId/articles/:articleId/comments/:commentId",
+  commentController.deleteComment
+);
 
 /**
  * article에 댓글에 대댓글을 추가합니다
  */
-router.post("/:communityId/articles/:articleId/comments/:commentId", commentController.createCommentReply);
+router.post(
+  "/:communityId/articles/:articleId/comments/:commentId/reply",
+  commentController.createCommentReply
+);
+
+/**
+ * 댓글에 좋아요 표시합니다.
+ */
+router.post(
+  "/community/:community/articles/:articleId/comments/:commentId/like",
+  emptyController
+);
+
+/**
+ * 댓글 좋아요를 취소합니다.
+ */
+router.delete(
+  "/community/:community/articles/:articleId/comments/:commentId/like",
+  emptyController
+);
 
 export default router;

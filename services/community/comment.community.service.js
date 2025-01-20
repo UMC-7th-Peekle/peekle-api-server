@@ -22,7 +22,6 @@ export const createComment = async (
     const status = "active";
 
     const comment = await db.ArticleComments.create({
-      communityId,
       articleId,
       authorId,
       content,
@@ -50,7 +49,6 @@ export const updateComment = async (
     // 댓글 조회
     const comment = await db.ArticleComments.findOne({
       where: {
-        communityId,
         articleId,
         commentId,
         authorId,
@@ -89,7 +87,6 @@ export const deleteComment = async (
     // 댓글 조회
     const comment = await db.ArticleComments.findOne({
       where: {
-        communityId,
         articleId,
         commentId,
         authorId,
@@ -116,7 +113,6 @@ export const deleteComment = async (
  * communityId, articleId, commentId에 해당하는 댓글에 대댓글을 작성합니다
  */
 export const createCommentReply = async (
-  communityId,
   articleId,
   commentId,
   authorId,
@@ -129,7 +125,6 @@ export const createCommentReply = async (
     const parentCommentId = commentId;
 
     const comment = await db.ArticleComments.create({
-      communityId,
       articleId,
       parentCommentId,
       authorId,

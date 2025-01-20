@@ -25,7 +25,8 @@ export const getArticleById = async (req, res, next) => {
 // 게시글 생성
 export const createArticle = async (req, res, next) => {
   try {
-    // 사용자 인증 검증 & 형식 검증 필요
+    // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
+    // 사용자 인증 검증 
     const { communityId } = req.params; // URL에서 communityId 추출
     const { title, content } = req.body; // Request body에서 title, content 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
@@ -38,7 +39,7 @@ export const createArticle = async (req, res, next) => {
       content
     ); // 게시글 생성
 
-    return res.status(201).json(article).json({
+    return res.status(201).json({
       message: "게시글 작성 성공",
     });
   } catch (error) {
@@ -49,7 +50,8 @@ export const createArticle = async (req, res, next) => {
 
 // 게시글 수정
 export const updateArticle = async (req, res, next) => {
-  // 사용자 인증 검증 & 입력 형식 검증 필요
+  // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
+  // 사용자 인증 검증 
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
     const { title, content } = req.body; // Request body에서 title, content 추출
@@ -64,7 +66,7 @@ export const updateArticle = async (req, res, next) => {
       content
     ); // 게시글 수정
 
-    return res.status(200).json(article).json({
+    return res.status(200).json({
       message: "게시글 수정 성공",
     });
   } catch (error) {

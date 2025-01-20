@@ -35,7 +35,6 @@ export const getArticleById = async (communityId, articleId) => {
  * communityId에 해당하는 게시판에 게시글을 추가합니다
  */
 export const createArticle = async (communityId, authorId, title, content) => {
-  // 형식 검증 로직 필요
   try {
     // 게시글 생성
     const article = await db.Articles.create({
@@ -54,9 +53,13 @@ export const createArticle = async (communityId, authorId, title, content) => {
 /**
  * communityId와 articleId에 해당하는 게시글을 수정
  */
-export const updateArticle = async (communityId, articleId, authorId, title, content) => {
-  // 형식 검증 로직 필요
-
+export const updateArticle = async (
+  communityId,
+  articleId,
+  authorId,
+  title,
+  content
+) => {
   // 게시글 검색
   const article = await db.Articles.findOne({
     where: {

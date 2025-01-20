@@ -38,6 +38,7 @@ export const getArticles = async (req, res, next) => {
 
 // 게시글 검색
 export const searchArticles = async (req, res, next) => {
+  // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
   try {
     const { communityId } = req.params; // URL에서 communityId 추출
     const { query } = req.query; // Query에서 search 추출

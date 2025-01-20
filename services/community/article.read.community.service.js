@@ -41,8 +41,6 @@ export const getArticles = async (communityId, { limit, cursor = null }) => {
  */
 export const searchArticles = async (communityId, query, { limit, cursor = null }) => {
   try {
-    // 검색어 형식 검증
-
     // 게시글 검색
     const articles = await db.Articles.findAll({
       where: {

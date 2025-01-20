@@ -5,7 +5,8 @@ import { logError } from "../../utils/handlers/error.logger.js";
 // 댓글 생성
 export const createComment = async (req, res, next) => {
   try {
-    // 사용자 인증 검증 & 형식 검증 필요
+    // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
+    // 사용자 인증 검증
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
     const { content } = req.body; // Request body에서 content 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
@@ -15,10 +16,10 @@ export const createComment = async (req, res, next) => {
       communityId,
       articleId,
       authorId,
-      content,
+      content
     ); // 댓글 생성
 
-    return res.status(201).json(comment).json({
+    return res.status(201).json({
       message: "댓글 작성 성공",
     });
   } catch (error) {
@@ -29,23 +30,24 @@ export const createComment = async (req, res, next) => {
 
 // 댓글 수정
 export const updateComment = async (req, res, next) => {
-  try{
-    // 사용자 인증 검증 & 형식 검증 필요
+  try {
+    // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
+    // 사용자 인증 검증
     const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
     const { content } = req.body; // Request body에서 content 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
     const comment = await commentService.updateComment(
-        communityId,
-        articleId,
-        commentId,
-        authorId,
-        content,
+      communityId,
+      articleId,
+      commentId,
+      authorId,
+      content
     ); // 댓글 수정
 
-    return res.status(200).json(comment).json({
-        message: "댓글 수정 성공",
+    return res.status(200).json({
+      message: "댓글 수정 성공",
     });
   } catch (error) {
     logError(error);
@@ -56,7 +58,7 @@ export const updateComment = async (req, res, next) => {
 // 댓글 삭제
 export const deleteComment = async (req, res, next) => {
   try {
-    // 사용자 인증 검증 & 형식 검증 필요
+    // 사용자 인증 검증
     const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
@@ -65,7 +67,7 @@ export const deleteComment = async (req, res, next) => {
       communityId,
       articleId,
       commentId,
-      authorId,
+      authorId
     ); // 댓글 삭제
 
     return res.status(200).json({
@@ -80,21 +82,21 @@ export const deleteComment = async (req, res, next) => {
 // 대댓글 생성
 export const createCommentReply = async (req, res, next) => {
   try {
-    // 사용자 인증 검증 & 형식 검증 필요
+    // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
+    // 사용자 인증 검증
     const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
     const { content } = req.body; // Request body에서 content 추출
     //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     var authorId = 1; // 임시로 사용자 ID를 1로 설정
 
     const comment = await commentService.createCommentReply(
-      communityId,
       articleId,
       commentId,
       authorId,
-      content,
+      content
     ); // 대댓글 생성
 
-    return res.status(201).json(comment).json({
+    return res.status(201).json({
       message: "대댓글 작성 성공",
     });
   } catch (error) {
