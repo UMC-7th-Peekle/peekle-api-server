@@ -12,7 +12,7 @@ const customFormat = printf(({ level, message, timestamp, stack }) => {
 const logger = winston.createLogger({
   level: "silly", // 기본 로그 레벨: 가장 낮은 수준의 로그까지 모두 기록
   format: combine(
-    timestamp(), // 타임스탬프 추가
+    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // 타임스탬프 형식 지정
     winston.format.errors({ stack: true }), // 스택 트레이스 추가
     customFormat // 커스텀 포맷 적용
   ),
