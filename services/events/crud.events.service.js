@@ -7,7 +7,41 @@ export const detailEvent = async (eventId) => {
    */
 
   const detail = await db.Events.findOne({
-    where: { eventId: eventId }
+    where: { eventId: eventId },
+    
+    attributes: { exclude: [ 'categoryId', 'createdUserId', 'columnName' ] },
+    include: [
+      {
+        model: db.EventCategory,
+        as: 'category',
+        attributes: ['name', 'description'],
+      },
+      {
+        model: db.EventImages,
+        as: 'eventImages',
+        attributes: [
+          'imageUrl',
+          'sequence',
+          'createdAt',
+          'updatedAt'
+        ],
+      },
+      {
+        model: db.EventSchedules,
+        as: 'eventSchedules',
+        attributes: [
+          'repeatType',
+          'repeatEndDate',
+          'isAllDay',
+          'customText',
+          'startDate',
+          'endDate',
+          'startTime',
+          'endTime'
+        ]
+      }
+    ],
+
   });
 
   return detail;

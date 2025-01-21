@@ -9,13 +9,13 @@ import { logError } from "../../utils/handlers/error.logger.js";
 export const newReport = async(req, res, next) => {
   try {
     const { eventId } = req.params;
-    const { reportedUserId } = req.user;
+    const { userId } = req.user;
     const { reason } = req.body;    // 신고 이유 사용자 작성
 
-    const report = await reportService.newReport(eventId, reportedUserId, reason);
+    const report = await reportService.newReport(eventId, userId, reason);
 
     if (report) {   // 201
-      return res.status(201).sucess({ message: "Report created successfully" });
+      return res.status(201).success({ message: "Report created successfully" });
     }
   } catch (error) {
         logError(error);

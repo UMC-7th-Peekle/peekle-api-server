@@ -8,7 +8,6 @@ import * as listEventController from "../controllers/events/read.events.controll
 const router = Router();
 
 // 이벤트 조회
-// query를 통해 category, cursor, limit를 받을 수 있음
 router.get("/", listEventController.listEvent);   // 이벤트 목록 조회
 router.get("/:eventId", detailEventController.detailEvent);    // 이벤트 상세정보 조회
 

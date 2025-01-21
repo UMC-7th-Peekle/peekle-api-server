@@ -1,6 +1,9 @@
 import * as listService from "../../services/events/read.events.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
+/**
+ * query를 통해 category, cursor, limit를 받을 수 있습니다.
+ */
 export const listEvent = async(req, res, next) => {
   try {
     const { category } = req.query;

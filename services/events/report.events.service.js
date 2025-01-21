@@ -1,14 +1,15 @@
 import {
   UnauthorizedError,
   NotAllowedError,
+  NotExistsError,
   AlreadyExistsError
 } from "../../utils/errors/errors.js";
 import db from "../../models/index.js";
 
-export const newReport = async (eventId, reportedUserId, reason) => {
+export const newReport = async (eventId, userId, reason) => {
   // 알맞은 유저인지 확인 401
   const user = await db.Users.findOne({
-    where: { userId: reportedUserId },
+    where: { userId: userId },
   });
 
   if (!user) {
@@ -22,11 +23,20 @@ export const newReport = async (eventId, reportedUserId, reason) => {
 
   // 신고 권한 (자기자신 신고할 경우 에러) 403
   const auth = await db.Events.findOne({
-    where: { eventId: eventId, createUserId: reportedUserId }
+    where: { eventId: eventId, createdUserId: userId }
   })
 
   if (auth) {
     throw new NotAllowedError("신고 권한이 존재하지 않습니다.");
+  }
+
+  // eventId가 유효한지 확인 404
+  const event = await db.Events.findOne({
+    where: { eventId: eventId },
+  });
+
+  if (!event) {
+    throw new NotExistsError("존재하지 않는 이벤트입니다.");
   }
 
   // 중복 신고인지 확인 409
@@ -34,7 +44,7 @@ export const newReport = async (eventId, reportedUserId, reason) => {
     where: 
     { type: "event", 
       targetId: eventId,
-      reportedUserId: reportedUserId,
+      reportedUserId: userId,
     },
   });
 
@@ -46,7 +56,7 @@ export const newReport = async (eventId, reportedUserId, reason) => {
   const newReport = await db.Reports.create({
     type: "event",
     targetId: eventId,
-    reportedUserId: reportedUserId,
+    reportedUserId: userId,
     reason: reason,
   });
 
