@@ -22,7 +22,16 @@ export default class Articles extends Model {
     authorId: {
       type: DataTypes.BIGINT,
       allowNull: false,
+      references: {
+        model: 'users',
+        key: 'user_id'
+      },
       field: 'author_id'
+    },
+    isAnonymous: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      field: 'is_anonymous'
     },
     communityId: {
       type: DataTypes.BIGINT,
@@ -44,11 +53,6 @@ export default class Articles extends Model {
       allowNull: false,
       defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)"),
       field: 'updated_at'
-    },
-    isAnonymous: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      field: 'is_anonymous'
     }
   }, {
     sequelize,

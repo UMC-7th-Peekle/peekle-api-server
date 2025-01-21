@@ -47,6 +47,16 @@ export const getKakaoAccessToken = async (authorizationCode) => {
 
 /**
  * 카카오 액세스 토큰을 사용하여 사용자 정보를 조회하는 함수.
+ * @async
+ * @function getKakaoUserInfo
+ * @param {string} accessToken - The access token from Kakao.
+ * @returns {{
+ *   oauthId: number,
+ *   name: string,
+ *   nickname: string,
+ *   email: string,
+ *   profileImage: string
+ * }} An object containing Kakao user information.
  */
 export const getKakaoUserInfo = async (accessToken) => {
   const userInfoResponse = await axios.get(
@@ -103,8 +113,8 @@ export const checkIfUserExists = async (data) => {
         as: "userOauths",
         attributes: ["userId"],
         where: {
-          oauth_type: "kakao",
-          oauth_id: data.oauth_id,
+          oauthType: "kakao",
+          oauthId: data.oauthId,
         },
       },
     ],

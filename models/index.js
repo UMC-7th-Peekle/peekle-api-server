@@ -14,7 +14,7 @@ const sequelize = new Sequelize(
     port: DATABASE.MYSQL_PORT,
     dialect: "mysql",
     logging: (msg) => logger.debug(`[Sequelize Log]: ${msg} ✨`),
-    timezone: "+09:00",
+    // timezone: "+09:00",
     pool: {
       max: 10, // 최대 연결 수
       min: 0, // 최소 연결 수
