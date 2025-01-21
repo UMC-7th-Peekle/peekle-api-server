@@ -83,6 +83,12 @@ export const unlikeComment = async ({
         likedUserId,
       },
     });
+
+    if (!existingLike) {
+      // 좋아요가 눌리지 않은 경우
+      throw new AlreadyExistsError("좋아요가 존재하지 않습니다"); // 409
+    }
+
     // 좋아요 삭제
     await db.ArticleCommentLikes.destroy({
       where: {
