@@ -5,7 +5,7 @@ import {
 } from "../utils/errors/errors.js";
 import { logError } from "../utils/handlers/error.logger.js";
 import logger from "../utils/logger/logger.js";
-import * as uploadService from "../utils/upload/upload.service.js";
+import * as uploadService from "../utils/upload/uploader.object.js";
 import multer from "multer";
 
 /**
@@ -48,7 +48,7 @@ export const s3Storage = ({
   field = [{ name: "image" }, { name: "images", maxCount: 5 }],
 }) => {
   // console.log(req.file, req.files, req.body);
-  const upload = uploadService.uploadImageToS3(restrictions).fields(field);
+  const upload = uploadService.uploadToS3(restrictions).fields(field);
   // multer 미들웨어를 사용하여 이미지 업로드 처리
   // 콜백함수 내에서는 throw 하면 안됨
   return (req, res, next) =>

@@ -1,15 +1,3 @@
-import multer from "multer";
-import logger from "../logger/logger.js";
-
-import {
-  InvalidInputError,
-  MulterError,
-  UnknownError,
-} from "../errors/errors.js";
-
-import * as uploadService from "./upload.service.js";
-import { logError } from "../handlers/error.logger.js";
-
 // handleSingleUpload
 
 /**
@@ -98,7 +86,7 @@ export const localFields = (destination = "uploads") => {
 export const s3Single = (req, res, next) => {
   try {
     // console.log(req.file, req.files, req.body);
-    const upload = uploadService.uploadImageToS3().single("image");
+    const upload = uploadService.uploadToS3().single("image");
     // multer 미들웨어를 사용하여 이미지 업로드 처리
     // 콜백함수 내에서는 throw 하면 안됨
     upload(req, res, (err) => {
@@ -138,7 +126,7 @@ export const s3Single = (req, res, next) => {
 export const s3Multiple = (req, res, next) => {
   try {
     // multer 미들웨어를 사용하여 여러 이미지 업로드 처리 (최대 5개)
-    const upload = uploadService.uploadImageToS3().array("images", 5);
+    const upload = uploadService.uploadToS3().array("images", 5);
     upload(req, res, (err) => {
       if (err instanceof multer.MulterError) {
         // Multer 오류 처리

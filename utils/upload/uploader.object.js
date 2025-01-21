@@ -79,7 +79,7 @@ export const createUploadMiddleware = ({ destination, restrictions }) => {
  * Multer-S3 설정을 통한 이미지 업로드 미들웨어 생성 함수.
  * @returns {Middleware} Express용 multer 미들웨어.
  */
-export const uploadImageToS3 = (restrictions) => {
+export const uploadToS3 = (restrictions) => {
   const s3Client = new S3Client({
     region: REGION,
     credentials: {
