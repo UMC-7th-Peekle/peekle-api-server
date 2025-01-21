@@ -111,6 +111,8 @@ export default function initModels(sequelize) {
   Users.hasMany(ArticleComments, { as: "articleComments", foreignKey: "authorId"});
   ArticleLikes.belongsTo(Users, { as: "likedUser", foreignKey: "likedUserId"});
   Users.hasMany(ArticleLikes, { as: "articleLikes", foreignKey: "likedUserId"});
+  Articles.belongsTo(Users, { as: "author", foreignKey: "authorId"});
+  Users.hasMany(Articles, { as: "articles", foreignKey: "authorId"});
   EventScraps.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(EventScraps, { as: "eventScraps", foreignKey: "userId"});
   Events.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
