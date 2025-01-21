@@ -16,7 +16,6 @@ export const likeComment = async ({
   likedUserId,
 }) => {
   try {
-    // 사용자 인증 검증 필요
     // 댓글 조회
     const comment = await db.ArticleComments.findOne({
       where: {
@@ -65,7 +64,6 @@ export const unlikeComment = async ({
   likedUserId,
 }) => {
   try {
-    // 사용자 인증 검증 필요
     // 댓글 조회
     const comment = await db.ArticleComments.findOne({
       where: {
@@ -78,7 +76,13 @@ export const unlikeComment = async ({
       // 댓글이 존재하지 않는 경우
       throw new NotExistsError("댓글이 존재하지 않습니다"); // 404
     }
-
+    // 이미 좋아요가 눌렸는지 확인
+    const existingLike = await db.ArticleCommentLikes.findOne({
+      where: {
+        commentId,
+        likedUserId,
+      },
+    });
     // 좋아요 삭제
     await db.ArticleCommentLikes.destroy({
       where: {

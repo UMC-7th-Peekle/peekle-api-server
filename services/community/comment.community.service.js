@@ -18,7 +18,7 @@ export const createComment = async ({
   isAnonymous = true,
 }) => {
   try {
-    // 사용자 인증 검증 & 형식 검증 필요
+    // 형식 검증 필요
     // 댓글 생성
     const status = "active";
 
@@ -47,7 +47,7 @@ export const updateComment = async ({
   content,
 }) => {
   try {
-    // 사용자 인증 검증 & 형식 검증 필요
+    // 형식 검증 필요
     // 댓글 조회
     const comment = await db.ArticleComments.findOne({
       where: {
@@ -82,7 +82,6 @@ export const deleteComment = async ({
   authorId,
 }) => {
   try {
-    // 사용자 인증 검증 필요
     // 댓글 조회
     const comment = await db.ArticleComments.findOne({
       where: {
@@ -117,7 +116,7 @@ export const createCommentReply = async ({
   isAnonymous = true,
 }) => {
   try {
-    // 사용자 인증 검증 & 형식 검증 필요
+    // 형식 검증 필요
     // 댓글 생성
     const status = "active";
     const parentCommentId = commentId;

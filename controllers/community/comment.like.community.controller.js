@@ -5,10 +5,8 @@ import { logError } from "../../utils/handlers/error.logger.js";
 // 댓글 좋아요
 export const likeComment = async (req, res, next) => {
   try {
-    // 사용자 인증 검증 필요
     const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
-    //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
-    var likedUserId = 1; // 임시로 사용자 ID를 1로 설정
+    const likedUserId = req.user.userId; // JWT에서 사용자 ID 추출
 
     const like = await commentLikeService.likeComment({
       communityId,
@@ -29,10 +27,8 @@ export const likeComment = async (req, res, next) => {
 // 댓글 좋아요 취소
 export const unlikeComment = async (req, res, next) => {
   try {
-    // 사용자 인증 검증 필요
     const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
-    //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
-    var likedUserId = 1; // 임시로 사용자 ID를 1로 설정
+    const likedUserId = req.user.userId; // JWT에서 사용자 ID 추출
 
     await commentLikeService.unlikeComment({
       communityId,

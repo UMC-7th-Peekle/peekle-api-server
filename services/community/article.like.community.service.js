@@ -11,7 +11,6 @@ import db from "../../models/index.js";
  */
 export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
   try {
-    // 사용자 인증 검증 필요
     // 게시글 조회
     const article = await db.Articles.findOne({
       where: {
@@ -59,7 +58,6 @@ export const unlikeArticle = async ({
   likedUserId,
 }) => {
   try {
-    // 사용자 인증 검증 필요
     // 게시글 조회
     const article = await db.Articles.findOne({
       where: {

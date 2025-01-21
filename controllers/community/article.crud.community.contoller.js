@@ -30,8 +30,7 @@ export const createArticle = async (req, res, next) => {
     // 사용자 인증 검증
     const { communityId } = req.params; // URL에서 communityId 추출
     const { title, content, isAnonymous } = req.body; // Request body에서 title, content 추출
-    //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
-    var authorId = 1; // 임시로 사용자 ID를 1로 설정
+    const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     const article = await articleCrudService.createArticle({
       communityId,
@@ -57,9 +56,7 @@ export const updateArticle = async (req, res, next) => {
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
     const { title, content } = req.body; // Request body에서 title, content 추출
-    //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
-    var authorId = 1; // 임시로 사용자 ID를 1로 설정
-
+    const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     const article = await articleCrudService.updateArticle({
       communityId,
       articleId,
@@ -82,8 +79,7 @@ export const deleteArticle = async (req, res, next) => {
   // 사용자 인증 검증 필요
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
-    //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
-    var authorId = 1; // 임시로 사용자 ID를 1로 설정
+    const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     await articleCrudService.deleteArticle({
       communityId,

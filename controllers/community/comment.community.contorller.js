@@ -6,11 +6,9 @@ import { logError } from "../../utils/handlers/error.logger.js";
 export const createComment = async (req, res, next) => {
   try {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-    // 사용자 인증 검증
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
     const { content, isAnonymous } = req.body; // Request body에서 content 추출
-    //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
-    var authorId = 1; // 임시로 사용자 ID를 1로 설정
+    const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     const comment = await commentService.createComment({
       communityId,
@@ -33,11 +31,9 @@ export const createComment = async (req, res, next) => {
 export const updateComment = async (req, res, next) => {
   try {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-    // 사용자 인증 검증
     const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
     const { content } = req.body; // Request body에서 content 추출
-    //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
-    var authorId = 1; // 임시로 사용자 ID를 1로 설정
+    const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     const comment = await commentService.updateComment({
       communityId,
@@ -59,10 +55,8 @@ export const updateComment = async (req, res, next) => {
 // 댓글 삭제
 export const deleteComment = async (req, res, next) => {
   try {
-    // 사용자 인증 검증
     const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
-    //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
-    var authorId = 1; // 임시로 사용자 ID를 1로 설정
+    const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     await commentService.deleteComment({
       communityId,
@@ -84,11 +78,9 @@ export const deleteComment = async (req, res, next) => {
 export const createCommentReply = async (req, res, next) => {
   try {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-    // 사용자 인증 검증
     const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
     const { content, isAnonymous } = req.body; // Request body에서 content 추출
-    //const authorId = req.user.userId; // JWT에서 사용자 ID 추출
-    var authorId = 1; // 임시로 사용자 ID를 1로 설정
+    const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     const comment = await commentService.createCommentReply({
       articleId,

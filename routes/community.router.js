@@ -4,6 +4,8 @@ import articleReadContoller from "../controllers/community/article.read.communit
 import commentController from "../controllers/community/comment.community.contorller.js";
 import articleLikeController from "../controllers/community/article.like.community.controller.js";
 import commentLikeController from "../controllers/community/comment.like.community.controller.js";
+// 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
+import { authenticateAccessToken } from "../middleware/authenticate.jwt.js"; 
 
 
 const router = Router();
@@ -29,13 +31,18 @@ router.get(
 /**
  * communityId에 해당하는 게시판에 게시글을 추가합니다
  */
-router.post("/:communityId/articles", articleCrudController.createArticle);
+router.post(
+  "/:communityId/articles",
+  authenticateAccessToken,
+  articleCrudController.createArticle
+);
 
 /**
  * communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 수정합니다
  */
 router.patch(
   "/:communityId/articles/:articleId",
+  authenticateAccessToken,
   articleCrudController.updateArticle
 ); // jwtMiddleware 추가해야 함
 
@@ -44,6 +51,7 @@ router.patch(
  */
 router.delete(
   "/:communityId/articles/:articleId",
+  authenticateAccessToken,
   articleCrudController.deleteArticle
 ); // jwtMiddleware 추가해야 함
 
@@ -52,6 +60,7 @@ router.delete(
  */
 router.post(
   "/:communityId/articles/:articleId/like",
+  authenticateAccessToken,
   articleLikeController.likeArticle
 );
 
@@ -60,6 +69,7 @@ router.post(
  */
 router.delete(
   "/:communityId/articles/:articleId/like",
+  authenticateAccessToken,
   articleLikeController.unlikeArticle
 );
 
@@ -68,6 +78,7 @@ router.delete(
  */
 router.post(
   "/:communityId/articles/:articleId/comments",
+  authenticateAccessToken,
   commentController.createComment
 );
 
@@ -76,6 +87,7 @@ router.post(
  */
 router.patch(
   "/:communityId/articles/:articleId/comments/:commentId",
+  authenticateAccessToken,
   commentController.updateComment
 );
 
@@ -84,6 +96,7 @@ router.patch(
  */
 router.delete(
   "/:communityId/articles/:articleId/comments/:commentId",
+  authenticateAccessToken,
   commentController.deleteComment
 );
 
@@ -92,6 +105,7 @@ router.delete(
  */
 router.post(
   "/:communityId/articles/:articleId/comments/:commentId/reply",
+  authenticateAccessToken,
   commentController.createCommentReply
 );
 
@@ -100,6 +114,7 @@ router.post(
  */
 router.post(
   "/:community/articles/:articleId/comments/:commentId/like",
+  authenticateAccessToken,
   commentLikeController.likeComment
 );
 
@@ -108,6 +123,7 @@ router.post(
  */
 router.delete(
   "/:community/articles/:articleId/comments/:commentId/like",
+  authenticateAccessToken,
   commentLikeController.unlikeComment
 );
 
