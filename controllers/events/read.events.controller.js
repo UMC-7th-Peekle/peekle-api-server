@@ -6,20 +6,21 @@ import { logError } from "../../utils/handlers/error.logger.js";
  */
 export const listEvent = async(req, res, next) => {
   try {
-    const { category } = req.query;
-    const { limit, cursor } = req.query;
+    const { category,limit, cursor } = req.query;
 
     // 페이지네이션 기본값 설정
     const paginationOptions = {
       limit: limit ? parseInt(limit, 10) : 10, // 기본 limit은 10
-      cursor: cursor || null, // cursor가 없으면 null
+      cursor: cursor ? parseInt(cursor, 10) : null, // cursor가 없으면 null
     };
 
     const list = await listService.listEvent(category, paginationOptions);
 
     if (list && list.length > 0) {
+      const nextCursor = list[list.length - 1].eventId;   // 다음 페이지로 이동할 커서 값
+
       // 200
-      return res.status(200).json({ message: "목록 조회 성공", data: list });
+      return res.status(200).json({ events: list, nextCursor });
     } else {
       // 204
       return res.status(204).send();
