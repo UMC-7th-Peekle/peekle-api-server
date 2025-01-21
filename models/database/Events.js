@@ -71,11 +71,6 @@ export default class Events extends Model {
       allowNull: false,
       defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)"),
       field: 'updated_at'
-    },
-    columnName: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      field: 'column_name'
     }
   }, {
     sequelize,

@@ -56,6 +56,15 @@ export default class UserOauth extends Model {
         ]
       },
       {
+        name: "user_oauth_pk",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "oauth_id" },
+          { name: "oauth_type" },
+        ]
+      },
+      {
         name: "user_oauth_users_user_id_fk",
         using: "BTREE",
         fields: [
