@@ -25,22 +25,30 @@ export const createComment = async ({
       articleId,
     },
   });
-  // 게시글이 존재하지 않는 경우
-  if (!article) {
-    logger.error(
-      `[createComment] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
-    );
-    throw new NotExistsError("게시글이 존재하지 않습니다");
-  }
 
+  let comment;
+  /* try-catch 블록 외부에서 comment 선언
+  try-catch 블록 내부에서 comment를 생성하고 반환하면
+  "comment is not defined" 에러가 발생합니다.
+  */
   // 댓글 생성
-  const comment = await models.ArticleComments.create({
+  try {
+    comment = await models.ArticleComments.create({
     articleId,
     authorId,
     content,
     status: "active",
     isAnonymous,
-  });
+    });
+  } catch (error) {
+    if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
+      logger.error(
+        `[createComment] 게시글이 존재하지 않음 - articleId: ${articleId}`
+      );
+      throw new NotExistsError("해당 게시글이 존재하지 않습니다");
+    }
+    throw error;
+  }
 
   return { comment };
 };
@@ -112,7 +120,7 @@ export const deleteComment = async ({
 
   // 댓글 작성자와 요청자가 다른 경우
   // toString()으로 타입 변환 후 strict 하게 비교하도록 수정했습니다.
-  if (authorId.toString !== comment.authorId.toString()) {
+  if (authorId.toString() !== comment.authorId.toString()) {
     logger.error(
       `[deleteComment] 댓글 삭제 권한 없음 - 요청자: ${authorId}, 작성자: ${comment.authorId}`
     );
