@@ -40,7 +40,7 @@ export const likeComment = async ({
 
     // 이미 좋아요가 눌린 경우
     if (comment.articleCommentLikes.length > 0) {
-      throw new AlreadyExistsError("이미 좋아요가 처리되었습니다"); // 409
+      throw new AlreadyExistsError("이미 좋아요를 누른 댓글입니다."); // 409
     }
 
     // 좋아요 추가
@@ -90,7 +90,7 @@ export const unlikeComment = async ({
 
     // 좋아요가 눌리지 않은 경우
     if (comment.articleCommentLikes.length === 0) {
-      throw new NotExistsError("좋아요가 존재하지 않습니다"); // 404
+      throw new NotExistsError("이미 좋아요가 취소된 댓글입니다."); // 404
     }
 
     // 좋아요 삭제

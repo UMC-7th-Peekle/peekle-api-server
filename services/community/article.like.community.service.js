@@ -36,7 +36,7 @@ export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
 
     if (article.articleLikes.length > 0) {
       // 이미 좋아요가 눌린 경우
-      throw new AlreadyExistsError("이미 좋아요가 처리되었습니다"); // 409
+      throw new AlreadyExistsError("이미 좋아요를 누른 게시글입니다."); // 409
     }
 
     // 좋아요 추가
@@ -87,7 +87,7 @@ export const unlikeArticle = async ({
 
     if (article.articleLikes.length === 0) {
       // 좋아요가 눌리지 않은 경우
-      throw new AlreadyExistsError("좋아요가 존재하지 않습니다"); // 409
+      throw new AlreadyExistsError("이미 좋아요가 취소된 게시글입니다."); // 409
     }
 
     // 좋아요 삭제
