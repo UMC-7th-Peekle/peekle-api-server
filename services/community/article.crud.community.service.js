@@ -7,36 +7,27 @@ import logger from "../../utils/logger/logger.js";
  * communityId와 articleId에 해당하는 게시글을 가져옵니다
  */
 export const getArticleById = async ({ communityId, articleId }) => {
-  try {
-    // 게시글 조회
-    const article = await models.Articles.findOne({
-      where: {
-        communityId,
-        articleId,
+  // 게시글 조회 및 댓글 포함
+  const article = await models.Articles.findOne({
+    where: {
+      communityId,
+      articleId,
+    },
+    include: [
+      {
+        model: models.ArticleComments,
+        as: "articleComments", // 모델 정의 시 설정한 별칭 사용
       },
-    });
+    ],
+  });
 
-    if (!article) {
-      // 게시글이 존재하지 않는 경우
-      throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
-    }
-
-    // TODO : include 활용해서 JOIN으로 쿼리문 한번에 끝내주세요.
-    // 그렇게 되면 Depth 구조가 전체적으로 바뀔거라,
-    // 따로 건들지 않겠습니다. 직접 해보세요 !
-
-    // 댓글 조회
-    const comments = await models.ArticleComments.findAll({
-      where: {
-        articleId,
-      },
-    });
-
-    // 게시글 및 댓글 반환
-    return { article, comments };
-  } catch (error) {
-    throw error;
+  if (!article) {
+    // 게시글이 존재하지 않는 경우
+    throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
   }
+
+  // 게시글 및 댓글 반환
+  return article;
 };
 
 /**
