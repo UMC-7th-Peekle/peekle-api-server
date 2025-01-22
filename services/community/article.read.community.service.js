@@ -3,7 +3,7 @@ import {
   InvalidInputError,
   NotExistsError,
 } from "../../utils/errors/errors.js";
-import db from "../../models/index.js";
+import models from "../../models/index.js";
 import { Op } from "sequelize";
 
 /**
@@ -12,7 +12,7 @@ import { Op } from "sequelize";
 export const getArticles = async (communityId, { limit, cursor = null }) => {
   try {
     // 게시글 목록 조회
-    const articles = await db.Articles.findAll({
+    const articles = await models.Articles.findAll({
       where: {
         communityId, // communityId가 일치하는 게시글만 조회
         ...(cursor && { createdAt: { [Op.lt]: cursor } }), // cursor 조건이 있을 경우 추가 (스프레드 연산자)
@@ -20,8 +20,6 @@ export const getArticles = async (communityId, { limit, cursor = null }) => {
       order: [["createdAt", "DESC"]], // createdAt 활용하여 최신순 정렬
       limit, // limit 개수만큼 조회
     });
-
-  
 
     // 다음 커서 계산: 현재 페이지에 게시글이 하나 이상 있으면 게시글의 마지막 항목의 createdAt을 다음 커서로 사용
     const nextCursor =
@@ -39,10 +37,14 @@ export const getArticles = async (communityId, { limit, cursor = null }) => {
 /**
  * communityId에 해당하는 게시판의 게시글들 중 검색어를 포함하는 게시글을 가져옵니다
  */
-export const searchArticles = async (communityId, query, { limit, cursor = null }) => {
+export const searchArticles = async (
+  communityId,
+  query,
+  { limit, cursor = null }
+) => {
   try {
     // 게시글 검색
-    const articles = await db.Articles.findAll({
+    const articles = await models.Articles.findAll({
       where: {
         communityId,
         title: {
@@ -53,7 +55,6 @@ export const searchArticles = async (communityId, query, { limit, cursor = null 
       order: [["createdAt", "DESC"]], // 최신순 정렬
       limit, // limit 개수만큼 조회
     });
-
 
     // 다음 커서 계산: 마지막 게시글의 createdAt 값
     const nextCursor =
@@ -66,9 +67,4 @@ export const searchArticles = async (communityId, query, { limit, cursor = null 
   } catch (error) {
     throw error;
   }
-};
-
-export default {
-  getArticles,
-  searchArticles,
 };

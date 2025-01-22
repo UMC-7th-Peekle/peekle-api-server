@@ -5,13 +5,13 @@ import {
   NotExistsError,
   UnauthorizedError,
 } from "../../utils/errors/errors.js";
-import db from "../../models/index.js";
+import models from "../../models/index.js";
 
 /**
  * communityId, articleId에 해당하는 게시글에 댓글을 추가합니다
  */
 export const createComment = async ({
-  communityId,  // 현재는 사용하지는 않음
+  communityId, // 현재는 사용하지는 않음
   articleId,
   authorId,
   content,
@@ -22,13 +22,19 @@ export const createComment = async ({
     // 댓글 생성
     const status = "active";
 
-    const comment = await db.ArticleComments.create({
-      articleId,
-      authorId,
-      content,
-      status,
-      isAnonymous,
-    });
+    try {
+      const comment = await models.ArticleComments.create({
+        articleId,
+        authorId,
+        content,
+        status,
+        isAnonymous,
+      });
+    } catch (err) {
+      if (err instanceof models.Sequelize.ForeignKeyConstraintError) {
+        throw new InvalidInputError("존재하지 않는 사용자나 게시글입니다.");
+      }
+    }
 
     return { comment };
   } catch (error) {
@@ -49,7 +55,7 @@ export const updateComment = async ({
   try {
     // 형식 검증 필요
     // 댓글 조회
-    const comment = await db.ArticleComments.findOne({
+    const comment = await models.ArticleComments.findOne({
       where: {
         articleId,
         commentId,
@@ -83,7 +89,7 @@ export const deleteComment = async ({
 }) => {
   try {
     // 댓글 조회
-    const comment = await db.ArticleComments.findOne({
+    const comment = await models.ArticleComments.findOne({
       where: {
         articleId,
         commentId,
@@ -121,7 +127,7 @@ export const createCommentReply = async ({
     const status = "active";
     const parentCommentId = commentId;
 
-    const comment = await db.ArticleComments.create({
+    const comment = await models.ArticleComments.create({
       articleId,
       parentCommentId,
       authorId,
@@ -138,11 +144,4 @@ export const createCommentReply = async ({
   } catch (error) {
     throw error;
   }
-};
-
-export default {
-  createComment,
-  updateComment,
-  deleteComment,
-  createCommentReply,
 };

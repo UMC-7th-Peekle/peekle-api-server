@@ -1,12 +1,11 @@
 import { Router } from "express";
-import articleCrudController from "../controllers/community/article.crud.community.contoller.js";
-import articleReadContoller from "../controllers/community/article.read.community.controller.js";
-import commentController from "../controllers/community/comment.community.contorller.js";
-import articleLikeController from "../controllers/community/article.like.community.controller.js";
-import commentLikeController from "../controllers/community/comment.like.community.controller.js";
+import * as articleCrudController from "../controllers/community/article.crud.community.contoller.js";
+import * as articleReadContoller from "../controllers/community/article.read.community.controller.js";
+import * as commentController from "../controllers/community/comment.community.contorller.js";
+import * as articleLikeController from "../controllers/community/article.like.community.controller.js";
+import * as commentLikeController from "../controllers/community/comment.like.community.controller.js";
 // 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
-import { authenticateAccessToken } from "../middleware/authenticate.jwt.js"; 
-
+import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 
 const router = Router();
 

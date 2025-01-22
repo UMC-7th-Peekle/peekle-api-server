@@ -1,5 +1,5 @@
 // Description: 게시글 좋아요 관련 로직을 처리하는 컨트롤러 파일입니다.
-import articleLikeService from "../../services/community/article.like.community.service.js";
+import * as articleLikeService from "../../services/community/article.like.community.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 // 게시글 좋아요
@@ -42,9 +42,4 @@ export const unlikeArticle = async (req, res, next) => {
     logError(error);
     next(error); // 에러 핸들러로 전달
   }
-};
-
-export default {
-  likeArticle,
-  unlikeArticle,
 };

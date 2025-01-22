@@ -4,7 +4,7 @@ import {
   UnauthorizedError,
   AlreadyExistsError,
 } from "../../utils/errors/errors.js";
-import db from "../../models/index.js";
+import models from "../../models/index.js";
 
 /**
  * 게시글 좋아요를 추가합니다
@@ -12,7 +12,7 @@ import db from "../../models/index.js";
 export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
   try {
     // 게시글 조회
-    const article = await db.Articles.findOne({
+    const article = await models.Articles.findOne({
       where: {
         communityId,
         articleId,
@@ -25,7 +25,7 @@ export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
     }
 
     // 이미 좋아요가 눌렸는지 확인
-    const existingLike = await db.ArticleLikes.findOne({
+    const existingLike = await models.ArticleLikes.findOne({
       where: {
         articleId,
         likedUserId,
@@ -38,7 +38,7 @@ export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
     }
 
     // 좋아요 추가
-    const like = await db.ArticleLikes.create({
+    const like = await models.ArticleLikes.create({
       articleId,
       likedUserId,
     });
@@ -59,7 +59,7 @@ export const unlikeArticle = async ({
 }) => {
   try {
     // 게시글 조회
-    const article = await db.Articles.findOne({
+    const article = await models.Articles.findOne({
       where: {
         communityId,
         articleId,
@@ -72,7 +72,7 @@ export const unlikeArticle = async ({
     }
 
     // 이미 좋아요가 눌렸는지 확인
-    const existingLike = await db.ArticleLikes.findOne({
+    const existingLike = await models.ArticleLikes.findOne({
       where: {
         articleId,
         likedUserId,
@@ -84,7 +84,7 @@ export const unlikeArticle = async ({
       throw new AlreadyExistsError("좋아요가 존재하지 않습니다"); // 409
     }
     // 좋아요 삭제
-    await db.ArticleLikes.destroy({
+    await models.ArticleLikes.destroy({
       where: {
         articleId,
         likedUserId,
@@ -95,9 +95,4 @@ export const unlikeArticle = async ({
   } catch (error) {
     throw error;
   }
-};
-
-export default {
-  likeArticle,
-  unlikeArticle,
 };

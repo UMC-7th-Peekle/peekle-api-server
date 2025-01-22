@@ -1,5 +1,5 @@
 // Description: 게시글 목록 조회와 관련된 컨트롤러 파일입니다.
-import articleReadService from "../../services/community/article.read.community.service.js";
+import * as articleReadService from "../../services/community/article.read.community.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 // 게시글 목록 조회
@@ -29,12 +29,11 @@ export const getArticles = async (req, res, next) => {
       articles,
       nextCursor,
     });
-    
   } catch (error) {
     logError(error);
     next(error); // 에러 핸들러로 전달
   }
-}
+};
 
 // 게시글 검색
 export const searchArticles = async (req, res, next) => {
@@ -70,9 +69,4 @@ export const searchArticles = async (req, res, next) => {
     logError(error);
     next(error); // 에러 핸들러로 전달
   }
-}
-
-export default {
-  getArticles,
-  searchArticles,
 };

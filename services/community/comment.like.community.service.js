@@ -1,10 +1,9 @@
 // Description: 댓글 좋아요 관련 로직을 처리하는 서비스 파일입니다.
 import {
   NotExistsError,
-  UnauthorizedError,
   AlreadyExistsError,
 } from "../../utils/errors/errors.js";
-import db from "../../models/index.js";
+import models from "../../models/index.js";
 
 /**
  * 댓글 좋아요를 추가합니다
@@ -17,7 +16,7 @@ export const likeComment = async ({
 }) => {
   try {
     // 댓글 조회
-    const comment = await db.ArticleComments.findOne({
+    const comment = await models.ArticleComments.findOne({
       where: {
         articleId,
         commentId,
@@ -30,7 +29,7 @@ export const likeComment = async ({
     }
 
     // 이미 좋아요가 눌렸는지 확인
-    const existingLike = await db.ArticleCommentLikes.findOne({
+    const existingLike = await models.ArticleCommentLikes.findOne({
       where: {
         commentId,
         likedUserId,
@@ -43,7 +42,7 @@ export const likeComment = async ({
     }
 
     // 좋아요 추가
-    const like = await db.ArticleCommentLikes.create({
+    const like = await models.ArticleCommentLikes.create({
       commentId,
       likedUserId,
     });
@@ -65,7 +64,7 @@ export const unlikeComment = async ({
 }) => {
   try {
     // 댓글 조회
-    const comment = await db.ArticleComments.findOne({
+    const comment = await models.ArticleComments.findOne({
       where: {
         articleId,
         commentId,
@@ -77,7 +76,7 @@ export const unlikeComment = async ({
       throw new NotExistsError("댓글이 존재하지 않습니다"); // 404
     }
     // 이미 좋아요가 눌렸는지 확인
-    const existingLike = await db.ArticleCommentLikes.findOne({
+    const existingLike = await models.ArticleCommentLikes.findOne({
       where: {
         commentId,
         likedUserId,
@@ -90,7 +89,7 @@ export const unlikeComment = async ({
     }
 
     // 좋아요 삭제
-    await db.ArticleCommentLikes.destroy({
+    await models.ArticleCommentLikes.destroy({
       where: {
         commentId,
         likedUserId,
@@ -101,9 +100,4 @@ export const unlikeComment = async ({
   } catch (error) {
     throw error;
   }
-};
-
-export default {
-  likeComment,
-  unlikeComment,
 };
