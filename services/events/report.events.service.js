@@ -4,11 +4,11 @@ import {
   NotExistsError,
   AlreadyExistsError
 } from "../../utils/errors/errors.js";
-import db from "../../models/index.js";
+import models from "../../models/index.js";
 
 export const newReport = async (eventId, userId, reason) => {
   // 알맞은 유저인지 확인 401
-  const user = await db.Users.findOne({
+  const user = await models.Users.findOne({
     where: { userId: userId },
   });
 
@@ -22,7 +22,7 @@ export const newReport = async (eventId, userId, reason) => {
    */
 
   // 신고 권한 (자기자신 신고할 경우 에러) 403
-  const auth = await db.Events.findOne({
+  const auth = await models.Events.findOne({
     where: { eventId: eventId, createdUserId: userId }
   })
 
@@ -31,7 +31,7 @@ export const newReport = async (eventId, userId, reason) => {
   }
 
   // eventId가 유효한지 확인 404
-  const event = await db.Events.findOne({
+  const event = await models.Events.findOne({
     where: { eventId: eventId },
   });
 
@@ -40,7 +40,7 @@ export const newReport = async (eventId, userId, reason) => {
   }
 
   // 중복 신고인지 확인 409
-  const existReport = await db.Reports.findOne({
+  const existReport = await models.Reports.findOne({
     where: 
     { type: "event", 
       targetId: eventId,
@@ -53,7 +53,7 @@ export const newReport = async (eventId, userId, reason) => {
   }
 
   // 해당 이벤트 신고하기
-  const newReport = await db.Reports.create({
+  const newReport = await models.Reports.create({
     type: "event",
     targetId: eventId,
     reportedUserId: userId,

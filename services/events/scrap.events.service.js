@@ -3,11 +3,11 @@ import {
   NotExistsError,
   UnauthorizedError,
 } from "../../utils/errors/errors.js";
-import db from "../../models/index.js";
+import models from "../../models/index.js";
 
 // 알맞은 유저인지 확인 401
 const checkUser = async (userId) => {
-  const user = await db.Users.findOne({
+  const user = await models.Users.findOne({
     where: { userId: userId },
   });
 
@@ -18,7 +18,7 @@ const checkUser = async (userId) => {
 
 // eventId가 유효한지 확인 404
 const existEvent = async (eventId) => {
-  const event = await db.Events.findOne({
+  const event = await models.Events.findOne({
     where: { eventId: eventId },
   });
 
@@ -33,7 +33,7 @@ export const newScrap = async (eventId, userId) => {
   await existEvent(eventId);
 
   // 이미 이벤트가 스크랩 되어 있는지 확인 409
-  const existScrap = await db.EventScraps.findOne({
+  const existScrap = await models.EventScraps.findOne({
     where: { eventId, userId },
   });
 
@@ -42,7 +42,7 @@ export const newScrap = async (eventId, userId) => {
   }
 
   // 스크랩 추가
-  const newScrap = await db.EventScraps.create({
+  const newScrap = await models.EventScraps.create({
     eventId,
     userId,
   });
@@ -56,7 +56,7 @@ export const deleteScrap = async (eventId, userId) => {
   await existEvent(eventId);
 
   // 스크랩이 존재하는지 확인하고 존재하지 않으면 404
-  const existScrap = await db.EventScraps.findOne({
+  const existScrap = await models.EventScraps.findOne({
     where: { eventId, userId },
   });
 
@@ -65,7 +65,7 @@ export const deleteScrap = async (eventId, userId) => {
   }
 
   // 스크랩 삭제하기
-  const deleteScrap = await db.EventScraps.destroy({
+  const deleteScrap = await models.EventScraps.destroy({
     where: { eventId, userId },
   });
 
