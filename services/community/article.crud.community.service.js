@@ -40,19 +40,30 @@ export const createArticle = async ({
   content,
   isAnonymous = true,
 }) => {
-  try {
-    // 게시글 생성
-    const article = await models.Articles.create({
+  // 게시판 검색
+  const community = await models.Communities.findOne({
+    where: {
       communityId,
-      authorId,
-      title,
-      content,
-      isAnonymous,
-    });
-    return { article };
-  } catch (error) {
-    throw error;
+    },
+  });
+
+  if (!community) {
+    // 게시판이 존재하지 않는 경우
+    throw new NotExistsError("게시판이 존재하지 않습니다");
   }
+
+  // 게시글 생성
+  const article = await models.Articles.create({
+    communityId,
+    authorId,
+    title,
+    content,
+    isAnonymous,
+  });
+
+  // 게시판이 존재하지 않는 경우
+
+  return { article };
 };
 
 /**

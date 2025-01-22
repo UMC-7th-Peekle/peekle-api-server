@@ -17,27 +17,17 @@ export const createComment = async ({
   content,
   isAnonymous = true,
 }) => {
-  try {
-    // TODO : 형식 검증 필요
+  // TODO : 형식 검증 필요
 
-    try {
-      const comment = await models.ArticleComments.create({
-        articleId,
-        authorId,
-        content,
-        status: "active",
-        isAnonymous,
-      });
-    } catch (err) {
-      if (err instanceof models.Sequelize.ForeignKeyConstraintError) {
-        throw new InvalidInputError("존재하지 않는 사용자나 게시글입니다.");
-      }
-    }
+    const comment = await models.ArticleComments.create({
+      articleId,
+      authorId,
+      content,
+      status: "active",
+      isAnonymous,
+    });
 
-    return { comment };
-  } catch (error) {
-    throw error;
-  }
+  return { comment };
 };
 
 /**
@@ -50,31 +40,27 @@ export const updateComment = async ({
   authorId,
   content,
 }) => {
-  try {
-    // 형식 검증 필요
-    // 댓글 조회
-    const comment = await models.ArticleComments.findOne({
-      where: {
-        articleId,
-        commentId,
-        authorId,
-      },
-    });
+  // 형식 검증 필요
+  // 댓글 조회
+  const comment = await models.ArticleComments.findOne({
+    where: {
+      articleId,
+      commentId,
+      authorId,
+    },
+  });
 
-    if (!comment) {
-      throw new NotExistsError("댓글이 존재하지 않습니다");
-    }
-
-    if (authorId != comment.authorId) {
-      throw new NotAllowedError("댓글 작성자만 수정할 수 있습니다");
-    }
-    // 댓글 수정
-    await comment.update({ content });
-
-    return { comment };
-  } catch (error) {
-    throw error;
+  if (!comment) {
+    throw new NotExistsError("댓글이 존재하지 않습니다");
   }
+
+  if (authorId != comment.authorId) {
+    throw new NotAllowedError("댓글 작성자만 수정할 수 있습니다");
+  }
+  // 댓글 수정
+  await comment.update({ content });
+
+  return { comment };
 };
 
 /**
@@ -86,28 +72,24 @@ export const deleteComment = async ({
   commentId,
   authorId,
 }) => {
-  try {
-    // 댓글 조회
-    const comment = await models.ArticleComments.findOne({
-      where: {
-        articleId,
-        commentId,
-        authorId,
-      },
-    });
+  // 댓글 조회
+  const comment = await models.ArticleComments.findOne({
+    where: {
+      articleId,
+      commentId,
+      authorId,
+    },
+  });
 
-    if (!comment) {
-      throw new NotExistsError("댓글이 존재하지 않습니다");
-    }
-    if (authorId !== comment.authorId) {
-      throw new NotAllowedError("댓글 작성자만 삭제할 수 있습니다");
-    }
-
-    // 댓글 삭제
-    await comment.destroy();
-  } catch (error) {
-    throw error;
+  if (!comment) {
+    throw new NotExistsError("댓글이 존재하지 않습니다");
   }
+  if (authorId !== comment.authorId) {
+    throw new NotAllowedError("댓글 작성자만 삭제할 수 있습니다");
+  }
+
+  // 댓글 삭제
+  await comment.destroy();
 };
 
 /**
@@ -120,25 +102,21 @@ export const createCommentReply = async ({
   content,
   isAnonymous = true,
 }) => {
-  try {
-    // 형식 검증 필요
-    // 댓글 생성
+  // 형식 검증 필요
+  // 댓글 생성
 
-    const comment = await models.ArticleComments.create({
-      articleId,
-      parentCommentId: commentId,
-      authorId,
-      content,
-      status: "active",
-      isAnonymous,
-    });
+  const comment = await models.ArticleComments.create({
+    articleId,
+    parentCommentId: commentId,
+    authorId,
+    content,
+    status: "active",
+    isAnonymous,
+  });
 
-    if (!comment) {
-      throw new NotExistsError("댓글이 존재하지 않습니다");
-    }
-
-    return { comment };
-  } catch (error) {
-    throw error;
+  if (!comment) {
+    throw new NotExistsError("댓글이 존재하지 않습니다");
   }
+
+  return { comment };
 };

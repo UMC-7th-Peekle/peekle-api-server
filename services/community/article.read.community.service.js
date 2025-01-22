@@ -10,28 +10,24 @@ import { Op } from "sequelize";
  * communityId에 해당하는 게시판의 게시글들을 가져옵니다
  */
 export const getArticles = async (communityId, { limit, cursor = null }) => {
-  try {
-    // 게시글 목록 조회
-    const articles = await models.Articles.findAll({
-      where: {
-        communityId, // communityId가 일치하는 게시글만 조회
-        ...(cursor && { createdAt: { [Op.lt]: cursor } }), // cursor 조건이 있을 경우 추가 (스프레드 연산자)
-      },
-      order: [["createdAt", "DESC"]], // createdAt 활용하여 최신순 정렬
-      limit, // limit 개수만큼 조회
-    });
+  // 게시글 목록 조회
+  const articles = await models.Articles.findAll({
+    where: {
+      communityId, // communityId가 일치하는 게시글만 조회
+      ...(cursor && { createdAt: { [Op.lt]: cursor } }), // cursor 조건이 있을 경우 추가 (스프레드 연산자)
+    },
+    order: [["createdAt", "DESC"]], // createdAt 활용하여 최신순 정렬
+    limit, // limit 개수만큼 조회
+  });
 
-    // 다음 커서 계산: 현재 페이지에 게시글이 하나 이상 있으면 게시글의 마지막 항목의 createdAt을 다음 커서로 사용
-    const nextCursor =
-      articles.length > 0 ? articles[articles.length - 1].createdAt : null;
+  // 다음 커서 계산: 현재 페이지에 게시글이 하나 이상 있으면 게시글의 마지막 항목의 createdAt을 다음 커서로 사용
+  const nextCursor =
+    articles.length > 0 ? articles[articles.length - 1].createdAt : null;
 
-    return {
-      articles,
-      nextCursor, // 다음 커서 반환
-    };
-  } catch (error) {
-    throw error;
-  }
+  return {
+    articles,
+    nextCursor, // 다음 커서 반환
+  };
 };
 
 /**
@@ -42,29 +38,25 @@ export const searchArticles = async (
   query,
   { limit, cursor = null }
 ) => {
-  try {
-    // 게시글 검색
-    const articles = await models.Articles.findAll({
-      where: {
-        communityId,
-        title: {
-          [Op.like]: `%${query}%`, // 검색어 포함된 제목 검색
-        },
-        ...(cursor && { createdAt: { [Op.lt]: cursor } }), // 커서 조건 추가
+  // 게시글 검색
+  const articles = await models.Articles.findAll({
+    where: {
+      communityId,
+      title: {
+        [Op.like]: `%${query}%`, // 검색어 포함된 제목 검색
       },
-      order: [["createdAt", "DESC"]], // 최신순 정렬
-      limit, // limit 개수만큼 조회
-    });
+      ...(cursor && { createdAt: { [Op.lt]: cursor } }), // 커서 조건 추가
+    },
+    order: [["createdAt", "DESC"]], // 최신순 정렬
+    limit, // limit 개수만큼 조회
+  });
 
-    // 다음 커서 계산: 마지막 게시글의 createdAt 값
-    const nextCursor =
-      articles.length > 0 ? articles[articles.length - 1].createdAt : null;
+  // 다음 커서 계산: 마지막 게시글의 createdAt 값
+  const nextCursor =
+    articles.length > 0 ? articles[articles.length - 1].createdAt : null;
 
-    return {
-      articles, // 현재 페이지의 게시글 목록
-      nextCursor, // 다음 페이지 요청에 사용할 커서
-    };
-  } catch (error) {
-    throw error;
-  }
+  return {
+    articles, // 현재 페이지의 게시글 목록
+    nextCursor, // 다음 페이지 요청에 사용할 커서
+  };
 };
