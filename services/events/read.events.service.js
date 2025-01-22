@@ -22,7 +22,7 @@ export const listEvent = async (category = "all", paginationOptions) => {
     where: whereCursor, // 커서 기준 조건 추가
     limit,
 
-    attributes: { exclude: ["categoryId", "createdUserId", "columnName"] },
+    attributes: { exclude: ["categoryId", "createdUserId"] },
     include: [
       {
         model: db.EventCategory,

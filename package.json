@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "start": "node index.js",
-    "dev": "TZ=Asia/Seoul nodemon index.js --host 0.0.0.0",
+    "dev": "nodemon index.js --host 0.0.0.0",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -15,6 +15,7 @@
   "license": "MIT",
   "description": "backend server for spectogether",
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "jest": "^29.7.0",
     "nodemon": "^3.1.7",
     "prettier": "^3.4.2",

@@ -20,10 +20,10 @@ export const listEvent = async(req, res, next) => {
       const nextCursor = list[list.length - 1].eventId;   // 다음 페이지로 이동할 커서 값
 
       // 200
-      return res.status(200).json({ events: list, nextCursor });
+      return res.status(200).success({ events: list, nextCursor });
     } else {
       // 204
-      return res.status(204).send();
+      return res.status(204).success({ events: [], nextCursor: null });
     }
   } catch (error) {
     logError(error);

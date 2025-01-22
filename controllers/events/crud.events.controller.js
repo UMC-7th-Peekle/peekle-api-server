@@ -10,14 +10,9 @@ export const detailEvent = async(req, res, next) => {
 
     const detail = await detailService.detailEvent(eventId);
 
-    if (detail) {
-      // 200
-      return res.status(200).success({ detail });
-    }
-    else if (!detail) {
-      // 204
-      return res.status(204).send();
-    }
+    if (!detail) return res.status(204).success();
+    
+    return res.status(200).success({ detail });
   } catch (error) {
     logError(error);
     next(error);

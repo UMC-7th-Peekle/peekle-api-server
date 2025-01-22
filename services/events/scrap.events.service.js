@@ -5,19 +5,8 @@ import {
 } from "../../utils/errors/errors.js";
 import db from "../../models/index.js";
 
-// 알맞은 유저인지 확인 401
-const checkUser = async (userId) => {
-  const user = await db.Users.findOne({
-    where: { userId: userId },
-  });
-
-  if (!user) {
-    throw new UnauthorizedError("로그인하지 않은 사용자의 접근입니다.");
-  }
-};
-
 // eventId가 유효한지 확인 404
-const existEvent = async (eventId) => {
+const isEventExists = async (eventId) => {
   const event = await db.Events.findOne({
     where: { eventId: eventId },
   });
@@ -29,8 +18,7 @@ const existEvent = async (eventId) => {
 
 export const newScrap = async (eventId, userId) => {
   // 중첩되어있는 부분 함수로 호출
-  await checkUser(userId);
-  await existEvent(eventId);
+  await isEventExists(eventId);
 
   // 이미 이벤트가 스크랩 되어 있는지 확인 409
   const existScrap = await db.EventScraps.findOne({
@@ -52,8 +40,7 @@ export const newScrap = async (eventId, userId) => {
 
 export const deleteScrap = async (eventId, userId) => {
   // 중첩되어있는 부분 함수로 호출
-  await checkUser(userId);
-  await existEvent(eventId);
+  await isEventExists(eventId);
 
   // 스크랩이 존재하는지 확인하고 존재하지 않으면 404
   const existScrap = await db.EventScraps.findOne({

@@ -16,6 +16,6 @@ router.post("/:eventId/scrap", authMiddleware.authenticateAccessToken, scrapEven
 router.delete("/:eventId/scrap", authMiddleware.authenticateAccessToken, scrapEventController.deleteScrap);     // 특정 이벤트를 스크랩 취소
 
 // 이벤트 신고하기
-router.post("/:eventId/report", authMiddleware.authenticateAccessToken, reportEventController.newReport);     // 특정 이벤트 신고고
+router.post("/report", authMiddleware.authenticateAccessToken, reportEventController.newReport);     // 특정 이벤트 신고
 
 export default router;

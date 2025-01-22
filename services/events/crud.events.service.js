@@ -9,7 +9,7 @@ export const detailEvent = async (eventId) => {
   const detail = await db.Events.findOne({
     where: { eventId: eventId },
     
-    attributes: { exclude: [ 'categoryId', 'createdUserId', 'columnName' ] },
+    attributes: { exclude: [ 'categoryId', 'createdUserId'] },
     include: [
       {
         model: db.EventCategory,
