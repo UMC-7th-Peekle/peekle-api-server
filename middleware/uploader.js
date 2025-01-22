@@ -88,8 +88,8 @@ export const s3Storage = ({
   프로필 사진은 5MB로 제한하고, "jpg, png"만 가능하게 하도록 하여라
 
   게시판에서 이미지는 "JPG, JPEG, GIF, PNG, BMP, HEIC, HEIF,  WEBP"만 가능하고,
-  한 장당 10MB, 총 30MB로 제한하도록 하여라. (?)
-  TODO : 물어보기!
+  한 장당 10MB, 총 300MB로 제한하도록 하여라.
+  다니다니 최고 ~
 
   동영상은 "AVI, WMV, MPG, MPEG, MOV, MKV, ASF, SKM, K3G, FLV, MP4, 3GP, WEBM"만 가능하고,
   한 동영상 당 최대 용량은 2GB, 개수는 10개로 하여라.
@@ -124,7 +124,7 @@ const articleImageRestrictions = {
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB
     files: Infinity, // 파일 개수 제한 없음
-    fieldSize: 30 * 1024 * 1024, // 업로드된 파일들의 총 크기 합 제한 (예: 30MB)
+    fieldSize: 300 * 1024 * 1024, // 업로드된 파일들의 총 크기 합 제한 (예: 30MB)
   },
   allowedMimeTypes: [
     "image/jpeg",
