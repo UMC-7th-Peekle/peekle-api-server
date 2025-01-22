@@ -15,24 +15,35 @@ export const likeComment = async ({
   commentId,
   likedUserId,
 }) => {
+  // 원래 ForeignKeyConstraintError를 처리하려 했지만, articleId에 대한 확인도 필요하여 이렇게 수정
+  const comment = await models.ArticleComments.findOne({
+    where: {
+      commentId,
+      articleId,
+    },
+  });
+
+  if (!comment) {
+    logger.error(
+      `[likeComment] 댓글이 존재하지 않음 - commentId: ${commentId}, articleId: ${articleId}`
+    );
+    throw new NotExistsError("해당 댓글이 존재하지 않습니다");
+  }
+
   let like;
   /* try-catch 블록 외부에서 like 선언
   try-catch 블록 내부에서 like를 생성하고 반환하면
   "like is not defined" 에러가 발생합니다.
   */
   try {
+    
     // 좋아요 추가 (Unique 제약 조건으로 중복 방지)
     like = await models.ArticleCommentLikes.create({
       commentId,
       likedUserId,
     });
   } catch (error) {
-    if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
-      logger.error(
-        `[likeComment] 댓글이 존재하지 않음 - commentId: ${commentId}`
-      );
-      throw new NotExistsError("해당 댓글이 존재하지 않습니다");
-    } else if (error instanceof models.Sequelize.UniqueConstraintError) {
+    if (error instanceof models.Sequelize.UniqueConstraintError) {
       // 이미 좋아요가 눌린 경우
       logger.error(
         `[likeComment] 이미 좋아요가 눌린 댓글 - commentId: ${commentId}, likedUserId: ${likedUserId}`
@@ -89,16 +100,8 @@ export const unlikeComment = async ({
   }
 
   // 좋아요 삭제
-  await models.ArticleCommentLikes.destroy({
-    where: {
-      commentId,
-      likedUserId,
-    },
-  });
+  await comment.articleCommentLikes[0].destroy();
 
-  logger.debug(
-    `[unlikeComment] 댓글 좋아요 취소 성공 - commentId: ${commentId}, likedUserId: ${likedUserId}`
-  );
 
   return;
 };

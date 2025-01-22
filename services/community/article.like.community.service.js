@@ -11,6 +11,21 @@ import logger from "../../utils/logger/logger.js";
  * 게시글 좋아요를 추가합니다
  */
 export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
+  // 원래 ForeignKeyConstraintError를 처리하려 했지만, articleId에 대한 확인도 필요하여 이렇게 수정
+  const article = await models.Articles.findOne({
+    where: {
+      communityId,
+      articleId,
+    },
+  });
+
+  if (!article) {
+    logger.error(
+      `[likeArticle] 게시글이 존재하지 않음 - articleId: ${articleId}`
+    );
+    throw new NotExistsError("게시글이 존재하지 않습니다");
+  }
+
   let like;
   /* try-catch 블록 외부에서 like 선언
   try-catch 블록 내부에서 like를 생성하고 반환하면
@@ -83,12 +98,7 @@ export const unlikeArticle = async ({
   }
 
   // 좋아요 삭제
-  await models.ArticleLikes.destroy({
-    where: {
-      articleId,
-      likedUserId,
-    },
-  });
+  await article.articleLikes[0].destroy();
 
   return;
 };
