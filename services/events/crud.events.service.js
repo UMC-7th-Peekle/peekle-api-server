@@ -1,4 +1,4 @@
-import db from "../../models/index.js";
+import models from "../../models/index.js";
 
 export const detailEvent = async (eventId) => {
   // eventId가 유효하지 않은 경우 400
@@ -6,18 +6,18 @@ export const detailEvent = async (eventId) => {
    * 아직 Ajv로 유효성 검사 안했어요
    */
 
-  const detail = await db.Events.findOne({
+  const detail = await models.Events.findOne({
     where: { eventId: eventId },
     
     attributes: { exclude: [ 'categoryId', 'createdUserId'] },
     include: [
       {
-        model: db.EventCategory,
+        model: models.EventCategory,
         as: 'category',
         attributes: ['name', 'description'],
       },
       {
-        model: db.EventImages,
+        model: models.EventImages,
         as: 'eventImages',
         attributes: [
           'imageUrl',
@@ -27,7 +27,7 @@ export const detailEvent = async (eventId) => {
         ],
       },
       {
-        model: db.EventSchedules,
+        model: models.EventSchedules,
         as: 'eventSchedules',
         attributes: [
           'repeatType',

@@ -1,4 +1,4 @@
-import db from "../../models/index.js";
+import models from "../../models/index.js";
 
 // 이벤트 목록 조회
 export const listEvent = async (category = "all", paginationOptions) => {
@@ -8,7 +8,7 @@ export const listEvent = async (category = "all", paginationOptions) => {
   let whereCursor = {};
   if (cursor) {
     whereCursor = {
-      eventId: { [db.Sequelize.Op.gt]: cursor },    // 커서보다 큰 ID 값을 조회
+      eventId: { [models.Sequelize.Op.gt]: cursor },    // 커서보다 큰 ID 값을 조회
     };
   }
 
@@ -18,25 +18,25 @@ export const listEvent = async (category = "all", paginationOptions) => {
     whereCategory = { name: category };   // 카테고리 이름으로 필터링
   }
 
-  const event = await db.Events.findAll({
+  const event = await models.Events.findAll({
     where: whereCursor, // 커서 기준 조건 추가
     limit,
 
     attributes: { exclude: ["categoryId", "createdUserId"] },
     include: [
       {
-        model: db.EventCategory,
+        model: models.EventCategory,
         as: "category",
         where: whereCategory,
         attributes: ["name", "description"],
       },
       {
-        model: db.EventImages,
+        model: models.EventImages,
         as: "eventImages",
         attributes: ["imageUrl", "sequence", "createdAt", "updatedAt"],
       },
       {
-        model: db.EventSchedules,
+        model: models.EventSchedules,
         as: "eventSchedules",
         attributes: [
           "repeatType",
