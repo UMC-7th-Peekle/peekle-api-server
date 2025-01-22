@@ -18,7 +18,7 @@ export const createComment = async (req, res, next) => {
       isAnonymous,
     }); // 댓글 생성
 
-    return res.status(201).json({
+    return res.status(201).success({
       message: "댓글 작성 성공",
     });
   } catch (error) {
@@ -43,7 +43,7 @@ export const updateComment = async (req, res, next) => {
       content,
     }); // 댓글 수정 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
 
-    return res.status(200).json({
+    return res.status(200).success({
       message: "댓글 수정 성공",
     });
   } catch (error) {
@@ -65,7 +65,7 @@ export const deleteComment = async (req, res, next) => {
       authorId,
     }); // 댓글 삭제
 
-    return res.status(200).json({
+    return res.status(200).success({
       message: "댓글 삭제 성공",
     });
   } catch (error) {
@@ -90,7 +90,7 @@ export const createCommentReply = async (req, res, next) => {
       isAnonymous,
     }); // 대댓글 생성 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
 
-    return res.status(201).json({
+    return res.status(201).success({
       message: "대댓글 작성 성공",
     });
   } catch (error) {

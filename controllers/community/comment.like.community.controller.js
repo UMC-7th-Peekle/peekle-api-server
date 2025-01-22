@@ -15,7 +15,7 @@ export const likeComment = async (req, res, next) => {
       likedUserId,
     }); // 댓글 좋아요 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
 
-    return res.status(201).json({
+    return res.status(201).success({
       message: "댓글 좋아요 성공",
     });
   } catch (error) {
@@ -37,7 +37,7 @@ export const unlikeComment = async (req, res, next) => {
       likedUserId,
     }); // 댓글 좋아요 취소
 
-    return res.status(200).json({
+    return res.status(200).success({
       message: "댓글 좋아요 취소 성공",
     });
   } catch (error) {
