@@ -16,13 +16,13 @@ export const listEvent = async (req, res, next) => {
 
     const { events, nextCursor, hasNextPage } = await listService.listEvent(category, paginationOptions);
 
-    if (events && events.length > 0) {
-      // 200
-      return res.status(200).success({ events, nextCursor, hasNextPage });
-    } else {
-      // 204
+    if (!events || events.length === 0) {
       return res.status(204).success({ events: [], nextCursor: null, hasNextPage: false });
     }
+    
+    // 200
+    return res.status(200).success({ events, nextCursor, hasNextPage });
+    
   } catch (error) {
     logError(error);
     next(error);

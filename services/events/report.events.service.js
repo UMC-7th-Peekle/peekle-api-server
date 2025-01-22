@@ -5,7 +5,11 @@ import {
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 
-// eventId 유효성 및 자기 자신 신고 방지 확인 403, 404
+/**
+ * eventId 유효성 여부 확인 403
+ * 자기 자신 신고 여부 확인 404
+ * 두 에러 같이 처리합니다.
+ */
 const existEvent = async (eventId, userId) => {
   const event = await models.Events.findOne({
     where: { eventId },
@@ -15,7 +19,11 @@ const existEvent = async (eventId, userId) => {
     throw new NotExistsError("존재하지 않는 이벤트입니다.");
   }
 
-  if (event.createdUserId == userId) {
+  // 타입 확인 해볼려고 추가
+  // console.log(typeof event.createdUserId); // number
+  // console.log(typeof userId); // string
+
+  if (event.createdUserId.toString() === userId.toString()) {
     throw new NotAllowedError("본인이 작성한 게시글을 신고할 수 없습니다.");
   }
 };
