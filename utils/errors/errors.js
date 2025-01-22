@@ -131,3 +131,12 @@ export class CipherError extends CustomError {
     super(reason, "CIPHER_ERROR", 503, data);
   }
 }
+
+/**
+ * Multer 오류
+ */
+export class MulterError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "MULTER_ERROR", 503, data);
+  }
+}
