@@ -68,6 +68,15 @@ export default class EventScraps extends Model {
           { name: "user_id" },
         ]
       },
+      {
+        name: "unique_event_scrap",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "event_id" },
+          { name: "user_id" }
+        ]
+      }
     ]
   });
   }
