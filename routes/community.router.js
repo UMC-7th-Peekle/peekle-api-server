@@ -9,11 +9,19 @@ import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 
 const router = Router();
 
+/*
+  게시판 조회
+*/
+
 // communityId에 해당하는 게시판의 게시글들을 가져옵니다, 좋아요 누른 게시글만 가져올 수도 있습니다
 router.get("/:communityId", articleReadContoller.getArticles);
 
 // communityId에 해당하는 게시판의 게시글들을 검색합니다
 router.get("/:communityId/search", articleReadContoller.searchArticles);
+
+/*
+  게시글 CREATE, READ, UPDATE, DELETE
+*/
 
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 가져옵니다
 router.get(
@@ -42,6 +50,10 @@ router.delete(
   articleCrudController.deleteArticle
 ); // jwtMiddleware 추가해야 함
 
+/*
+  게시글 좋아요
+*/
+
 // article에 좋아요를 표시합니다.
 router.post(
   "/:communityId/articles/:articleId/like",
@@ -55,6 +67,10 @@ router.delete(
   authenticateAccessToken,
   articleLikeController.unlikeArticle
 );
+
+/*
+  게시글 댓글
+*/
 
 // article에 댓글을 추가합니다.
 router.post(
@@ -83,6 +99,10 @@ router.post(
   authenticateAccessToken,
   commentController.createCommentReply
 );
+
+/*
+  게시글 댓글 좋아요
+*/
 
 // 댓글에 좋아요를 표시합니다.
 router.post(
