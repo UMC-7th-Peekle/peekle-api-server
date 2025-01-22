@@ -17,6 +17,16 @@ export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
         communityId,
         articleId,
       },
+      include: [
+        {
+          model: models.ArticleLikes,
+          as: "articleLikes",
+          where: {
+            likedUserId,
+          },
+          required: false, // 좋아요가 없는 경우도 조회 가능하도록 설정
+        },
+      ],
     });
 
     if (!article) {
@@ -24,15 +34,7 @@ export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
       throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
     }
 
-    // 이미 좋아요가 눌렸는지 확인
-    const existingLike = await models.ArticleLikes.findOne({
-      where: {
-        articleId,
-        likedUserId,
-      },
-    });
-
-    if (existingLike) {
+    if (article.articleLikes.length > 0) {
       // 이미 좋아요가 눌린 경우
       throw new AlreadyExistsError("이미 좋아요가 처리되었습니다"); // 409
     }
@@ -64,25 +66,30 @@ export const unlikeArticle = async ({
         communityId,
         articleId,
       },
+      include: [
+        {
+          model: models.ArticleLikes,
+          as: "articleLikes",
+          where: {
+            likedUserId,
+          },
+          required: false, // 좋아요가 없는 경우도 조회 가능하도록 설정
+        }, // true로 설정할 경우 좋아요가 없는 경우 조회되지 article 자체가 null이 되어 좋아요만 없어도 404 에러가 발생
+      ],
     });
+
+    console.log(article);
 
     if (!article) {
       // 게시글이 존재하지 않는 경우
       throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
     }
 
-    // 이미 좋아요가 눌렸는지 확인
-    const existingLike = await models.ArticleLikes.findOne({
-      where: {
-        articleId,
-        likedUserId,
-      },
-    });
-
-    if (!existingLike) {
+    if (article.articleLikes.length === 0) {
       // 좋아요가 눌리지 않은 경우
       throw new AlreadyExistsError("좋아요가 존재하지 않습니다"); // 409
     }
+
     // 좋아요 삭제
     await models.ArticleLikes.destroy({
       where: {

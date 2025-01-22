@@ -21,23 +21,25 @@ export const likeComment = async ({
         articleId,
         commentId,
       },
+      include: [
+        {
+          model: models.ArticleCommentLikes,
+          as: "articleCommentLikes",
+          where: {
+            likedUserId,
+          },
+          required: false, // 좋아요가 없는 경우도 조회 가능하도록 설정
+        },
+      ],
     });
 
+    // 댓글이 존재하지 않는 경우
     if (!comment) {
-      // 댓글이 존재하지 않는 경우
       throw new NotExistsError("댓글이 존재하지 않습니다"); // 404
     }
 
-    // 이미 좋아요가 눌렸는지 확인
-    const existingLike = await models.ArticleCommentLikes.findOne({
-      where: {
-        commentId,
-        likedUserId,
-      },
-    });
-
-    if (existingLike) {
-      // 이미 좋아요가 눌린 경우
+    // 이미 좋아요가 눌린 경우
+    if (comment.articleCommentLikes.length > 0) {
       throw new AlreadyExistsError("이미 좋아요가 처리되었습니다"); // 409
     }
 
@@ -69,23 +71,26 @@ export const unlikeComment = async ({
         articleId,
         commentId,
       },
+      include: [
+        {
+          model: models.ArticleCommentLikes,
+          as: "articleCommentLikes",
+          where: {
+            likedUserId,
+          },
+          required: false, // 좋아요가 없는 경우도 조회 가능하도록 설정
+        },
+      ],
     });
 
+    // 댓글이 존재하지 않는 경우
     if (!comment) {
-      // 댓글이 존재하지 않는 경우
       throw new NotExistsError("댓글이 존재하지 않습니다"); // 404
     }
-    // 이미 좋아요가 눌렸는지 확인
-    const existingLike = await models.ArticleCommentLikes.findOne({
-      where: {
-        commentId,
-        likedUserId,
-      },
-    });
 
-    if (!existingLike) {
-      // 좋아요가 눌리지 않은 경우
-      throw new AlreadyExistsError("좋아요가 존재하지 않습니다"); // 409
+    // 좋아요가 눌리지 않은 경우
+    if (comment.articleCommentLikes.length === 0) {
+      throw new NotExistsError("좋아요가 존재하지 않습니다"); // 404
     }
 
     // 좋아요 삭제

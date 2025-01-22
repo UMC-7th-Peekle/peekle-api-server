@@ -20,7 +20,7 @@ export const getArticles = async (req, res, next) => {
     );
 
     // 게시글이 없는 경우
-    if (articles.length === 0) {
+    if (articles && articles.length===0) { // articles가 존재하지 않거나 길이가 0인 경우, findAll에서는 null이 아니라 빈 배열을 반환
       return res.status(204).success(); // 응답 본문 없이 204 반환
     }
     // 게시글이 있는 경우

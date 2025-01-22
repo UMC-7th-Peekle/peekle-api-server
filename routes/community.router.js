@@ -10,6 +10,10 @@ import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 const router = Router();
 
 /*
+  관리자 메뉴 : 게시판 생성
+*/
+
+/*
   게시판 조회
 */
 
@@ -41,14 +45,14 @@ router.patch(
   "/:communityId/articles/:articleId",
   authenticateAccessToken,
   articleCrudController.updateArticle
-); // jwtMiddleware 추가해야 함
+); 
 
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 삭제합니다
 router.delete(
   "/:communityId/articles/:articleId",
   authenticateAccessToken,
   articleCrudController.deleteArticle
-); // jwtMiddleware 추가해야 함
+); 
 
 /*
   게시글 좋아요
