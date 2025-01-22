@@ -56,6 +56,7 @@ export const getArticles = async (communityId, { limit, cursor = null }) => {
   return {
     articles,
     nextCursor,
+    hasNextPage,
   };
 };
 
@@ -124,5 +125,6 @@ export const searchArticles = async (
   return {
     articles,
     nextCursor,
+    hasNextPage,
   };
 };

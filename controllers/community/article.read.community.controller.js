@@ -14,7 +14,7 @@ export const getArticles = async (req, res, next) => {
       cursor: cursor || null, // cursor가 없으면 null
     };
 
-    const { articles, nextCursor } = await articleReadService.getArticles(
+    const { articles, nextCursor, hasNextPage } = await articleReadService.getArticles(
       communityId,
       paginationOptions
     );
@@ -28,6 +28,7 @@ export const getArticles = async (req, res, next) => {
       message: "게시글 목록 조회 성공",
       articles,
       nextCursor,
+      hasNextPage
     });
   } catch (error) {
     logError(error);
@@ -49,7 +50,7 @@ export const searchArticles = async (req, res, next) => {
       cursor: cursor || null, // cursor가 없으면 null
     };
 
-    const { articles, nextCursor } = await articleReadService.searchArticles(
+    const { articles, nextCursor, hasNextPage } = await articleReadService.searchArticles(
       communityId,
       query,
       paginationOptions
@@ -64,6 +65,7 @@ export const searchArticles = async (req, res, next) => {
       message: "게시글 목록 조회 성공",
       articles,
       nextCursor,
+      hasNextPage
     });
   } catch (error) {
     logError(error);
