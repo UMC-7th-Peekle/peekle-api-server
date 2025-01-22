@@ -4,12 +4,16 @@ import {
   NotExistsError,
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
+import logger from "../../utils/logger/logger.js";
 import { Op } from "sequelize";
 
 /**
  * communityId에 해당하는 게시판의 게시글들을 가져옵니다
  */
 export const getArticles = async (communityId, { limit, cursor = null }) => {
+  logger.info(
+    `[getArticles] 게시글 목록 조회 요청 - communityId: ${communityId}, limit: ${limit}, cursor: ${cursor}`
+  );
   // 게시판과 게시글을 조인하여 조회
   const whereClause = {
     communityId,
@@ -38,6 +42,10 @@ export const getArticles = async (communityId, { limit, cursor = null }) => {
     articles.pop(); // 초과분 제거
   }
 
+  logger.info(
+    `[getArticles] 게시글 목록 조회 성공 - 반환 게시글 수: ${articles.length}`
+  );
+
   return {
     articles,
     nextCursor, // 다음 커서 반환
@@ -52,6 +60,10 @@ export const searchArticles = async (
   query,
   { limit, cursor = null }
 ) => {
+  logger.info(
+    `[searchArticles] 게시글 검색 요청 - communityId: ${communityId}, query: "${query}", limit: ${limit}, cursor: ${cursor}`
+  );
+
   const whereClause = {
     communityId,
     [Op.or]: [
@@ -92,6 +104,10 @@ export const searchArticles = async (
   if (articles.length > limit) {
     articles.pop(); // 초과분 제거
   }
+
+  logger.info(
+    `[searchArticles] 게시글 검색 성공 - 반환 게시글 수: ${articles.length}`
+  );
 
   return {
     articles, // 현재 페이지의 게시글 목록
