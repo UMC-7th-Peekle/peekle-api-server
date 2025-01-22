@@ -18,16 +18,14 @@ export const createComment = async ({
   isAnonymous = true,
 }) => {
   try {
-    // 형식 검증 필요
-    // 댓글 생성
-    const status = "active";
+    // TODO : 형식 검증 필요
 
     try {
       const comment = await models.ArticleComments.create({
         articleId,
         authorId,
         content,
-        status,
+        status: "active",
         isAnonymous,
       });
     } catch (err) {
@@ -66,7 +64,8 @@ export const updateComment = async ({
     if (!comment) {
       throw new NotExistsError("댓글이 존재하지 않습니다");
     }
-    if (authorId !== comment.authorId) {
+
+    if (authorId != comment.authorId) {
       throw new NotAllowedError("댓글 작성자만 수정할 수 있습니다");
     }
     // 댓글 수정
