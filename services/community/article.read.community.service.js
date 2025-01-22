@@ -11,41 +11,39 @@ import { Op } from "sequelize";
  */
 export const getArticles = async (communityId, { limit, cursor = null }) => {
   // 게시판과 게시글을 조인하여 조회
-  const community = await models.Communities.findOne({
-    // 게시판 조회
-    where: {
-      communityId,
-    },
-    include: [
-      {
-        model: models.Articles,
-        as: "articles",
-        where: {
-          ...(cursor && { createdAt: { [Op.lt]: cursor } }), // 커서 조건이 있을 경우 추가
-        },
-        order: [["createdAt", "DESC"]], // 최신순 정렬
-        limit, // 조회 개수 제한
-        required: false, // 게시글이 없는 경우에도 커뮤니티는 반환
-      },
-    ],
-  });
+  const whereClause = {
+    communityId,
+  };
 
-  if (!community) {
-    // 게시판이 존재하지 않는 경우
-    throw new NotExistsError("게시판이 존재하지 않습니다");
+  // where 절에 cursor가 있을 경우 조건을 추가
+  if (cursor) {
+    whereClause.articleId = { [Op.lt]: cursor }; //articleId가 cursor보다 작은 게시글만 조회
   }
 
-// 게시글만 추출
-  const articles = community.articles;
+  // 게시글 목록 조회
+  const articles = await models.Articles.findAll({
+    where: whereClause,
+    order: [["createdAt", "DESC"]], // 최신순 정렬
+    limit: limit + 1, // limit + 1개 가져오기
+  });
 
+  // limit + 1개를 불러왔을 때, 초과한 경우에만 다음 커서 설정
   const nextCursor =
-    articles.length > 0 ? articles[articles.length - 1].createdAt : null;
+    articles.length > limit
+      ? articles[limit - 1]?.articleId // 다음 커서를 limit번째 게시글의 id로 설정
+      : null;
+
+  // 사용자에게는 limit 개수만큼만 반환
+  if (articles.length > limit) {
+    articles.pop(); // 초과분 제거
+  }
 
   return {
     articles,
-    nextCursor,
+    nextCursor, // 다음 커서 반환
   };
 };
+
 /**
  * communityId에 해당하는 게시판의 게시글들 중 검색어를 포함하는 게시글을 가져옵니다
  */
@@ -54,39 +52,46 @@ export const searchArticles = async (
   query,
   { limit, cursor = null }
 ) => {
-  // 게시글 검색
-  const community = await models.Communities.findOne({
-    where: {
-      communityId,
-    },
-    include: [
+  const whereClause = {
+    communityId,
+    [Op.or]: [
       {
-        model: models.Articles,
-        as: "articles",
-        where: {
-          title: {
-            [Op.like]: `%${query}%`, // 검색어 포함된 제목 검색
-          },
-          ...(cursor && { createdAt: { [Op.lt]: cursor } }), // 커서 조건이 있을 경우 추가
+        title: {
+          // 제목에 검색어가 포함된 경우
+          [Op.like]: `%${query}%`,
         },
-        order: [["createdAt", "DESC"]], // 최신순 정렬
-        limit, // 조회 개수 제한
-        required: false, // 게시글이 없는 경우에도 커뮤니티는 반환
+      },
+      {
+        content: {
+          // 내용에 검색어가 포함된 경우
+          [Op.like]: `%${query}%`,
+        },
       },
     ],
-  });
+  };
 
-  if (!community) {
-    // 게시판이 존재하지 않는 경우
-    throw new NotExistsError("게시판이 존재하지 않습니다");
+  // where 절에 cursor가 있을 경우 조건을 추가
+  if (cursor) {
+    whereClause.articleId = { [Op.lt]: cursor }; //articleId가 cursor보다 작은 게시글만 조회
   }
 
-// 게시글만 추출
-  const articles = community.articles;
-  
-  // 다음 커서 계산: 마지막 게시글의 createdAt 값
+  // 게시글 목록 조회
+  const articles = await models.Articles.findAll({
+    where: whereClause,
+    order: [["createdAt", "DESC"]], // 최신순 정렬
+    limit: limit + 1, // limit + 1개 가져오기
+  });
+
+  // limit + 1개를 불러왔을 때, 초과한 경우에만 다음 커서 설정
   const nextCursor =
-    articles.length > 0 ? articles[articles.length - 1].createdAt : null;
+    articles.length > limit
+      ? articles[limit - 1]?.articleId // 다음 커서를 limit번째 게시글의 id로 설정
+      : null;
+
+  // 사용자에게는 limit 개수만큼만 반환
+  if (articles.length > limit) {
+    articles.pop(); // 초과분 제거
+  }
 
   return {
     articles, // 현재 페이지의 게시글 목록
