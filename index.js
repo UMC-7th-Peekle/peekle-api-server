@@ -27,6 +27,13 @@ import { specs } from "./utils/swagger/swagger.js";
 
 // Router import , /routes/index.js에서 Router들을 1차적으로 모아서 export 합니다.
 import routers from "./routes/index.js";
+import path from "path";
+
+// __dirname을 사용하기 위한 설정
+// static file을 serve하기 위해 사용합니다.
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Socket.io Router는 이 주석 아래에 import 해주시면 됩니다.
 // ex) const exampleSocketRouter = require("./routes/example.socket.router"); // commonJS
@@ -43,6 +50,8 @@ app.use(morgan("dev")); // morgan logger
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Swagger 설정
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
