@@ -11,9 +11,6 @@ import logger from "../../utils/logger/logger.js";
  * 게시글 좋아요를 추가합니다
  */
 export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
-  logger.info(
-    `[likeArticle] 좋아요 추가 요청 - communityId: ${communityId}, articleId: ${articleId}, likedUserId: ${likedUserId}`
-  );
   // 게시글 조회
   const article = await models.Articles.findOne({
     where: {
@@ -34,7 +31,7 @@ export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
 
   if (!article) {
     // 게시글이 존재하지 않는 경우
-    logger.warn(
+    logger.error(
       `[likeArticle] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
     );
     throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
@@ -42,7 +39,7 @@ export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
 
   if (article.articleLikes.length > 0) {
     // 이미 좋아요가 눌린 경우
-    logger.warn(
+    logger.error(
       `[likeArticle] 이미 좋아요가 눌린 게시글 - articleId: ${articleId}, likedUserId: ${likedUserId}`
     );
     throw new AlreadyExistsError("이미 좋아요를 누른 게시글입니다."); // 409
@@ -54,9 +51,6 @@ export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
     likedUserId,
   });
 
-  logger.debug(
-    `[likeArticle] 좋아요 추가 성공 - articleId: ${articleId}, likedUserId: ${likedUserId}`
-  );
   return { like };
 };
 
@@ -68,9 +62,6 @@ export const unlikeArticle = async ({
   articleId,
   likedUserId,
 }) => {
-  logger.info(
-    `[unlikeArticle] 좋아요 취소 요청 - communityId: ${communityId}, articleId: ${articleId}, likedUserId: ${likedUserId}`
-  );
   // 게시글 조회
   const article = await models.Articles.findOne({
     where: {
@@ -89,11 +80,10 @@ export const unlikeArticle = async ({
     ],
   });
 
-  console.log(article);
 
   if (!article) {
     // 게시글이 존재하지 않는 경우
-    logger.warn(
+    logger.error(
       `[unlikeArticle] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
     );
     throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
@@ -101,7 +91,7 @@ export const unlikeArticle = async ({
 
   if (article.articleLikes.length === 0) {
     // 이미 좋아요가 취소된 경우
-    logger.warn(
+    logger.error(
       `[unlikeArticle] 이미 좋아요가 취소된 게시글 - articleId: ${articleId}, likedUserId: ${likedUserId}`
     );
     throw new AlreadyExistsError("이미 좋아요가 취소된 게시글입니다."); // 409
@@ -114,10 +104,6 @@ export const unlikeArticle = async ({
       likedUserId,
     },
   });
-
-  logger.debug(
-    `[unlikeArticle] 좋아요 취소 성공 - articleId: ${articleId}, likedUserId: ${likedUserId}`
-  );
 
   return;
 };

@@ -7,9 +7,6 @@ import logger from "../../utils/logger/logger.js";
  * communityId와 articleId에 해당하는 게시글을 가져옵니다
  */
 export const getArticleById = async ({ communityId, articleId }) => {
-  logger.info(
-    `[getArticleById] 게시글 조회 시작 - communityId: ${communityId}, articleId: ${articleId}`
-  );
   // 게시글 조회 및 댓글 포함
   const article = await models.Articles.findOne({
     where: {
@@ -19,23 +16,20 @@ export const getArticleById = async ({ communityId, articleId }) => {
     include: [
       {
         model: models.ArticleComments,
-        as: "articleComments", // 모델 정의 시 설정한 별칭 사용
+        as: "articleComments", 
       },
     ],
   });
 
   if (!article) {
     // 게시글이 존재하지 않는 경우
-    logger.warn(
+    logger.error(
       `[getArticleById] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
     );
     throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
   }
 
   // 게시글 및 댓글 반환
-  logger.debug(
-    `[getArticleById] 게시글 조회 성공 - 게시글: ${JSON.stringify(article, null, 2)}`
-  );
   return article;
 };
 
@@ -49,9 +43,6 @@ export const createArticle = async ({
   content,
   isAnonymous = true,
 }) => {
-  logger.info(
-    `[createArticle] 게시글 생성 요청 - communityId: ${communityId}, authorId: ${authorId}, title: ${title}`
-  );
   // 게시판 검색
   const community = await models.Communities.findOne({
     where: {
@@ -61,7 +52,7 @@ export const createArticle = async ({
 
   if (!community) {
     // 게시판이 존재하지 않는 경우
-    logger.warn(
+    logger.error(
       `[createArticle] 게시판이 존재하지 않음 - communityId: ${communityId}`
     );
     throw new NotExistsError("게시판이 존재하지 않습니다");
@@ -76,9 +67,8 @@ export const createArticle = async ({
     isAnonymous,
   });
 
-  logger.debug(
-    `[createArticle] 게시글 생성 성공 - articleId: ${article.articleId}`
-  );
+  logger.debug(`[updateArticle] 생성된 게시글 제목: ${article.title}, 생성된 내용: ${article.content}`, );
+
   return { article };
 };
 
@@ -92,9 +82,6 @@ export const updateArticle = async ({
   title,
   content,
 }) => {
-  logger.info(
-    `[updateArticle] 게시글 수정 요청 - communityId: ${communityId}, articleId: ${articleId}, authorId: ${authorId}`
-  );
   // 게시글 검색
   const article = await models.Articles.findOne({
     where: {
@@ -106,7 +93,7 @@ export const updateArticle = async ({
   // 게시글이 존재하지 않는 경우 예외처리 추가했습니다.
   if (!article) {
     // 게시글이 존재하지 않는 경우
-    logger.warn(
+    logger.error(
       `[updateArticle] 수정하려는 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
     );
     throw new NotExistsError("게시글이 존재하지 않습니다");
@@ -115,7 +102,7 @@ export const updateArticle = async ({
   // !== 대신 !=로 수정했습니다. 둘이 type이 달라요.
   if (article.authorId != authorId) {
     // 작성자와 요청자가 다른 경우
-    logger.debug(
+    logger.error(
       `[updateArticle] 잘못된 수정 요청 - 작성자: ${article.authorId}, 요청자: ${authorId}`
     );
 
@@ -128,7 +115,7 @@ export const updateArticle = async ({
     content,
   });
 
-  logger.debug(`[updateArticle] 게시글 수정 성공 - articleId: ${articleId}`);
+  logger.debug(`[updateArticle] 수정된 게시글 제목: ${article.title}, 수정된 내용: ${article.content}`, );
   return { article };
 };
 
@@ -136,9 +123,6 @@ export const updateArticle = async ({
  * communityId와 articleId에 해당하는 게시글을 삭제
  */
 export const deleteArticle = async ({ communityId, articleId, authorId }) => {
-  logger.info(
-    `[deleteArticle] 게시글 삭제 요청 - communityId: ${communityId}, articleId: ${articleId}, authorId: ${authorId}`
-  );
   // 게시글 검색
   const article = await models.Articles.findOne({
     where: {
@@ -150,7 +134,7 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
   // 게시글이 존재하지 않는 경우 예외처리 추가했습니다.
   if (!article) {
     // 게시글이 존재하지 않는 경우
-    logger.warn(
+    logger.error(
       `[deleteArticle] 삭제하려는 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
     );
     throw new NotExistsError("게시글이 존재하지 않습니다");
@@ -159,7 +143,7 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
   // !== 대신 !=로 수정했습니다. 둘이 type이 달라요.
   if (article.authorId != authorId) {
     // 작성자와 요청자가 다른 경우
-    logger.debug(
+    logger.error(
       `[deleteArticle] 잘못된 삭제 요청 - 작성자: ${article.authorId}, 요청자: ${authorId}`
     );
     throw new NotAllowedError("게시글 작성자만 삭제할 수 있습니다");
@@ -168,5 +152,4 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
   // 게시글 삭제
   await article.destroy();
 
-  logger.debug(`[deleteArticle] 게시글 삭제 성공 - articleId: ${articleId}`);
 };

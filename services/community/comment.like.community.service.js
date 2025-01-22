@@ -15,9 +15,6 @@ export const likeComment = async ({
   commentId,
   likedUserId,
 }) => {
-  logger.info(
-    `[likeComment] 댓글 좋아요 추가 요청 - communityId: ${communityId}, articleId: ${articleId}, commentId: ${commentId}, likedUserId: ${likedUserId}`
-  );
   // 댓글 조회
   const comment = await models.ArticleComments.findOne({
     where: {
@@ -38,13 +35,13 @@ export const likeComment = async ({
 
   // 댓글이 존재하지 않는 경우
   if (!comment) {
-    logger.warn(`[likeComment] 댓글이 존재하지 않음 - commentId: ${commentId}`);
+    logger.error(`[likeComment] 댓글이 존재하지 않음 - commentId: ${commentId}`);
     throw new NotExistsError("댓글이 존재하지 않습니다"); // 404
   }
 
   // 이미 좋아요가 눌린 경우
   if (comment.articleCommentLikes.length > 0) {
-    logger.warn(
+    logger.error(
       `[likeComment] 이미 좋아요가 눌린 댓글 - commentId: ${commentId}, likedUserId: ${likedUserId}`
     );
     throw new AlreadyExistsError("이미 좋아요를 누른 댓글입니다."); // 409
@@ -55,10 +52,6 @@ export const likeComment = async ({
     commentId,
     likedUserId,
   });
-
-  logger.debug(
-    `[likeComment] 댓글 좋아요 추가 성공 - commentId: ${commentId}, likedUserId: ${likedUserId}`
-  );
 
   return { like };
 };
@@ -72,9 +65,6 @@ export const unlikeComment = async ({
   commentId,
   likedUserId,
 }) => {
-  logger.info(
-    `[unlikeComment] 댓글 좋아요 취소 요청 - communityId: ${communityId}, articleId: ${articleId}, commentId: ${commentId}, likedUserId: ${likedUserId}`
-  );
   // 댓글 조회
   const comment = await models.ArticleComments.findOne({
     where: {
@@ -95,7 +85,7 @@ export const unlikeComment = async ({
 
   // 댓글이 존재하지 않는 경우
   if (!comment) {
-    logger.warn(
+    logger.error(
       `[unlikeComment] 댓글이 존재하지 않음 - commentId: ${commentId}`
     );
     throw new NotExistsError("댓글이 존재하지 않습니다"); // 404
@@ -103,7 +93,7 @@ export const unlikeComment = async ({
 
   // 좋아요가 눌리지 않은 경우
   if (comment.articleCommentLikes.length === 0) {
-    logger.warn(
+    logger.error(
       `[unlikeComment] 이미 좋아요가 취소된 댓글 - commentId: ${commentId}, likedUserId: ${likedUserId}`
     );
     throw new NotExistsError("이미 좋아요가 취소된 댓글입니다."); // 404

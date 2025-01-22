@@ -11,10 +11,6 @@ import { Op } from "sequelize";
  * communityId에 해당하는 게시판의 게시글들을 가져옵니다
  */
 export const getArticles = async (communityId, { limit, cursor = null }) => {
-  logger.info(
-    `[getArticles] 게시글 목록 조회 요청 - communityId: ${communityId}, limit: ${limit}, cursor: ${cursor}`
-  );
-
   // 게시판 및 게시글 조회
   const community = await models.Communities.findOne({
     where: { communityId },
@@ -34,24 +30,28 @@ export const getArticles = async (communityId, { limit, cursor = null }) => {
 
   if (!community) {
     // 게시판이 존재하지 않는 경우
-    logger.warn(`[getArticles] 존재하지 않는 communityId - ${communityId}`);
+    logger.error(`[getArticles] 존재하지 않는 communityId - ${communityId}`);
     throw new NotExistsError("해당 게시판이 존재하지 않습니다.");
   }
 
   // 게시글만 추출
   const articles = community.articles;
 
+  logger.debug(
+    `[getArticles] 조회된 데이터 개수 - 총 ${articles.length}개, 요청 limit: ${limit}`
+  );
+
   // 다음 커서 설정
   const hasNextPage = articles.length > limit; // limit + 1개를 가져왔으면 다음 페이지 있음
   const nextCursor = hasNextPage ? articles[limit - 1].articleId : null;
 
+  logger.debug(
+    `[getArticles] 다음 커서 설정 - nextCursor: ${nextCursor || "커서 없음"}`
+  );
+
   if (hasNextPage) {
     articles.pop(); // limit + 1개를 가져왔으면 마지막 요소는 버림
   }
-
-  logger.info(
-    `[getArticles] 게시글 목록 조회 성공 - 반환 게시글 수: ${articles.length}, nextCursor: ${nextCursor}`
-  );
 
   return {
     articles,
@@ -67,10 +67,6 @@ export const searchArticles = async (
   query,
   { limit, cursor = null }
 ) => {
-  logger.info(
-    `[searchArticles] 게시글 검색 요청 - communityId: ${communityId}, query: "${query}", limit: ${limit}, cursor: ${cursor}`
-  );
-
   // 게시판 및 게시글 조회
   const community = await models.Communities.findOne({
     where: { communityId },
@@ -102,24 +98,28 @@ export const searchArticles = async (
 
   if (!community) {
     // 커뮤니티가 존재하지 않는 경우
-    logger.warn(`[searchArticles] 존재하지 않는 communityId - ${communityId}`);
+    logger.error(`[searchArticles] 존재하지 않는 communityId - ${communityId}`);
     throw new NotExistsError("해당 게시판이 존재하지 않습니다.");
   }
 
   // 게시글만 추출
   const articles = community.articles;
 
+  logger.debug(
+    `[searchArticles] 조회된 데이터 개수 - 총 ${articles.length}개, 요청 limit: ${limit}`
+  );
+
   // 다음 커서 설정
   const hasNextPage = articles.length > limit; // limit + 1개를 가져왔으면 다음 페이지 있음
   const nextCursor = hasNextPage ? articles[limit - 1].articleId : null;
 
+  logger.debug(
+    `[searchArticles] 다음 커서 설정 - nextCursor: ${nextCursor || "커서 없음"}`
+  );
+
   if (hasNextPage) {
     articles.pop(); // limit + 1개를 가져왔으면 마지막 요소는 버림
   }
-
-  logger.info(
-    `[searchArticles] 게시글 검색 성공 - 반환 게시글 수: ${articles.length}, nextCursor: ${nextCursor}`
-  );
 
   return {
     articles,
