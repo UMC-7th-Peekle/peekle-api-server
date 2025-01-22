@@ -123,7 +123,6 @@ export const createCommentReply = async ({
   try {
     // 형식 검증 필요
     // 댓글 생성
-    const status = "active";
     const parentCommentId = commentId;
 
     const comment = await models.ArticleComments.create({
@@ -131,7 +130,7 @@ export const createCommentReply = async ({
       parentCommentId,
       authorId,
       content,
-      status,
+      status: "active",
       isAnonymous,
     });
 
