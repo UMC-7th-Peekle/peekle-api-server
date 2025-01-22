@@ -71,7 +71,9 @@ export const updateComment = async ({
     throw new NotExistsError("댓글이 존재하지 않습니다");
   }
 
-  if (authorId != comment.authorId) {
+  // 댓글 작성자와 요청자가 다른 경우
+  // toString()으로 타입 변환 후 strict 하게 비교하도록 수정했습니다.
+  if (authorId.toString() !== comment.authorId.toString()) {
     logger.error(
       `[updateComment] 댓글 수정 권한 없음 - 요청자: ${authorId}, 작성자: ${comment.authorId}`
     );
@@ -107,7 +109,10 @@ export const deleteComment = async ({
     );
     throw new NotExistsError("댓글이 존재하지 않습니다");
   }
-  if (authorId !== comment.authorId) {
+
+  // 댓글 작성자와 요청자가 다른 경우
+  // toString()으로 타입 변환 후 strict 하게 비교하도록 수정했습니다.
+  if (authorId.toString !== comment.authorId.toString()) {
     logger.error(
       `[deleteComment] 댓글 삭제 권한 없음 - 요청자: ${authorId}, 작성자: ${comment.authorId}`
     );

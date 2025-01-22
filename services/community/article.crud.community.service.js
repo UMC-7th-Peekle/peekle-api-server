@@ -16,7 +16,7 @@ export const getArticleById = async ({ communityId, articleId }) => {
     include: [
       {
         model: models.ArticleComments,
-        as: "articleComments", 
+        as: "articleComments",
       },
     ],
   });
@@ -50,24 +50,35 @@ export const createArticle = async ({
     },
   });
 
-  if (!community) {
-    // 게시판이 존재하지 않는 경우
-    logger.error(
-      `[createArticle] 게시판이 존재하지 않음 - communityId: ${communityId}`
-    );
-    throw new NotExistsError("게시판이 존재하지 않습니다");
+  // 게시글 생성
+  let article;
+  /*try-catch 블록 외부에서 article 선언
+  try-catch 블록 내부에서 article을 생성하고 반환하면
+  "article is not defined" 에러가 발생합니다.
+  */
+
+  try {
+    article = await models.Articles.create({
+      communityId,
+      authorId,
+      title,
+      content,
+      isAnonymous,
+    });
+  } catch (error) {
+    if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
+      // 게시판이 존재하지 않는 경우
+      logger.error(
+        `[createArticle] 존재하지 않는 communityId - ${communityId}`
+      );
+      throw new NotExistsError("해당 게시판이 존재하지 않습니다.");
+    }
+    throw error;
   }
 
-  // 게시글 생성
-  const article = await models.Articles.create({
-    communityId,
-    authorId,
-    title,
-    content,
-    isAnonymous,
-  });
-
-  logger.debug(`[updateArticle] 생성된 게시글 제목: ${article.title}, 생성된 내용: ${article.content}`, );
+  logger.debug(
+    `[updateArticle] 생성된 게시글 제목: ${article.title}, 생성된 내용: ${article.content}`
+  );
 
   return { article };
 };
@@ -99,8 +110,8 @@ export const updateArticle = async ({
     throw new NotExistsError("게시글이 존재하지 않습니다");
   }
 
-  // !== 대신 !=로 수정했습니다. 둘이 type이 달라요.
-  if (article.authorId != authorId) {
+  // toString()으로 타입 변환 후 strict 하게 비교하도록 수정했습니다.
+  if (article.authorId.toString() !== authorId.toString()) {
     // 작성자와 요청자가 다른 경우
     logger.error(
       `[updateArticle] 잘못된 수정 요청 - 작성자: ${article.authorId}, 요청자: ${authorId}`
@@ -115,7 +126,9 @@ export const updateArticle = async ({
     content,
   });
 
-  logger.debug(`[updateArticle] 수정된 게시글 제목: ${article.title}, 수정된 내용: ${article.content}`, );
+  logger.debug(
+    `[updateArticle] 수정된 게시글 제목: ${article.title}, 수정된 내용: ${article.content}`
+  );
   return { article };
 };
 
@@ -140,8 +153,8 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
     throw new NotExistsError("게시글이 존재하지 않습니다");
   }
 
-  // !== 대신 !=로 수정했습니다. 둘이 type이 달라요.
-  if (article.authorId != authorId) {
+  // toString()으로 타입 변환 후 strict 하게 비교하도록 수정했습니다.
+  if (article.authorId.toString() !== authorId.toString()) {
     // 작성자와 요청자가 다른 경우
     logger.error(
       `[deleteArticle] 잘못된 삭제 요청 - 작성자: ${article.authorId}, 요청자: ${authorId}`
@@ -151,5 +164,4 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
 
   // 게시글 삭제
   await article.destroy();
-
 };
