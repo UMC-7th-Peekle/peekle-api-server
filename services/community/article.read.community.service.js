@@ -14,41 +14,48 @@ export const getArticles = async (communityId, { limit, cursor = null }) => {
   logger.info(
     `[getArticles] 게시글 목록 조회 요청 - communityId: ${communityId}, limit: ${limit}, cursor: ${cursor}`
   );
-  // 게시판과 게시글을 조인하여 조회
-  const whereClause = {
-    communityId,
-  };
 
-  // where 절에 cursor가 있을 경우 조건을 추가
-  if (cursor) {
-    whereClause.articleId = { [Op.lt]: cursor }; //articleId가 cursor보다 작은 게시글만 조회
-  }
-
-  // 게시글 목록 조회
-  const articles = await models.Articles.findAll({
-    where: whereClause,
-    order: [["createdAt", "DESC"]], // 최신순 정렬
-    limit: limit + 1, // limit + 1개 가져오기
+  // 게시판 및 게시글 조회
+  const community = await models.Communities.findOne({
+    where: { communityId },
+    include: [
+      {
+        model: models.Articles,
+        as: "articles",
+        where: {
+          ...(cursor && { articleId: { [Op.lt]: cursor } }), // 커서 조건: articleId 기준
+        },
+        order: [["createdAt", "DESC"]], // 최신순 정렬
+        limit: limit + 1, // 조회 개수 제한
+        required: false, // 게시글이 없는 경우에도 커뮤니티는 반환
+      },
+    ],
   });
 
-  // limit + 1개를 불러왔을 때, 초과한 경우에만 다음 커서 설정
-  const nextCursor =
-    articles.length > limit
-      ? articles[limit - 1]?.articleId // 다음 커서를 limit번째 게시글의 id로 설정
-      : null;
+  if (!community) {
+    // 게시판이 존재하지 않는 경우
+    logger.warn(`[getArticles] 존재하지 않는 communityId - ${communityId}`);
+    throw new NotExistsError("해당 게시판이 존재하지 않습니다.");
+  }
 
-  // 사용자에게는 limit 개수만큼만 반환
-  if (articles.length > limit) {
-    articles.pop(); // 초과분 제거
+  // 게시글만 추출
+  const articles = community.articles;
+
+  // 다음 커서 설정
+  const hasNextPage = articles.length > limit; // limit + 1개를 가져왔으면 다음 페이지 있음
+  const nextCursor = hasNextPage ? articles[limit - 1].articleId : null;
+
+  if (hasNextPage) {
+    articles.pop(); // limit + 1개를 가져왔으면 마지막 요소는 버림
   }
 
   logger.info(
-    `[getArticles] 게시글 목록 조회 성공 - 반환 게시글 수: ${articles.length}`
+    `[getArticles] 게시글 목록 조회 성공 - 반환 게시글 수: ${articles.length}, nextCursor: ${nextCursor}`
   );
 
   return {
     articles,
-    nextCursor, // 다음 커서 반환
+    nextCursor,
   };
 };
 
@@ -64,53 +71,58 @@ export const searchArticles = async (
     `[searchArticles] 게시글 검색 요청 - communityId: ${communityId}, query: "${query}", limit: ${limit}, cursor: ${cursor}`
   );
 
-  const whereClause = {
-    communityId,
-    [Op.or]: [
+  // 게시판 및 게시글 조회
+  const community = await models.Communities.findOne({
+    where: { communityId },
+    include: [
       {
-        title: {
-          // 제목에 검색어가 포함된 경우
-          [Op.like]: `%${query}%`,
+        model: models.Articles,
+        as: "articles",
+        where: {
+          [Op.or]: [
+            {
+              title: {
+                [Op.like]: `%${query}%`, // 제목에 검색어 포함
+              },
+            },
+            {
+              content: {
+                [Op.like]: `%${query}%`, // 내용에 검색어 포함
+              },
+            },
+          ],
+          ...(cursor && { articleId: { [Op.lt]: cursor } }), // 커서 조건: articleId 기준
         },
-      },
-      {
-        content: {
-          // 내용에 검색어가 포함된 경우
-          [Op.like]: `%${query}%`,
-        },
+        order: [["createdAt", "DESC"]], // 최신순 정렬
+        limit: limit + 1, // 조회 개수 제한
+        required: false, // 검색 결과가 없는 경우에도 커뮤니티는 반환
       },
     ],
-  };
-
-  // where 절에 cursor가 있을 경우 조건을 추가
-  if (cursor) {
-    whereClause.articleId = { [Op.lt]: cursor }; //articleId가 cursor보다 작은 게시글만 조회
-  }
-
-  // 게시글 목록 조회
-  const articles = await models.Articles.findAll({
-    where: whereClause,
-    order: [["createdAt", "DESC"]], // 최신순 정렬
-    limit: limit + 1, // limit + 1개 가져오기
   });
 
-  // limit + 1개를 불러왔을 때, 초과한 경우에만 다음 커서 설정
-  const nextCursor =
-    articles.length > limit
-      ? articles[limit - 1]?.articleId // 다음 커서를 limit번째 게시글의 id로 설정
-      : null;
+  if (!community) {
+    // 커뮤니티가 존재하지 않는 경우
+    logger.warn(`[searchArticles] 존재하지 않는 communityId - ${communityId}`);
+    throw new NotExistsError("해당 게시판이 존재하지 않습니다.");
+  }
 
-  // 사용자에게는 limit 개수만큼만 반환
-  if (articles.length > limit) {
-    articles.pop(); // 초과분 제거
+  // 게시글만 추출
+  const articles = community.articles;
+
+  // 다음 커서 설정
+  const hasNextPage = articles.length > limit; // limit + 1개를 가져왔으면 다음 페이지 있음
+  const nextCursor = hasNextPage ? articles[limit - 1].articleId : null;
+
+  if (hasNextPage) {
+    articles.pop(); // limit + 1개를 가져왔으면 마지막 요소는 버림
   }
 
   logger.info(
-    `[searchArticles] 게시글 검색 성공 - 반환 게시글 수: ${articles.length}`
+    `[searchArticles] 게시글 검색 성공 - 반환 게시글 수: ${articles.length}, nextCursor: ${nextCursor}`
   );
 
   return {
-    articles, // 현재 페이지의 게시글 목록
-    nextCursor, // 다음 페이지 요청에 사용할 커서
+    articles,
+    nextCursor,
   };
 };
