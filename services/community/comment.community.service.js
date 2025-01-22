@@ -19,6 +19,18 @@ export const createComment = async ({
 }) => {
   // TODO : 형식 검증 필요
 
+  // 게시글 조회
+  const article = await models.Articles.findOne({
+    where: {
+      articleId,
+    },
+  });
+  // 게시글이 존재하지 않는 경우
+  if (!article) {
+    throw new NotExistsError("게시글이 존재하지 않습니다");
+  }
+
+  // 댓글 생성
     const comment = await models.ArticleComments.create({
       articleId,
       authorId,
@@ -26,6 +38,7 @@ export const createComment = async ({
       status: "active",
       isAnonymous,
     });
+
 
   return { comment };
 };
