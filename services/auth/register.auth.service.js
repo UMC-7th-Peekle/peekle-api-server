@@ -56,6 +56,7 @@ export const oauthRegister = async (data) => {
     };
 
     const newUser = await models.Users.create(newUserData, { transaction });
+    logger.debug(`[oauthRegister] 새로운 사용자 생성: ${newUser.userId}`);
 
     await models.UserTerms.bulkCreate(
       data.terms.map((term) => ({
@@ -65,13 +66,23 @@ export const oauthRegister = async (data) => {
       })),
       { transaction }
     );
+    logger.debug(`[oauthRegister] 약관 동의 정보 생성: ${newUser.userId}`);
 
     // local과 다른 점
-    await models.UserOauth.create({
-      oauthId: data.oauthId,
-      oauthType: data.oauthType,
-      userId: newUser.userId,
-    });
+    logger.debug(
+      `[oauthRegister] OAuth 정보 생성: ${newUser.userId}, ${data.oauthId}, ${data.oauthType}`
+    );
+    const userOauth = await models.UserOauth.create(
+      {
+        userId: newUser.userId,
+        oauthId: data.oauthId,
+        oauthType: data.oauthType,
+      },
+      { transaction } // transaction 사용하는 경우 반드시 option으로 추가하기
+    );
+    logger.debug(
+      `[oauthRegister] OAuth 정보 생성: ${newUser.userId}, ${userOauth.oauthId}`
+    );
 
     await transaction.commit();
   } catch (error) {
