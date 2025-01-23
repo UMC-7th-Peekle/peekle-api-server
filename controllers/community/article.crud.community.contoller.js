@@ -35,6 +35,9 @@ export const createArticle = async (req, res, next) => {
     const { communityId } = req.params; // URL에서 communityId 추출
     const { title, content, isAnonymous } = req.body; // Request body에서 title, content 추출
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
+    // 업로드된 파일 정보 추출
+    const uploadedFiles = req.files?.article_images || [];
+    const imagePaths = uploadedFiles.map((file) => file.path); // 로컬 저장된 파일 경로
 
     // 게시글 생성
     // 현재는 response에 article을 넣지 않지만,
@@ -45,7 +48,25 @@ export const createArticle = async (req, res, next) => {
       title,
       content,
       isAnonymous,
+      imagePaths,
     });
+
+    // TODO: 사진 업로드 안 되었을 시 적용할 transaction 처리
+
+    // 이미지 파일 처리
+    if (req.files && req.files.images) {
+      // 필드명은 uploader.js와 통일
+      const imageFiles = req.files.images;
+
+      const imageRecords = imageFiles.map((image) => ({
+        articleId: article.articleId, // 게시글 ID와 연계
+        imageUrl: image.location, // 업로드된 이미지의 URL (로컬 또는 S3 경로)
+        sequence: 0, // 이미지 순서 (0부터 시작)
+      }));
+
+      // 이미지 업로드
+      await articleCrudService.createArticleImages(imageRecords); // 이미지 데이터를 DB에 저장
+    }
 
     return res.status(201).success({
       message: "게시글 작성 성공",

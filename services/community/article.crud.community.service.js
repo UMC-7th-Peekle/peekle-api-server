@@ -42,6 +42,7 @@ export const createArticle = async ({
   title,
   content,
   isAnonymous = true,
+  imagePaths,
 }) => {
   // 게시판 검색
   const community = await models.Communities.findOne({
@@ -52,6 +53,7 @@ export const createArticle = async ({
 
   // 게시글 생성
   let article;
+  let articleImageData;
   /*try-catch 블록 외부에서 article 선언
   try-catch 블록 내부에서 article을 생성하고 반환하면
   "article is not defined" 에러가 발생합니다.
@@ -65,6 +67,17 @@ export const createArticle = async ({
       content,
       isAnonymous,
     });
+
+    // 이미지 경로를 ArticleImages 테이블에 저장
+    if (imagePaths.length > 0) {
+        articleImageData = imagePaths.map((path, index) => ({
+        articleId: article.articleId,
+        imageUrl: path,
+        sequence: index + 1, // 이미지 순서 설정
+      }));
+    }
+
+      await models.ArticleImages.bulkCreate(articleImageData);
   } catch (error) {
     if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
       // 게시판이 존재하지 않는 경우
@@ -77,11 +90,12 @@ export const createArticle = async ({
   }
 
   logger.debug(
-    `[updateArticle] 생성된 게시글 제목: ${article.title}, 생성된 내용: ${article.content}`
+    `[createArticle] 생성된 게시글 제목: ${article.title}, 생성된 내용: ${article.content}`
   );
 
   return { article };
 };
+
 
 /**
  * communityId와 articleId에 해당하는 게시글을 수정
