@@ -9,6 +9,7 @@ import {
   InvalidCodeError,
   InvalidInputError,
   NotExistsError,
+  NotVerifiedError,
   RestrictedUserError,
   TimeOutError,
   TooManyRequest,
@@ -23,34 +24,39 @@ import * as coolSMS from "../../utils/sms/coolsms.js";
  * 제재된 사용자인지 확인합니다.
  */
 export const isRestrictedUser = (data) => {
-  data.forEach((restriction) => {
-    const restrictionEndDate = new Date(restriction.endsAt).getTime();
-    const currentDate = Date.now();
+  if (data.userRestrictions && data.userRestrictions.length > 0) {
+    data.userRestrictions.forEach((restriction) => {
+      const restrictionEndDate = new Date(restriction.endsAt).getTime();
+      const currentDate = Date.now();
 
-    if (restriction.type == "suspend" && restrictionEndDate > currentDate) {
-      logger.error(
-        `[checkAccountStatus] 정지 상태인 사용자가 로그인을 시도했습니다. userId: ${result.userId}`
-      );
-      throw new RestrictedUserError(
-        `${restriction.endsAt} 까지 이용이 정지된 사용자입니다.`,
-        {
-          type: restriction.type,
-          reason: restriction.reason,
-          endsAt: restriction.endsAt,
-          restrictedAt: restriction.createdAt,
-        }
-      );
-    } else if (restriction.type == "ban") {
-      logger.error(
-        `[checkAccountStatus] 영구 정지 상태인 사용자가 로그인을 시도했습니다. userId: ${result.userId}`
-      );
-      throw new RestrictedUserError(`영구적으로 이용이 정지된 사용자입니다.`, {
-        type: restriction.type,
-        reason: restriction.reason,
-        restrictedAt: restriction.createdAt,
-      });
-    }
-  });
+      if (restriction.type == "suspend" && restrictionEndDate > currentDate) {
+        logger.error(
+          `[checkAccountStatus] 정지 상태인 사용자가 로그인을 시도했습니다. userId: ${result.userId}`
+        );
+        throw new RestrictedUserError(
+          `${restriction.endsAt} 까지 이용이 정지된 사용자입니다.`,
+          {
+            type: restriction.type,
+            reason: restriction.reason,
+            endsAt: restriction.endsAt,
+            restrictedAt: restriction.createdAt,
+          }
+        );
+      } else if (restriction.type == "ban") {
+        logger.error(
+          `[checkAccountStatus] 영구 정지 상태인 사용자가 로그인을 시도했습니다. userId: ${result.userId}`
+        );
+        throw new RestrictedUserError(
+          `영구적으로 이용이 정지된 사용자입니다.`,
+          {
+            type: restriction.type,
+            reason: restriction.reason,
+            restrictedAt: restriction.createdAt,
+          }
+        );
+      }
+    });
+  }
 };
 
 /**
@@ -113,9 +119,7 @@ export const checkAccountStatus = async ({ phone }) => {
   }
 
   // 사용자 제재 이력이 존재하고, 활성 상태인 제재가 존재하는 경우
-  if (result.userRestrictions && result.userRestrictions.length > 0) {
-    isRestrictedUser(result.userRestrictions);
-  }
+  isRestrictedUser(result);
 
   // 탈퇴했거나 휴면인 사용자.
   // 탈퇴한게 우선이기 때문에 우선 배치 .. 인데 탈퇴를 고려하여야 하나?
@@ -199,7 +203,7 @@ export const verifyToken = async ({ id, token, phone }) => {
 
   // 3. 인증 횟수를 초과하지는 않았는지 확인
   const MAX_ATTEMPTS = 10;
-  if (record.attempts > MAX_ATTEMPTS) {
+  if (record.attempts >= MAX_ATTEMPTS) {
     // 3-1. 인증 시도 횟수를 초과한 경우 에러 리턴 및 해당 세션 삭제
     await record.destroy();
     throw new TooManyRequest("인증 시도 횟수를 초과하였습니다.", {
@@ -212,8 +216,7 @@ export const verifyToken = async ({ id, token, phone }) => {
   // 4. 토큰 비교
   if (record.code !== token) {
     // 4-1. 토큰이 일치하지 않는 경우 attempts 증가 후 에러 리턴
-    record.attempts += 1;
-    await record.save();
+    await record.update({ attempts: record.attempts + 1 }); // update로 구문 수정
     throw new InvalidCodeError("인증 코드가 일치하지 않습니다.", {
       currentAttempts: record.attempts,
       maxAttempts: MAX_ATTEMPTS,
@@ -236,7 +239,8 @@ export const verifyToken = async ({ id, token, phone }) => {
 };
 
 /**
- * 인증 세션 ID와 전화번호를 받아서 그 진위여부를 판단합니다.
+ * 전화번호를 받아, 해당 인증세션에서 사용된 전화번호와 일치하는지 확인합니다.
+ * 인증여부는 판단하지 않습니다.
  */
 export const getAndVerifyPhoneBySessionId = async ({ id, phone }) => {
   const decryptedId = decrypt62(id);
@@ -262,4 +266,27 @@ export const getAndVerifyPhoneBySessionId = async ({ id, phone }) => {
   }
 
   return record.identifierValue;
+};
+
+/**
+ * 전화번호를 받아, 해당 인증세션에서 사용된 전화번호와 일치하는지 확인 및 인증여부를 확인합니다.
+ */
+export const isSessionVerified = async ({ id, phone }) => {
+  const decryptedId = decrypt62(id);
+  const record = await models.VerificationCode.findOne({
+    attributes: ["sessionId"],
+    where: {
+      sessionId: decryptedId,
+      identifierValue: phone,
+      isVerified: true,
+    },
+  });
+
+  if (!record) {
+    throw new NotVerifiedError(
+      "인증되지 않았거나, 존재하지 않는 세션 ID 입니다."
+    );
+  }
+
+  return;
 };

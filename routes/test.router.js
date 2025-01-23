@@ -5,6 +5,7 @@ import {
   createTestToken,
 } from "../utils/tokens/create.jwt.tokens.js";
 import * as uploader from "../middleware/uploader.js";
+import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 
 const router = Router();
 
@@ -26,6 +27,12 @@ router.get("/accesstoken/:userId/long", (req, res) => {
   const { userId } = req.params;
   res.status(201).success({
     accessToken: createTestToken({ userId }),
+  });
+});
+
+router.get("/middleware/auth", authenticateAccessToken, (req, res) => {
+  res.status(201).success({
+    message: "인증에 성공했습니다.",
   });
 });
 

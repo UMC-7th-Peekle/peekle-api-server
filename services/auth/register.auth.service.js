@@ -2,7 +2,7 @@ import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 const { sequelize } = models;
 
-const PROFILE_IMAGE_DEFAULT = "peekle_default_profile_image.jpg";
+const PROFILE_IMAGE_DEFAULT = "default/peekle_default_profile_image.png";
 
 export const register = async (data) => {
   // transaction 추가
@@ -75,7 +75,7 @@ export const oauthRegister = async (data) => {
 
     await transaction.commit();
   } catch (error) {
-    logger.debug(`[register] 에러가 발생하여 rollback을 실시합니다.`);
+    logger.debug(`[oauthRegister] 에러가 발생하여 rollback을 실시합니다.`);
     await transaction.rollback();
     throw error;
   }

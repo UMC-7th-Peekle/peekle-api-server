@@ -19,11 +19,14 @@ export const localLogin = async (req, res, next) => {
     const { phone, phoneVerificationSessionId, phoneVerificationCode } =
       req.body;
 
+    // 인증세션과 전화번호를 활용해서
+    // 해당 전화번호가 해당 인증세션에서 사용된 값과 일치하는지 확인
     await phoneService.getAndVerifyPhoneBySessionId({
       id: phoneVerificationSessionId,
       phone,
     });
 
+    // 인증 코드를 확인합니다.
     await phoneService.verifyToken({
       id: phoneVerificationSessionId,
       token: phoneVerificationCode,

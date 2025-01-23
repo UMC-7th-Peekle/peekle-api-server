@@ -158,3 +158,12 @@ export class UserStatusError extends CustomError {
     super(reason, "DORMANT_OR_TERMINATED", 403, data);
   }
 }
+
+/**
+ * 핸드폰 번호가 인증되지 않은 경우
+ */
+export class NotVerifiedError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "NOT_VERIFIED", 401, data);
+  }
+}
