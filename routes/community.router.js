@@ -50,6 +50,11 @@ router.post(
 router.patch(
   "/:communityId/articles/:articleId",
   authenticateAccessToken,
+  fileUploadMiddleware.localStorage({
+    restrictions: fileUploadMiddleware.restrictions("article"),
+    field: [{ name: "article_images", maxCount: 5 }], // 다중 파일 업로드 설정
+    destination: "uploads/articles", // 저장 경로 설정
+  }),
   articleCrudController.updateArticle
 ); 
 

@@ -2,6 +2,8 @@
 import { NotAllowedError, NotExistsError } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
+import fs from "fs/promises";
+import path from "path";
 
 /**
  * communityId와 articleId에 해당하는 게시글을 가져옵니다
@@ -106,6 +108,7 @@ export const updateArticle = async ({
   authorId,
   title,
   content,
+  imagePaths,
 }) => {
   // 게시글 검색
   const article = await models.Articles.findOne({
@@ -140,6 +143,44 @@ export const updateArticle = async ({
     content,
   });
 
+  // 사진이 새로 들어온 경우에만 사진 업데이트
+  // 기존 이미지 삭제
+  if (imagePaths.length > 0) {
+    // DB에서 기존 이미지 경로 가져오기
+    const existingImages = await models.ArticleImages.findAll({
+      where: { articleId },
+      attributes: ["imageUrl"],
+    });
+
+    // 로컬 파일 삭제
+    const deletePromises = existingImages.map(async (img) => {
+      const filePath = path.resolve(img.imageUrl); // 이미지 경로 절대 경로로 변환
+      try {
+        await fs.unlink(filePath); // 로컬 파일 삭제
+        logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
+      } catch (err) {
+        logger.error(`[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`);
+      }
+    });
+
+    // 모든 파일 삭제 완료 대기
+    await Promise.all(deletePromises);
+
+    // 기존 이미지 데이터 삭제
+    await models.ArticleImages.destroy({
+      where: { articleId },
+    });
+
+    // 새로운 이미지 추가
+    const articleImageData = imagePaths.map((path, index) => ({
+      articleId,
+      imageUrl: path,
+      sequence: index + 1, // 이미지 순서 설정
+    }));
+
+    await models.ArticleImages.bulkCreate(articleImageData);
+  }
+  
   logger.debug(
     `[updateArticle] 수정된 게시글 제목: ${article.title}, 수정된 내용: ${article.content}`
   );
