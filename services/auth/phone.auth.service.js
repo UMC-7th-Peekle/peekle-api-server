@@ -12,15 +12,71 @@ import {
   RestrictedUserError,
   TimeOutError,
   TooManyRequest,
+  UserStatusError,
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 
 import * as coolSMS from "../../utils/sms/coolsms.js";
 
-export const checkAccountStatus = async ({ phone }) => {
-  //
-  const result = await models.Users.findOne({
+/**
+ * 제재된 사용자인지 확인합니다.
+ */
+export const isRestrictedUser = (data) => {
+  data.forEach((restriction) => {
+    const restrictionEndDate = new Date(restriction.endsAt).getTime();
+    const currentDate = Date.now();
+
+    if (restriction.type == "suspend" && restrictionEndDate > currentDate) {
+      logger.error(
+        `[checkAccountStatus] 정지 상태인 사용자가 로그인을 시도했습니다. userId: ${result.userId}`
+      );
+      throw new RestrictedUserError(
+        `${restriction.endsAt} 까지 이용이 정지된 사용자입니다.`,
+        {
+          type: restriction.type,
+          reason: restriction.reason,
+          endsAt: restriction.endsAt,
+          restrictedAt: restriction.createdAt,
+        }
+      );
+    } else if (restriction.type == "ban") {
+      logger.error(
+        `[checkAccountStatus] 영구 정지 상태인 사용자가 로그인을 시도했습니다. userId: ${result.userId}`
+      );
+      throw new RestrictedUserError(`영구적으로 이용이 정지된 사용자입니다.`, {
+        type: restriction.type,
+        reason: restriction.reason,
+        restrictedAt: restriction.createdAt,
+      });
+    }
+  });
+};
+
+/**
+ * 휴면이거나 탈퇴한지 7일이 되지 않은 사용자인지 확인합니다.
+ */
+export const isDormantOrTerminatedUser = (data) => {
+  if (data.terminationDate) {
+    throw new UserStatusError("탈퇴한 사용자입니다.", {
+      message: "탈퇴한 사용자입니다.",
+      terminationDate: data.terminationDate,
+    });
+  }
+
+  if (data.dormantDate) {
+    throw new UserStatusError("휴면 상태인 사용자입니다.", {
+      message: "휴면 상태인 사용자입니다.",
+      dormantDate: data.dormantDate,
+    });
+  }
+};
+
+/**
+ * 전화번호로 사용자를 검색하되, 제재사항까지 가져옵니다.
+ */
+export const findUserWithRestrictions = async ({ phone }) => {
+  return await models.Users.findOne({
     attributes: ["userId", "dormantDate", "terminationDate"],
     where: {
       phone,
@@ -37,6 +93,13 @@ export const checkAccountStatus = async ({ phone }) => {
       },
     ],
   });
+};
+
+/**
+ * 전화번호로 사용자가 존재하는지, 계정 상태 확인
+ */
+export const checkAccountStatus = async ({ phone }) => {
+  const result = await findUserWithRestrictions({ phone });
 
   logger.debug(
     `[checkAccountStatus] result: ${JSON.stringify(result, null, 2)}`
@@ -51,31 +114,13 @@ export const checkAccountStatus = async ({ phone }) => {
 
   // 사용자 제재 이력이 존재하고, 활성 상태인 제재가 존재하는 경우
   if (result.userRestrictions && result.userRestrictions.length > 0) {
-    result.userRestrictions.forEach((restriction) => {
-      const restrictionEndDate = new Date(restriction.endsAt).getTime();
-      const currentDate = Date.now();
-
-      if (restriction.type == "suspend" && restrictionEndDate > currentDate) {
-        logger.error(
-          `[checkAccountStatus] 정지 상태인 사용자가 로그인을 시도했습니다. userId: ${result.userId}`
-        );
-        throw new RestrictedUserError(
-          `${restriction.endsAt} 까지 이용이 정지된 사용자입니다.`,
-          {
-            type: restriction.type,
-            reason: restriction.reason,
-            endsAt: restriction.endsAt,
-            restrictedAt: restriction.createdAt,
-          }
-        );
-      } else if (restriction.type == "ban") {
-        logger.error(
-          `[checkAccountStatus] 영구 정지 상태인 사용자가 로그인을 시도했습니다. userId: ${result.userId}`
-        );
-        throw new RestrictedUserError(`영구적으로 이용이 정지된 사용자입니다.`);
-      }
-    });
+    isRestrictedUser(result.userRestrictions);
   }
+
+  // 탈퇴했거나 휴면인 사용자.
+  // 탈퇴한게 우선이기 때문에 우선 배치 .. 인데 탈퇴를 고려하여야 하나?
+
+  isDormantOrTerminatedUser(result);
 
   return {
     message: "가입된 사용자의 전화번호입니다.",
@@ -98,7 +143,7 @@ export const sendTokenToPhone = async ({ phone }) => {
   const message = `[Peekle, 피클] 인증번호는 ${token} 입니다.\n절대 타인에게 노출하지 마세요.`;
   logger.debug(`[sendTokenToPhone]\n핸드폰번호: ${phone}\n메세지: ${message}`);
 
-  // COOLSMS 사용 시
+  // COOLSMS 사용
   const result = await coolSMS.sdkSendSMS(phone, message);
   logger.debug(`[sendTokenToPhone] result: ${JSON.stringify(result, null, 2)}`);
 
