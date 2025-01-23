@@ -8,6 +8,15 @@ export const listEvent = async (req, res, next) => {
   try {
     const { category, limit, cursor } = req.query;
 
+    // limit 및 cursor 유효성 검증 (정수형 확인)
+    const isInteger = (value) => /^\d+$/.test(value); // 정수만 허용
+
+    if ((limit && !isInteger(limit)) || (cursor && !isInteger(cursor))) {
+      return res.status(400).json({
+        message: "잘못된 쿼리 매개변수입니다. 'limit' 및 'cursor'는 정수여야 합니다.",
+      });
+    }
+
     // 페이지네이션 기본값 설정
     const paginationOptions = {
       limit: limit ? parseInt(limit, 10) : 10, // 기본 limit은 10
