@@ -23,7 +23,7 @@ const existEvent = async (eventId, userId) => {
   // console.log(typeof event.createdUserId); // number
   // console.log(typeof userId); // string
 
-  if (event.createdUserId.toString() === userId.toString()) {
+  if (event.createdUserId.toString() === userId) {
     throw new NotAllowedError("본인이 작성한 게시글을 신고할 수 없습니다.");
   }
 };
