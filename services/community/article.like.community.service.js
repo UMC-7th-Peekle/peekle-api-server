@@ -4,49 +4,55 @@ import {
   UnauthorizedError,
   AlreadyExistsError,
 } from "../../utils/errors/errors.js";
-import db from "../../models/index.js";
+import models from "../../models/index.js";
+import logger from "../../utils/logger/logger.js";
 
 /**
  * 게시글 좋아요를 추가합니다
  */
 export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
+  // 원래 ForeignKeyConstraintError를 처리하려 했지만, articleId에 대한 확인도 필요하여 이렇게 수정
+  const article = await models.Articles.findOne({
+    where: {
+      communityId,
+      articleId,
+    },
+  });
+
+  if (!article) {
+    logger.error(
+      `[likeArticle] 게시글이 존재하지 않음 - articleId: ${articleId}`
+    );
+    throw new NotExistsError("게시글이 존재하지 않습니다");
+  }
+
+  let like;
+  /* try-catch 블록 외부에서 like 선언
+  try-catch 블록 내부에서 like를 생성하고 반환하면
+  "like is not defined" 에러가 발생합니다.
+  */
   try {
-    // 게시글 조회
-    const article = await db.Articles.findOne({
-      where: {
-        communityId,
-        articleId,
-      },
-    });
-
-    if (!article) {
-      // 게시글이 존재하지 않는 경우
-      throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
-    }
-
-    // 이미 좋아요가 눌렸는지 확인
-    const existingLike = await db.ArticleLikes.findOne({
-      where: {
-        articleId,
-        likedUserId,
-      },
-    });
-
-    if (existingLike) {
-      // 이미 좋아요가 눌린 경우
-      throw new AlreadyExistsError("이미 좋아요가 처리되었습니다"); // 409
-    }
-
     // 좋아요 추가
-    const like = await db.ArticleLikes.create({
+    like = await models.ArticleLikes.create({
       articleId,
       likedUserId,
     });
-
-    return { like };
   } catch (error) {
-    throw error;
+    if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
+      logger.error(
+        `[likeArticle] 게시글 존재하지 않음 - articleId: ${articleId}`
+      );
+      throw new NotExistsError("게시글이 존재하지 않습니다");
+    } else if (error instanceof models.Sequelize.UniqueConstraintError) {
+      logger.error(
+        `[likeArticle] 이미 좋아요가 눌린 게시글 - articleId: ${articleId}, likedUserId: ${likedUserId}`
+      );
+      throw new AlreadyExistsError("이미 좋아요를 누른 게시글입니다.");
+    } else {
+      throw error;
+    }
   }
+  return { like };
 };
 
 /**
@@ -57,47 +63,42 @@ export const unlikeArticle = async ({
   articleId,
   likedUserId,
 }) => {
-  try {
-    // 게시글 조회
-    const article = await db.Articles.findOne({
-      where: {
-        communityId,
-        articleId,
-      },
-    });
+  // 게시글 조회
+  const article = await models.Articles.findOne({
+    where: {
+      communityId,
+      articleId,
+    },
+    include: [
+      {
+        model: models.ArticleLikes,
+        as: "articleLikes",
+        where: {
+          likedUserId,
+        },
+        required: false, // 좋아요가 없는 경우도 조회 가능하도록 설정
+      }, // true로 설정할 경우 좋아요가 없는 경우 조회되지 article 자체가 null이 되어 좋아요만 없어도 404 에러가 발생
+    ],
+  });
 
-    if (!article) {
-      // 게시글이 존재하지 않는 경우
-      throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
-    }
-
-    // 이미 좋아요가 눌렸는지 확인
-    const existingLike = await db.ArticleLikes.findOne({
-      where: {
-        articleId,
-        likedUserId,
-      },
-    });
-
-    if (!existingLike) {
-      // 좋아요가 눌리지 않은 경우
-      throw new AlreadyExistsError("좋아요가 존재하지 않습니다"); // 409
-    }
-    // 좋아요 삭제
-    await db.ArticleLikes.destroy({
-      where: {
-        articleId,
-        likedUserId,
-      },
-    });
-
-    return;
-  } catch (error) {
-    throw error;
+  if (!article) {
+    // 게시글이 존재하지 않는 경우
+    logger.error(
+      `[unlikeArticle] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
+    );
+    throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
   }
-};
 
-export default {
-  likeArticle,
-  unlikeArticle,
+  if (article.articleLikes.length === 0) {
+    // 이미 좋아요가 취소된 경우
+    logger.error(
+      `[unlikeArticle] 이미 좋아요가 취소된 게시글 - articleId: ${articleId}, likedUserId: ${likedUserId}`
+    );
+    throw new AlreadyExistsError("이미 좋아요가 취소된 게시글입니다."); // 409
+  }
+
+  // 좋아요 삭제
+  await article.articleLikes[0].destroy();
+
+  return;
 };

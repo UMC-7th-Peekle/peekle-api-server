@@ -1,5 +1,5 @@
 // Description: 게시글 관련 조회, 생성, 수정, 삭제와 관련된 컨트롤러 파일입니다.
-import articleCrudService from "../../services/community/article.crud.community.service.js";
+import * as articleCrudService from "../../services/community/article.crud.community.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 // 게시글 조회
@@ -32,13 +32,16 @@ export const createArticle = async (req, res, next) => {
     const { title, content, isAnonymous } = req.body; // Request body에서 title, content 추출
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
+    // 게시글 생성
+    // 현재는 response에 article을 넣지 않지만,
+    // 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성
     const article = await articleCrudService.createArticle({
       communityId,
       authorId,
       title,
       content,
       isAnonymous,
-    }); // 게시글 생성 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
+    });
 
     return res.status(201).success({
       message: "게시글 작성 성공",
@@ -94,11 +97,4 @@ export const deleteArticle = async (req, res, next) => {
     logError(error);
     next(error); // 에러 핸들러로 전달
   }
-};
-
-export default {
-  getArticleById,
-  createArticle,
-  updateArticle,
-  deleteArticle,
 };
