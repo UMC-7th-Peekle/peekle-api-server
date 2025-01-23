@@ -59,7 +59,7 @@ export const listEvent = async (category = "all", paginationOptions) => {
   // limit+1로 조회했을 때 초과된 데이터가 있으면, 다음 페이지가 있다는 뜻
   if (events.length > limit) {
     hasNextPage = true;
-    events.pop(); // 초과된 첫 번째 레코드를 제거
+    events.pop(); // 초과된 마지막 레코드를 제거
   }
 
   // 더 과거의 이벤트가 있으면 nextCursor를 설정
