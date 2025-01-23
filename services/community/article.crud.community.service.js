@@ -217,6 +217,31 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
     throw new NotAllowedError("게시글 작성자만 삭제할 수 있습니다");
   }
 
+  // DB에서 기존 이미지 경로 가져오기
+  const existingImages = await models.ArticleImages.findAll({
+    where: { articleId },
+    attributes: ["imageUrl"],
+  });
+
+  // 로컬 파일 삭제
+  const deletePromises = existingImages.map(async (img) => {
+    const filePath = path.resolve(img.imageUrl); // 이미지 경로 절대 경로로 변환
+    try {
+      await fs.unlink(filePath); // 로컬 파일 삭제
+      logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
+    } catch (err) {
+      logger.error(`[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`);
+    }
+  });
+
+  // 모든 파일 삭제 완료 대기
+  await Promise.all(deletePromises);
+
+  // 기존 이미지 데이터 삭제
+  await models.ArticleImages.destroy({
+    where: { articleId },
+  });
+
   // 게시글 삭제
   await article.destroy();
 };
