@@ -1,51 +1,125 @@
 import { Router } from "express";
-import { notImplementedController } from "../controllers/empty.cotroller.js";
+import * as articleCrudController from "../controllers/community/article.crud.community.contoller.js";
+import * as articleReadContoller from "../controllers/community/article.read.community.controller.js";
+import * as commentController from "../controllers/community/comment.community.contorller.js";
+import * as articleLikeController from "../controllers/community/article.like.community.controller.js";
+import * as commentLikeController from "../controllers/community/comment.like.community.controller.js";
+// 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
+import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 
 const router = Router();
 
-// 관리자 메뉴 : 게시판 생성
-router.post("/", notImplementedController);
+/*
+  관리자 메뉴 : 게시판 생성
+*/
 
-// 게시글 조회
-router.get("/:communityId", notImplementedController);
-router.get("/:communityId/search", notImplementedController);
+/*
+  게시판 조회
+*/
 
-// 게시글 생성, 수정, 삭제
-router.get("/:communityId/articles/:articleId", notImplementedController);
-router.post("/:communityId/articles", notImplementedController);
-router.patch("/:communityId/articles/:articleId", notImplementedController);
-router.delete("/:communityId/articles/:articleId", notImplementedController);
+// communityId에 해당하는 게시판의 게시글들을 가져옵니다, 좋아요 누른 게시글만 가져올 수도 있습니다
+router.get("/:communityId", articleReadContoller.getArticles);
 
-// 게시글 좋아요 및 좋아요 취소
-router.post("/:communityId/articles/:articleId/like", notImplementedController);
+// communityId에 해당하는 게시판의 게시글들을 검색합니다
+router.get("/:communityId/search", articleReadContoller.searchArticles);
+
+/*
+  게시글 CREATE, READ, UPDATE, DELETE
+*/
+
+// communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 가져옵니다
+router.get(
+  "/:communityId/articles/:articleId",
+  articleCrudController.getArticleById
+);
+
+// communityId에 해당하는 게시판에 새로운 게시글을 추가합니다
+router.post(
+  "/:communityId/articles",
+  authenticateAccessToken,
+  articleCrudController.createArticle
+);
+
+// communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 수정합니다
+router.patch(
+  "/:communityId/articles/:articleId",
+  authenticateAccessToken,
+  articleCrudController.updateArticle
+); 
+
+// communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 삭제합니다
+router.delete(
+  "/:communityId/articles/:articleId",
+  authenticateAccessToken,
+  articleCrudController.deleteArticle
+); 
+
+/*
+  게시글 좋아요
+*/
+
+// article에 좋아요를 표시합니다.
+router.post(
+  "/:communityId/articles/:articleId/like",
+  authenticateAccessToken,
+  articleLikeController.likeArticle
+);
+
+// article에 좋아요를 취소합니다.
 router.delete(
   "/:communityId/articles/:articleId/like",
-  notImplementedController
+  authenticateAccessToken,
+  articleLikeController.unlikeArticle
 );
 
-// 댓글 생성, 수정, 삭제, 대댓글
+/*
+  게시글 댓글
+*/
+
+// article에 댓글을 추가합니다.
 router.post(
   "/:communityId/articles/:articleId/comments",
-  notImplementedController
+  authenticateAccessToken,
+  commentController.createComment
 );
+
+// article에 댓글을 수정합니다.
 router.patch(
   "/:communityId/articles/:articleId/comments/:commentId",
-  notImplementedController
+  authenticateAccessToken,
+  commentController.updateComment
 );
+
+// article에 댓글을 삭제합니다.
 router.delete(
   "/:communityId/articles/:articleId/comments/:commentId",
-  notImplementedController
+  authenticateAccessToken,
+  commentController.deleteComment
 );
 
+// 댓글에 대댓글을 추가합니다.
 router.post(
   "/:communityId/articles/:articleId/comments/:commentId/reply",
-  notImplementedController
+  authenticateAccessToken,
+  commentController.createCommentReply
 );
 
-// 게시글 신고
+/*
+  게시글 댓글 좋아요
+*/
+
+// 댓글에 좋아요를 표시합니다.
 router.post(
-  "/:communityId/articles/:articleId/report",
-  notImplementedController
+  "/:community/articles/:articleId/comments/:commentId/like",
+  authenticateAccessToken,
+  commentLikeController.likeComment
+);
+
+// 댓글에 좋아요를 취소합니다.
+router.delete(
+  "/:community/articles/:articleId/comments/:commentId/like",
+  authenticateAccessToken,
+  commentLikeController.unlikeComment
 );
 
 export default router;
