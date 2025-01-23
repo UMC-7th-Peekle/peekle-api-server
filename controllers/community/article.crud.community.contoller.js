@@ -12,10 +12,6 @@ export const getArticleById = async (req, res, next) => {
       articleId,
     }); // 게시글 조회
 
-    // TODO : article과 comment의 depth가 달라요, 이름도 명확하지 않고요.
-    // service 단도 TODO 남겨드렸으니, 수정하면서 이 부분도
-    // 동일한 depth로 return 하는 것으로 수정해주세요.
-
     // 게시글이 존재하는 경우
     return res.status(200).success({
       message: "게시글 조회 성공",

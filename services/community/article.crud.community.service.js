@@ -8,7 +8,7 @@ import logger from "../../utils/logger/logger.js";
  */
 export const getArticleById = async ({ communityId, articleId }) => {
   // 게시글 조회 및 댓글 포함
-  const article = await models.Articles.findOne({
+  const articleWithComments = await models.Articles.findOne({
     where: {
       communityId,
       articleId,
@@ -21,7 +21,7 @@ export const getArticleById = async ({ communityId, articleId }) => {
     ],
   });
 
-  if (!article) {
+  if (!articleWithComments) {
     // 게시글이 존재하지 않는 경우
     logger.error(
       `[getArticleById] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
@@ -29,8 +29,14 @@ export const getArticleById = async ({ communityId, articleId }) => {
     throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
   }
 
-  // 게시글 및 댓글 반환
-  return article;
+  // 게시글 데이터와 댓글 데이터를 분리
+  const { articleComments, ...articleData } = articleWithComments.toJSON();
+
+  // article과 comments를 동일한 depth로 출력
+  return {
+    articleData, // 게시글 데이터
+    articleComments, // 댓글 데이터
+  };
 };
 
 /**
