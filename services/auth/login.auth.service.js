@@ -14,6 +14,9 @@ export const getUserByPhone = async ({ phone }) => {
   const data = await findUserWithRestrictions({ phone });
 
   if (!data) {
+    logger.error(
+      `[getUserByPhone] 가입되지 않은 전화번호로 인증 및 로그인을 시도했습니다. 전화번호: ${phone}`
+    );
     throw new InvalidInputError("가입되지 않은 전화번호입니다.");
   }
 
@@ -22,6 +25,9 @@ export const getUserByPhone = async ({ phone }) => {
   }
 
   isDormantOrTerminatedUser(data);
+
+  // 사용자를 로그인 시켜줄 경우, lastActivityDate를 업데이트합니다.
+  await data.update({ lastActivityDate: new Date() });
 
   return data.userId;
 };

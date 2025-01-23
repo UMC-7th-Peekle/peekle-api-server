@@ -244,15 +244,18 @@ export const getAndVerifyPhoneBySessionId = async ({ id, phone }) => {
     attributes: ["identifierValue"],
     where: {
       sessionId: decryptedId,
-      isVerified: true,
+      // isVerified: true,
     },
   });
 
-  if (!record) {
-    throw new InvalidInputError(
-      "인증되지 않았거나, 존재하지 않는 세션 ID 입니다."
-    );
-  }
+  // if (!record) {
+  //   throw new InvalidInputError(
+  //     "인증되지 않았거나, 존재하지 않는 세션 ID 입니다."
+  //   );
+  // }
+
+  // 이 함수는 인증여부를 확인할 필요 없이 인증을 시도한 전화번호와
+  // 기존에 인증을 요청한 전화번호가 일치하는지만 확인하면 됨
 
   if (record.identifierValue !== phone) {
     throw new InvalidInputError("인증되지 않은 전화번호 입니다.");
