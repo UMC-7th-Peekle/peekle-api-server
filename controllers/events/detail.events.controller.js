@@ -1,4 +1,4 @@
-import * as detailService from "../../services/events/crud.events.service.js";
+import * as detailService from "../../services/events/detail.events.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 /**

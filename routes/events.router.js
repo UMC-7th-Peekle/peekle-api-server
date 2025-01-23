@@ -2,14 +2,18 @@ import { Router } from "express";
 import * as authMiddleware from "../middleware/authenticate.jwt.js";
 import * as scrapEventController from "../controllers/events/scrap.events.controller.js";
 import * as reportEventController from "../controllers/events/report.events.controller.js";
-import * as detailEventController from "../controllers/events/crud.events.controller.js";
-import * as listEventController from "../controllers/events/read.events.controller.js";
+import * as detailEventController from "../controllers/events/detail.events.controller.js";
+import * as listEventController from "../controllers/events/list.events.controller.js";
+import * as createEventController from "../controllers/events/create.events.controller.js";
 
 const router = Router();
 
 // 이벤트 조회
 router.get("/", listEventController.listEvent);   // 이벤트 목록 조회
 router.get("/:eventId", detailEventController.detailEvent);    // 이벤트 상세정보 조회
+
+// 이벤트 생성
+router.post("/", authMiddleware.authenticateAccessToken, createEventController.createEvent);    // 이벤트 생성성
 
 // 이벤트 스크랩
 router.post("/:eventId/scrap", authMiddleware.authenticateAccessToken, scrapEventController.newScrap);       // 특정 이벤트 스크랩

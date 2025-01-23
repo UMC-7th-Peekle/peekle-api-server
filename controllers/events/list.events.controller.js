@@ -1,4 +1,4 @@
-import * as listService from "../../services/events/read.events.service.js";
+import * as listService from "../../services/events/list.events.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 /**
