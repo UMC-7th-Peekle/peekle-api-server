@@ -14,6 +14,7 @@ export default class PeeklingImages extends Model {
     imageUrl: {
       type: DataTypes.STRING(512),
       allowNull: false,
+      unique: "peekling_images_pk",
       field: 'image_url'
     },
     sequence: {
@@ -52,6 +53,14 @@ export default class PeeklingImages extends Model {
         using: "BTREE",
         fields: [
           { name: "image_id" },
+        ]
+      },
+      {
+        name: "peekling_images_pk",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "image_url" },
         ]
       },
       {

@@ -23,6 +23,7 @@ export default class EventImages extends Model {
     imageUrl: {
       type: DataTypes.STRING(512),
       allowNull: false,
+      unique: "event_images_pk",
       field: 'image_url'
     },
     sequence: {
@@ -52,6 +53,14 @@ export default class EventImages extends Model {
         using: "BTREE",
         fields: [
           { name: "image_id" },
+        ]
+      },
+      {
+        name: "event_images_pk",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "image_url" },
         ]
       },
       {
