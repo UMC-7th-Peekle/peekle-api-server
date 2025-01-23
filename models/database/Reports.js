@@ -59,6 +59,16 @@ export default class Reports extends Model {
         ]
       },
       {
+        name: "reports_pk",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "target_id" },
+          { name: "type" },
+          { name: "reported_user_id" },
+        ]
+      },
+      {
         name: "reports_users_user_id_fk",
         using: "BTREE",
         fields: [

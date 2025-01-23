@@ -1,47 +1,32 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Notices extends Model {
+export default class Roles extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    noticeId: {
+    roleId: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      field: 'notice_id'
+      field: 'role_id'
     },
-    categoryId: {
+    parentRoleId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
-        model: 'notice_category',
-        key: 'category_id'
+        model: 'roles',
+        key: 'role_id'
       },
-      field: 'category_id'
+      field: 'parent_role_id'
     },
-    authorId: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'user_id'
-      },
-      field: 'author_id'
+    name: {
+      type: DataTypes.STRING(128),
+      allowNull: false
     },
-    title: {
+    description: {
       type: DataTypes.STRING(512),
-      allowNull: false
-    },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false
-    },
-    isNotice: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: 0,
-      field: 'is_notice'
+      allowNull: true
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -57,7 +42,7 @@ export default class Notices extends Model {
     }
   }, {
     sequelize,
-    tableName: 'notices',
+    tableName: 'roles',
     timestamps: false,
     indexes: [
       {
@@ -65,21 +50,14 @@ export default class Notices extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "notice_id" },
+          { name: "role_id" },
         ]
       },
       {
-        name: "notices_admins_admin_id_fk",
+        name: "roles_roles_role_id_fk",
         using: "BTREE",
         fields: [
-          { name: "author_id" },
-        ]
-      },
-      {
-        name: "notices_notice_categories_category_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "category_id" },
+          { name: "parent_role_id" },
         ]
       },
     ]

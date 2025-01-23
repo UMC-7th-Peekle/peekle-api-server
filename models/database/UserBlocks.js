@@ -65,10 +65,12 @@ export default class UserBlocks extends Model {
         ]
       },
       {
-        name: "user_blocks_users_user_id_fk",
+        name: "user_blocks_pk",
+        unique: true,
         using: "BTREE",
         fields: [
           { name: "blocker_user_id" },
+          { name: "blocked_user_id" },
         ]
       },
       {

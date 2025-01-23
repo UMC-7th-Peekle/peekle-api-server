@@ -1,47 +1,28 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Notices extends Model {
+export default class UserRoles extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    noticeId: {
-      autoIncrement: true,
+    roleId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      field: 'notice_id'
-    },
-    categoryId: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
       references: {
-        model: 'notice_category',
-        key: 'category_id'
+        model: 'roles',
+        key: 'role_id'
       },
-      field: 'category_id'
+      field: 'role_id'
     },
-    authorId: {
+    userId: {
       type: DataTypes.BIGINT,
       allowNull: false,
+      primaryKey: true,
       references: {
         model: 'users',
         key: 'user_id'
       },
-      field: 'author_id'
-    },
-    title: {
-      type: DataTypes.STRING(512),
-      allowNull: false
-    },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false
-    },
-    isNotice: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: 0,
-      field: 'is_notice'
+      field: 'user_id'
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -57,7 +38,7 @@ export default class Notices extends Model {
     }
   }, {
     sequelize,
-    tableName: 'notices',
+    tableName: 'user_roles',
     timestamps: false,
     indexes: [
       {
@@ -65,21 +46,15 @@ export default class Notices extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "notice_id" },
+          { name: "role_id" },
+          { name: "user_id" },
         ]
       },
       {
-        name: "notices_admins_admin_id_fk",
+        name: "user_roles_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "author_id" },
-        ]
-      },
-      {
-        name: "notices_notice_categories_category_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "category_id" },
+          { name: "user_id" },
         ]
       },
     ]
