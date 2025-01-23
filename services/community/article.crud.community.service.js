@@ -167,7 +167,7 @@ export const updateArticle = async ({
 
     // 로컬 파일 삭제
     const deletePromises = existingImages.map(async (img) => {
-      const filePath = path.resolve(img.imageUrl); // 이미지 경로 절대 경로로 변환
+      const filePath = path.join("uploads", img.imageUrl.replace(/^/, "")); // 경로에 uploads 추가
       try {
         await fs.unlink(filePath); // 로컬 파일 삭제
         logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
@@ -240,7 +240,7 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
 
   // 로컬 파일 삭제
   const deletePromises = existingImages.map(async (img) => {
-    const filePath = path.resolve(img.imageUrl); // 이미지 경로 절대 경로로 변환
+    const filePath = path.join("uploads", img.imageUrl.replace(/^/, ""));  // 경로에 uploads/ 추가
     try {
       await fs.unlink(filePath); // 로컬 파일 삭제
       logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
