@@ -1,4 +1,3 @@
-import { token } from "morgan";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { InvalidInputError } from "../../utils/errors/errors.js";

@@ -1,5 +1,5 @@
 // Description: 댓글 관련 조회, 생성, 수정, 삭제와 관련된 컨트롤러 파일입니다.
-import commentService from "../../services/community/comment.community.service.js";
+import * as commentService from "../../services/community/comment.community.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 // 댓글 생성
@@ -97,11 +97,4 @@ export const createCommentReply = async (req, res, next) => {
     logError(error);
     next(error); // 에러 핸들러로 전달
   }
-};
-
-export default {
-  createComment,
-  updateComment,
-  deleteComment,
-  createCommentReply,
 };

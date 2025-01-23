@@ -26,5 +26,6 @@ const sequelize = new Sequelize(
 
 const models = initModels(sequelize);
 models.sequelize = sequelize;
+models.Sequelize = Sequelize;
 
 export default models;

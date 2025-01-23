@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { encrypt62 } from "../utils/cipher/encrypt.js";
-import { createAccessToken } from "../utils/tokens/create.jwt.tokens.js";
+import {
+  createAccessToken,
+  createTestToken,
+} from "../utils/tokens/create.jwt.tokens.js";
 import * as uploader from "../middleware/uploader.js";
 
 const router = Router();
@@ -15,7 +18,14 @@ router.get("/encrypted/:text", (req, res) => {
 router.get("/accesstoken/:userId", (req, res) => {
   const { userId } = req.params;
   res.status(201).success({
-    accessToken: createAccessToken(userId),
+    accessToken: createAccessToken({ userId }),
+  });
+});
+
+router.get("/accesstoken/:userId/long", (req, res) => {
+  const { userId } = req.params;
+  res.status(201).success({
+    accessToken: createTestToken({ userId }),
   });
 });
 

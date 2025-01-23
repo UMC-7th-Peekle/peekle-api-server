@@ -1,5 +1,5 @@
 // Description: 게시글 목록 조회와 관련된 컨트롤러 파일입니다.
-import articleReadService from "../../services/community/article.read.community.service.js";
+import * as articleReadService from "../../services/community/article.read.community.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 // 게시글 목록 조회
@@ -14,13 +14,13 @@ export const getArticles = async (req, res, next) => {
       cursor: cursor || null, // cursor가 없으면 null
     };
 
-    const { articles, nextCursor } = await articleReadService.getArticles(
+    const { articles, nextCursor, hasNextPage } = await articleReadService.getArticles(
       communityId,
       paginationOptions
     );
 
     // 게시글이 없는 경우
-    if (articles.length === 0) {
+    if (articles && articles.length===0) { // articles가 존재하지 않거나 길이가 0인 경우, findAll에서는 null이 아니라 빈 배열을 반환
       return res.status(204).success(); // 응답 본문 없이 204 반환
     }
     // 게시글이 있는 경우
@@ -28,13 +28,13 @@ export const getArticles = async (req, res, next) => {
       message: "게시글 목록 조회 성공",
       articles,
       nextCursor,
+      hasNextPage
     });
-    
   } catch (error) {
     logError(error);
     next(error); // 에러 핸들러로 전달
   }
-}
+};
 
 // 게시글 검색
 export const searchArticles = async (req, res, next) => {
@@ -50,7 +50,7 @@ export const searchArticles = async (req, res, next) => {
       cursor: cursor || null, // cursor가 없으면 null
     };
 
-    const { articles, nextCursor } = await articleReadService.searchArticles(
+    const { articles, nextCursor, hasNextPage } = await articleReadService.searchArticles(
       communityId,
       query,
       paginationOptions
@@ -65,14 +65,10 @@ export const searchArticles = async (req, res, next) => {
       message: "게시글 목록 조회 성공",
       articles,
       nextCursor,
+      hasNextPage
     });
   } catch (error) {
     logError(error);
     next(error); // 에러 핸들러로 전달
   }
-}
-
-export default {
-  getArticles,
-  searchArticles,
 };

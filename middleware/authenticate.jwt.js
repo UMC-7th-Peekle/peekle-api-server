@@ -44,7 +44,7 @@ export const authenticateAccessToken = (req, res, next) => {
 
       // payload 안의 user_id를 암호화하여 전달했을 경우 복호화
       // user_id = parseInt(decrypt62(user_id));
-
+      logger.debug(`[authenticateAccessToken] AT userId : ${user.userId}`);
       req.user = {
         userId: user.userId,
       }; // 검증된 사용자 정보를 요청 객체에 추가

@@ -16,6 +16,13 @@ export const createAccessToken = ({ userId }) => {
   return `Bearer ${token}`;
 };
 
+export const createTestToken = ({ userId }) => {
+  const token = jwt.sign({ userId }, JWT_SECRET, {
+    expiresIn: "1y",
+  });
+  return `Bearer ${token}`;
+};
+
 /**
  * Refresh Token을 생성합니다. JWT string 만을 반환합니다.
  * @param {int} userId
