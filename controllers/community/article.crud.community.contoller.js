@@ -64,13 +64,13 @@ export const createArticle = async (req, res, next) => {
         sequence: 0, // 이미지 순서 (0부터 시작)
       }));
 
-      logger.debug(`[createArticle] imageRecords: ${JSON.stringify(imageRecords)}`);
-      
+      logger.debug(
+        `[createArticle] imageRecords: ${JSON.stringify(imageRecords)}`
+      );
+
       // 이미지 업로드
       await articleCrudService.createArticleImages(imageRecords); // 이미지 데이터를 DB에 저장
     }
-
-
 
     return res.status(201).success({
       message: "게시글 작성 성공",

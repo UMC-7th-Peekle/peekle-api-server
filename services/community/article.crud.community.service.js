@@ -10,7 +10,7 @@ import path from "path";
  */
 export const getArticleById = async ({ communityId, articleId }) => {
   // 게시글 조회 및 댓글 포함
-  const article = await models.Articles.findOne({
+  const articleWithComments = await models.Articles.findOne({
     where: {
       communityId,
       articleId,
@@ -20,10 +20,15 @@ export const getArticleById = async ({ communityId, articleId }) => {
         model: models.ArticleComments,
         as: "articleComments",
       },
+      {
+        model: models.ArticleImages,
+        as: "articleImages",
+        attributes: ["imageUrl", "sequence"], // 필요한 필드만 가져오기
+      },
     ],
   });
 
-  if (!article) {
+  if (!articleWithComments) {
     // 게시글이 존재하지 않는 경우
     logger.error(
       `[getArticleById] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
@@ -31,8 +36,17 @@ export const getArticleById = async ({ communityId, articleId }) => {
     throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
   }
 
-  // 게시글 및 댓글 반환
-  return article;
+  
+  // 게시글 데이터와 댓글 데이터를 분리
+  const { articleComments, articleImages, ...articleData } =
+    articleWithComments.toJSON();
+
+  // article과 comments를 동일한 depth로 출력
+  return {
+    articleData, // 게시글 데이터
+    articleImages, // 이미지 데이터
+    articleComments, // 댓글 데이터
+  };
 };
 
 /**
@@ -72,14 +86,14 @@ export const createArticle = async ({
 
     // 이미지 경로를 ArticleImages 테이블에 저장
     if (imagePaths.length > 0) {
-        articleImageData = imagePaths.map((path, index) => ({
+      articleImageData = imagePaths.map((path, index) => ({
         articleId: article.articleId,
         imageUrl: path,
         sequence: index + 1, // 이미지 순서 설정
       }));
     }
 
-      await models.ArticleImages.bulkCreate(articleImageData);
+    await models.ArticleImages.bulkCreate(articleImageData);
   } catch (error) {
     if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
       // 게시판이 존재하지 않는 경우
@@ -97,7 +111,6 @@ export const createArticle = async ({
 
   return { article };
 };
-
 
 /**
  * communityId와 articleId에 해당하는 게시글을 수정
@@ -159,7 +172,9 @@ export const updateArticle = async ({
         await fs.unlink(filePath); // 로컬 파일 삭제
         logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
       } catch (err) {
-        logger.error(`[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`);
+        logger.error(
+          `[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`
+        );
       }
     });
 
@@ -180,7 +195,7 @@ export const updateArticle = async ({
 
     await models.ArticleImages.bulkCreate(articleImageData);
   }
-  
+
   logger.debug(
     `[updateArticle] 수정된 게시글 제목: ${article.title}, 수정된 내용: ${article.content}`
   );
@@ -230,7 +245,9 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
       await fs.unlink(filePath); // 로컬 파일 삭제
       logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
     } catch (err) {
-      logger.error(`[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`);
+      logger.error(
+        `[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`
+      );
     }
   });
 
