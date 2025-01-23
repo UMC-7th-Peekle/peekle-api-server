@@ -33,7 +33,7 @@ router.get("/login/kakao", kakaoController.kakaoLogin);
 router.get("/login/kakao/callback", kakaoController.kakaoCallback);
 
 // 전화번호 인증
-router.post("/phone/unique", phoneController.phoneUnique);
+router.get("/phone/account/status", phoneController.checkAccountStatus);
 router.post("/phone/send", phoneController.sendTokenToPhone);
 router.post("/phone/verify", phoneController.verifyToken);
 

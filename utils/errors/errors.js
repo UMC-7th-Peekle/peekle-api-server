@@ -140,3 +140,12 @@ export class MulterError extends CustomError {
     super(reason, "MULTER_ERROR", 503, data);
   }
 }
+
+/**
+ * 정지된 사용자 입니다.
+ */
+export class RestrictedUserError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "USER_RESTRICTED", 503, data);
+  }
+}

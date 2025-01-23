@@ -9,34 +9,84 @@ import {
   InvalidCodeError,
   InvalidInputError,
   NotExistsError,
+  RestrictedUserError,
   TimeOutError,
   TooManyRequest,
 } from "../../utils/errors/errors.js";
-import db from "../../models/index.js";
+import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 
 import * as coolSMS from "../../utils/sms/coolsms.js";
 
-export const checkPhoneUnique = async ({ phone }) => {
+export const checkAccountStatus = async ({ phone }) => {
   //
-  const result = await db.Users.findOne({
-    attributes: ["userId"],
+  const result = await models.Users.findOne({
+    attributes: ["userId", "dormantDate", "terminationDate"],
     where: {
       phone,
     },
+    include: [
+      {
+        model: models.UserRestrictions,
+        as: "userRestrictions",
+        attributes: ["type", "reason", "endsAt", "createdAt"],
+        where: {
+          type: ["suspend", "ban"],
+        },
+        required: false,
+      },
+    ],
   });
 
-  if (result) {
-    throw new AlreadyExistsError("이미 존재하는 전화번호입니다.");
+  logger.debug(
+    `[checkAccountStatus] result: ${JSON.stringify(result, null, 2)}`
+  );
+
+  // 사용자가 존재하지 않는 경우
+  if (!result) {
+    return {
+      message: "가입되지 않은 전화번호입니다.",
+    };
   }
-  return true;
+
+  // 사용자 제재 이력이 존재하고, 활성 상태인 제재가 존재하는 경우
+  if (result.userRestrictions && result.userRestrictions.length > 0) {
+    result.userRestrictions.forEach((restriction) => {
+      const restrictionEndDate = new Date(restriction.endsAt).getTime();
+      const currentDate = Date.now();
+
+      if (restriction.type == "suspend" && restrictionEndDate > currentDate) {
+        logger.error(
+          `[checkAccountStatus] 정지 상태인 사용자가 로그인을 시도했습니다. userId: ${result.userId}`
+        );
+        throw new RestrictedUserError(
+          `${restriction.endsAt} 까지 이용이 정지된 사용자입니다.`,
+          {
+            type: restriction.type,
+            reason: restriction.reason,
+            endsAt: restriction.endsAt,
+            restrictedAt: restriction.createdAt,
+          }
+        );
+      } else if (restriction.type == "ban") {
+        logger.error(
+          `[checkAccountStatus] 영구 정지 상태인 사용자가 로그인을 시도했습니다. userId: ${result.userId}`
+        );
+        throw new RestrictedUserError(`영구적으로 이용이 정지된 사용자입니다.`);
+      }
+    });
+  }
+
+  return {
+    message: "가입된 사용자의 전화번호입니다.",
+  };
 };
 
 export const sendTokenToPhone = async ({ phone }) => {
   // 토큰을 생성하고, db에 저장하고, 사용자에게 전송
 
   const token = generate6DigitToken();
-  const record = await db.VerificationCode.create({
+  const record = await models.VerificationCode.create({
     identifierType: "phone",
     identifierValue: phone,
     attempts: 0,
@@ -63,7 +113,7 @@ export const verifyToken = async ({ id, token, phone }) => {
   const decryptedId = decrypt62(id);
   logger.debug(`[verifyToken] decryptedId: ${decryptedId}`);
 
-  const record = await db.VerificationCode.findOne({
+  const record = await models.VerificationCode.findOne({
     attributes: [
       "sessionId",
       "attempts",
@@ -145,7 +195,7 @@ export const verifyToken = async ({ id, token, phone }) => {
  */
 export const getAndVerifyPhoneBySessionId = async ({ id, phone }) => {
   const decryptedId = decrypt62(id);
-  const record = await db.VerificationCode.findOne({
+  const record = await models.VerificationCode.findOne({
     attributes: ["identifierValue"],
     where: {
       sessionId: decryptedId,
