@@ -12,6 +12,7 @@ const router = Router();
 // 회원가입
 router.get("/terms", registerController.getTerms);
 router.post("/register/local", registerController.register);
+router.post("/register/oauth", registerController.oauthRegister);
 
 // 테스트용 회원가입
 router.post("/register/test", registerController.testRegister);

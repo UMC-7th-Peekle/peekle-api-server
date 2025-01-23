@@ -39,13 +39,8 @@ export const oauthRegister = async (req, res, next) => {
       phone: req.body.phone,
     });
 
-    // 해당 전화번호가 unique한지 확인
-    await phoneService.checkPhoneUnique({ phone: req.body.phone });
-
     // 회원가입 처리
     await registerService.oauthRegister(req.body);
-
-    // TODO : terms 처리를 안하고 있음.
 
     return res.status(201).success({
       message: "회원가입이 완료되었습니다.",
