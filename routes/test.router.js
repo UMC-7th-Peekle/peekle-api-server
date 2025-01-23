@@ -32,7 +32,7 @@ router.get("/accesstoken/:userId/long", (req, res) => {
 
 router.get("/middleware/auth", authenticateAccessToken, (req, res) => {
   res.status(201).success({
-    message: "인증에 성공했습니다.",
+    message: "authenticateAccessToken 정상 작동중.",
   });
 });
 
