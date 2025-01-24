@@ -6,6 +6,8 @@ import {
 } from "../utils/tokens/create.jwt.tokens.js";
 import * as uploader from "../middleware/uploader.js";
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
+import { validate } from "../middleware/validate.js";
+import { oauthRegisterSchema } from "../utils/validators/auth/auth.validators.js";
 
 const router = Router();
 
@@ -95,5 +97,12 @@ router.post(
     });
   }
 );
+
+// Validator test
+router.get("/validator", validate(oauthRegisterSchema), (req, res) => {
+  res.status(200).success({
+    message: "검증에 성공했습니다.",
+  });
+});
 
 export default router;

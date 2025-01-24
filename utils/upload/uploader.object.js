@@ -28,6 +28,13 @@ const ensureDirectoryExists = (destination) => {
 };
 
 /**
+ * 파일 경로 앞에 STATIC_FILE_BASE_URL을 붙여주는 함수
+ */
+export const addBaseUrl = (filePath) => {
+  return `${STATIC_FILE_BASE_URL}${filePath.startsWith("/") ? "" : "/"}${filePath}`;
+};
+
+/**
  * 업로드 미들웨어를 생성하는 팩토리 함수
  * @param {string} destination - 업로드 디렉토리 경로
  * @returns {multer.Multer} - multer 미들웨어 인스턴스
@@ -52,7 +59,7 @@ export const createUploadMiddleware = ({ destination, restrictions }) => {
     storage: storage,
     limits: restrictions.limits,
     fileFilter: (req, file, cb) => {
-      console.log(restrictions);
+      // console.log(restrictions);
       const allowedMimeTypes = restrictions.allowedMimeTypes;
       if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
@@ -89,7 +96,7 @@ export const uploadToS3 = (restrictions) => {
       bucket: BUCKET_NAME,
       // acl: "public-read", // 업로드된 파일의 접근 권한
       metadata: (req, file, cb) => {
-        console.log(req, file);
+        // console.log(req, file);
         logger.debug(
           `[uploadImageToS3] file: ${JSON.stringify(file, null, 2)}`
         );
@@ -127,6 +134,18 @@ export const uploadToS3 = (restrictions) => {
       }
     },
   });
+};
+
+export const deleteLocalFile = async (filePath) => {
+  filePath = path.join("uploads", filePath);
+  try {
+    await fs.promises.unlink(filePath);
+    logger.debug(`[deleteLocalFile] 파일 삭제 성공: ${filePath}`);
+  } catch (err) {
+    logger.error(
+      `[deleteLocalFile] 파일 삭제 실패: ${filePath} - ${err.message}`
+    );
+  }
 };
 
 export const getStaticFilesUrl = (fileKey) =>
