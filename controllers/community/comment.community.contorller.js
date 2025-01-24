@@ -98,3 +98,27 @@ export const createCommentReply = async (req, res, next) => {
     next(error); // 에러 핸들러로 전달
   }
 };
+
+
+// 댓글 조회
+export const getComments = async (req, res, next) => {
+  try {
+    const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
+
+    const { comments } = await commentService.getComments({
+      communityId,
+      articleId,
+    }); // 댓글 조회
+
+    if (comments && comments.length === 0) {
+      return res.status(204).success(); // 응답 본문 없이 204 반환
+    }
+    return res.status(200).success({
+      message: "댓글 조회 성공",
+      comments,
+    });
+  } catch (error) {
+    logError(error);
+    next(error); // 에러 핸들러로 전달
+  }
+}
