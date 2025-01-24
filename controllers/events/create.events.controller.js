@@ -13,7 +13,7 @@ export const createEvent = async (req, res, next) => {
 
     if (event) {
       // 201
-      return res.status(201).success({ event });
+      return res.status(201).success({ message: "새로운 이벤트 저장 완료" });
     }
   } catch (error) {
     logError(error);
