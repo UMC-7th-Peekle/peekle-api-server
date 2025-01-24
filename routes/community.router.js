@@ -4,7 +4,8 @@ import * as articleReadContoller from "../controllers/community/article.read.com
 import * as commentController from "../controllers/community/comment.community.contorller.js";
 import * as articleLikeController from "../controllers/community/article.like.community.controller.js";
 import * as commentLikeController from "../controllers/community/comment.like.community.controller.js";
-// 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
+// 사용자 인증 미들웨어 
+// TODO: 추후 네임스페이스 방식으로 변경 필요
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 
 const router = Router();
@@ -103,6 +104,13 @@ router.post(
   authenticateAccessToken,
   commentController.createCommentReply
 );
+
+// communityId에 해당하는 게시판의 articleId에 해당하는 게시글의 댓글 정보를 가져옵니다.
+router.get(
+  "/:communityId/articles/:articleId/comments", 
+  commentController.getComments
+);
+
 
 /*
   게시글 댓글 좋아요
