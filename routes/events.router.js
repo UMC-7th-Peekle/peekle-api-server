@@ -44,6 +44,7 @@ router.patch(
     field: [{ name: "event_images", maxCount: 5 }],
     destination: "uploads/events",
   }),
+  validate(eventValidator.patchEventSchema, true),
   detailEventController.updateEvent
 ); // 이벤트 상세정보 수정
 
