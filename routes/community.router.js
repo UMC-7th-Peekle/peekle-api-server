@@ -7,6 +7,7 @@ import * as commentLikeController from "../controllers/community/comment.like.co
 // 사용자 인증 미들웨어 
 // TODO: 추후 네임스페이스 방식으로 변경 필요
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
+import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
 
 const router = Router();
 
@@ -38,6 +39,11 @@ router.get(
 router.post(
   "/:communityId/articles",
   authenticateAccessToken,
+  fileUploadMiddleware.localStorage({
+    restrictions: fileUploadMiddleware.restrictions("article"),
+    field: [{ name: "article_images", maxCount: 5 }], // `field`에 따라 다중 업로드 설정
+    destination: "uploads/articles", // 저장 경로 설정
+  }),
   articleCrudController.createArticle
 );
 
@@ -45,6 +51,11 @@ router.post(
 router.patch(
   "/:communityId/articles/:articleId",
   authenticateAccessToken,
+  fileUploadMiddleware.localStorage({
+    restrictions: fileUploadMiddleware.restrictions("article"),
+    field: [{ name: "article_images", maxCount: 5 }], // 다중 파일 업로드 설정
+    destination: "uploads/articles", // 저장 경로 설정
+  }),
   articleCrudController.updateArticle
 ); 
 
