@@ -55,6 +55,15 @@ export default class ArticleCommentLikes extends Model {
         ]
       },
       {
+        name: "article_comment_likes_pk",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "comment_id" },
+          { name: "liked_user_id" },
+        ]
+      },
+      {
         name: "article_comment_likes_article_comments_comment_id_fk",
         using: "BTREE",
         fields: [

@@ -1,6 +1,5 @@
 import _sequelize from "sequelize";
 const DataTypes = _sequelize.DataTypes;
-import _Admins from  "./Admins.js";
 import _ArticleCommentLikes from  "./ArticleCommentLikes.js";
 import _ArticleComments from  "./ArticleComments.js";
 import _ArticleImages from  "./ArticleImages.js";
@@ -18,8 +17,11 @@ import _Notices from  "./Notices.js";
 import _Peekling from  "./Peekling.js";
 import _PeeklingCategory from  "./PeeklingCategory.js";
 import _PeeklingImages from  "./PeeklingImages.js";
+import _Permissions from  "./Permissions.js";
 import _RefreshTokens from  "./RefreshTokens.js";
 import _Reports from  "./Reports.js";
+import _RolePermissions from  "./RolePermissions.js";
+import _Roles from  "./Roles.js";
 import _Terms from  "./Terms.js";
 import _TicketMessageImages from  "./TicketMessageImages.js";
 import _TicketMessages from  "./TicketMessages.js";
@@ -28,12 +30,12 @@ import _UserBlocks from  "./UserBlocks.js";
 import _UserFilters from  "./UserFilters.js";
 import _UserOauth from  "./UserOauth.js";
 import _UserRestrictions from  "./UserRestrictions.js";
+import _UserRoles from  "./UserRoles.js";
 import _UserTerms from  "./UserTerms.js";
 import _Users from  "./Users.js";
 import _VerificationCode from  "./VerificationCode.js";
 
 export default function initModels(sequelize) {
-  const Admins = _Admins.init(sequelize, DataTypes);
   const ArticleCommentLikes = _ArticleCommentLikes.init(sequelize, DataTypes);
   const ArticleComments = _ArticleComments.init(sequelize, DataTypes);
   const ArticleImages = _ArticleImages.init(sequelize, DataTypes);
@@ -51,8 +53,11 @@ export default function initModels(sequelize) {
   const Peekling = _Peekling.init(sequelize, DataTypes);
   const PeeklingCategory = _PeeklingCategory.init(sequelize, DataTypes);
   const PeeklingImages = _PeeklingImages.init(sequelize, DataTypes);
+  const Permissions = _Permissions.init(sequelize, DataTypes);
   const RefreshTokens = _RefreshTokens.init(sequelize, DataTypes);
   const Reports = _Reports.init(sequelize, DataTypes);
+  const RolePermissions = _RolePermissions.init(sequelize, DataTypes);
+  const Roles = _Roles.init(sequelize, DataTypes);
   const Terms = _Terms.init(sequelize, DataTypes);
   const TicketMessageImages = _TicketMessageImages.init(sequelize, DataTypes);
   const TicketMessages = _TicketMessages.init(sequelize, DataTypes);
@@ -61,14 +66,15 @@ export default function initModels(sequelize) {
   const UserFilters = _UserFilters.init(sequelize, DataTypes);
   const UserOauth = _UserOauth.init(sequelize, DataTypes);
   const UserRestrictions = _UserRestrictions.init(sequelize, DataTypes);
+  const UserRoles = _UserRoles.init(sequelize, DataTypes);
   const UserTerms = _UserTerms.init(sequelize, DataTypes);
   const Users = _Users.init(sequelize, DataTypes);
   const VerificationCode = _VerificationCode.init(sequelize, DataTypes);
 
-  Notices.belongsTo(Admins, { as: "admin", foreignKey: "adminId"});
-  Admins.hasMany(Notices, { as: "notices", foreignKey: "adminId"});
-  UserRestrictions.belongsTo(Admins, { as: "admin", foreignKey: "adminId"});
-  Admins.hasMany(UserRestrictions, { as: "userRestrictions", foreignKey: "adminId"});
+  Permissions.belongsToMany(Roles, { as: 'roleIdRoles', through: RolePermissions, foreignKey: "permissionId", otherKey: "roleId" });
+  Roles.belongsToMany(Permissions, { as: 'permissionIdPermissions', through: RolePermissions, foreignKey: "roleId", otherKey: "permissionId" });
+  Roles.belongsToMany(Users, { as: 'userIdUsers', through: UserRoles, foreignKey: "roleId", otherKey: "userId" });
+  Users.belongsToMany(Roles, { as: 'roleIdRolesUserRoles', through: UserRoles, foreignKey: "userId", otherKey: "roleId" });
   ArticleCommentLikes.belongsTo(ArticleComments, { as: "comment", foreignKey: "commentId"});
   ArticleComments.hasMany(ArticleCommentLikes, { as: "articleCommentLikes", foreignKey: "commentId"});
   ArticleComments.belongsTo(ArticleComments, { as: "parentComment", foreignKey: "parentCommentId"});
@@ -97,14 +103,20 @@ export default function initModels(sequelize) {
   Peekling.hasMany(PeeklingImages, { as: "peeklingImages", foreignKey: "peeklingId"});
   Peekling.belongsTo(PeeklingCategory, { as: "category", foreignKey: "categoryId"});
   PeeklingCategory.hasMany(Peekling, { as: "peeklings", foreignKey: "categoryId"});
+  RolePermissions.belongsTo(Permissions, { as: "permission", foreignKey: "permissionId"});
+  Permissions.hasMany(RolePermissions, { as: "rolePermissions", foreignKey: "permissionId"});
+  RolePermissions.belongsTo(Roles, { as: "role", foreignKey: "roleId"});
+  Roles.hasMany(RolePermissions, { as: "rolePermissions", foreignKey: "roleId"});
+  Roles.belongsTo(Roles, { as: "parentRole", foreignKey: "parentRoleId"});
+  Roles.hasMany(Roles, { as: "roles", foreignKey: "parentRoleId"});
+  UserRoles.belongsTo(Roles, { as: "role", foreignKey: "roleId"});
+  Roles.hasMany(UserRoles, { as: "userRoles", foreignKey: "roleId"});
   UserTerms.belongsTo(Terms, { as: "term", foreignKey: "termId"});
   Terms.hasMany(UserTerms, { as: "userTerms", foreignKey: "termId"});
   TicketMessageImages.belongsTo(TicketMessages, { as: "ticketMessage", foreignKey: "ticketMessageId"});
   TicketMessages.hasMany(TicketMessageImages, { as: "ticketMessageImages", foreignKey: "ticketMessageId"});
   TicketMessages.belongsTo(Tickets, { as: "ticket", foreignKey: "ticketId"});
   Tickets.hasMany(TicketMessages, { as: "ticketMessages", foreignKey: "ticketId"});
-  Admins.belongsTo(Users, { as: "user", foreignKey: "userId"});
-  Users.hasMany(Admins, { as: "admins", foreignKey: "userId"});
   ArticleCommentLikes.belongsTo(Users, { as: "likedUser", foreignKey: "likedUserId"});
   Users.hasMany(ArticleCommentLikes, { as: "articleCommentLikes", foreignKey: "likedUserId"});
   ArticleComments.belongsTo(Users, { as: "author", foreignKey: "authorId"});
@@ -117,6 +129,8 @@ export default function initModels(sequelize) {
   Users.hasMany(EventScraps, { as: "eventScraps", foreignKey: "userId"});
   Events.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
   Users.hasMany(Events, { as: "events", foreignKey: "createdUserId"});
+  Notices.belongsTo(Users, { as: "author", foreignKey: "authorId"});
+  Users.hasMany(Notices, { as: "notices", foreignKey: "authorId"});
   Peekling.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
   Users.hasMany(Peekling, { as: "peeklings", foreignKey: "createdUserId"});
   RefreshTokens.belongsTo(Users, { as: "user", foreignKey: "userId"});
@@ -137,11 +151,14 @@ export default function initModels(sequelize) {
   Users.hasMany(UserOauth, { as: "userOauths", foreignKey: "userId"});
   UserRestrictions.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserRestrictions, { as: "userRestrictions", foreignKey: "userId"});
+  UserRestrictions.belongsTo(Users, { as: "adminUser", foreignKey: "adminUserId"});
+  Users.hasMany(UserRestrictions, { as: "adminUserUserRestrictions", foreignKey: "adminUserId"});
+  UserRoles.belongsTo(Users, { as: "user", foreignKey: "userId"});
+  Users.hasMany(UserRoles, { as: "userRoles", foreignKey: "userId"});
   UserTerms.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserTerms, { as: "userTerms", foreignKey: "userId"});
 
   return {
-    Admins,
     ArticleCommentLikes,
     ArticleComments,
     ArticleImages,
@@ -159,8 +176,11 @@ export default function initModels(sequelize) {
     Peekling,
     PeeklingCategory,
     PeeklingImages,
+    Permissions,
     RefreshTokens,
     Reports,
+    RolePermissions,
+    Roles,
     Terms,
     TicketMessageImages,
     TicketMessages,
@@ -169,6 +189,7 @@ export default function initModels(sequelize) {
     UserFilters,
     UserOauth,
     UserRestrictions,
+    UserRoles,
     UserTerms,
     Users,
     VerificationCode,

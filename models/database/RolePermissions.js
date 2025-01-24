@@ -1,34 +1,28 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class NoticeImages extends Model {
+export default class RolePermissions extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    imageId: {
-      autoIncrement: true,
+    roleId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      field: 'image_id'
+      references: {
+        model: 'roles',
+        key: 'role_id'
+      },
+      field: 'role_id'
     },
-    noticeId: {
+    permissionId: {
       type: DataTypes.BIGINT,
       allowNull: false,
+      primaryKey: true,
       references: {
-        model: 'notices',
-        key: 'notice_id'
+        model: 'permissions',
+        key: 'permission_id'
       },
-      field: 'notice_id'
-    },
-    imageUrl: {
-      type: DataTypes.STRING(512),
-      allowNull: false,
-      unique: "notice_images_pk",
-      field: 'image_url'
-    },
-    sequence: {
-      type: DataTypes.INTEGER,
-      allowNull: false
+      field: 'permission_id'
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -44,7 +38,7 @@ export default class NoticeImages extends Model {
     }
   }, {
     sequelize,
-    tableName: 'notice_images',
+    tableName: 'role_permissions',
     timestamps: false,
     indexes: [
       {
@@ -52,22 +46,15 @@ export default class NoticeImages extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "image_id" },
+          { name: "role_id" },
+          { name: "permission_id" },
         ]
       },
       {
-        name: "notice_images_pk",
-        unique: true,
+        name: "role_permissions_permissions_permission_id_fk",
         using: "BTREE",
         fields: [
-          { name: "image_url" },
-        ]
-      },
-      {
-        name: "notice_images_notices_notice_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "notice_id" },
+          { name: "permission_id" },
         ]
       },
     ]

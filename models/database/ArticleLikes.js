@@ -55,6 +55,15 @@ export default class ArticleLikes extends Model {
         ]
       },
       {
+        name: "article_likes_pk",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "article_id" },
+          { name: "liked_user_id" },
+        ]
+      },
+      {
         name: "article_likes_articles_article_id_fk",
         using: "BTREE",
         fields: [

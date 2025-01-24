@@ -23,6 +23,7 @@ export default class TicketMessageImages extends Model {
     imageUrl: {
       type: DataTypes.STRING(512),
       allowNull: false,
+      unique: "ticket_message_images_pk",
       field: 'image_url'
     },
     sequence: {
@@ -52,6 +53,14 @@ export default class TicketMessageImages extends Model {
         using: "BTREE",
         fields: [
           { name: "image_id" },
+        ]
+      },
+      {
+        name: "ticket_message_images_pk",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "image_url" },
         ]
       },
       {

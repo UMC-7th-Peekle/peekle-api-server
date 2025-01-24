@@ -12,7 +12,6 @@ export const getArticleById = async (req, res, next) => {
       articleId,
     }); // 게시글 조회
 
-
     // 게시글이 존재하는 경우
     return res.status(200).success({
       message: "게시글 조회 성공",

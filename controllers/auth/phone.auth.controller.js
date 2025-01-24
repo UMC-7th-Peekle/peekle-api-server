@@ -1,14 +1,15 @@
 import * as phoneService from "../../services/auth/phone.auth.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
-export const phoneUnique = async (req, res, next) => {
+/**
+ * 전화번호로 사용자가 존재하는지, 계정 상태 확인
+ * registered, unregistered, blocked, dormant, deleted
+ */
+export const checkAccountStatus = async (req, res, next) => {
   try {
-    const { phone } = req.body;
-    const result = await phoneService.checkPhoneUnique({ phone });
-    if (result)
-      return res
-        .status(200)
-        .success({ message: "사용 가능한 전화번호입니다." });
+    const { phone } = req.query;
+    const result = await phoneService.checkAccountStatus({ phone });
+    return res.status(200).success(result);
   } catch (error) {
     logError(error);
     next(error);

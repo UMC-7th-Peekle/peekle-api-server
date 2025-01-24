@@ -1,30 +1,22 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class UserOauth extends Model {
+export default class Permissions extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    userId: {
+    permissionId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
-      references: {
-        model: 'users',
-        key: 'user_id'
-      },
-      field: 'user_id'
+      field: 'permission_id'
     },
-    oauthId: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      primaryKey: true,
-      field: 'oauth_id'
+    name: {
+      type: DataTypes.STRING(100),
+      allowNull: false
     },
-    oauthType: {
-      type: DataTypes.ENUM('kakao','google','naver'),
-      allowNull: false,
-      primaryKey: true,
-      field: 'oauth_type'
+    description: {
+      type: DataTypes.STRING(255),
+      allowNull: true
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -40,7 +32,7 @@ export default class UserOauth extends Model {
     }
   }, {
     sequelize,
-    tableName: 'user_oauth',
+    tableName: 'permissions',
     timestamps: false,
     indexes: [
       {
@@ -48,9 +40,7 @@ export default class UserOauth extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "user_id" },
-          { name: "oauth_type" },
-          { name: "oauth_id" },
+          { name: "permission_id" },
         ]
       },
     ]

@@ -23,6 +23,7 @@ export default class ArticleImages extends Model {
     imageUrl: {
       type: DataTypes.STRING(512),
       allowNull: false,
+      unique: "article_images_pk",
       field: 'image_url'
     },
     sequence: {
@@ -52,6 +53,14 @@ export default class ArticleImages extends Model {
         using: "BTREE",
         fields: [
           { name: "article_image_id" },
+        ]
+      },
+      {
+        name: "article_images_pk",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "image_url" },
         ]
       },
       {

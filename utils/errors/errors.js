@@ -140,3 +140,30 @@ export class MulterError extends CustomError {
     super(reason, "MULTER_ERROR", 503, data);
   }
 }
+
+/**
+ * 제재를 받은 사용자
+ */
+export class RestrictedUserError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "USER_RESTRICTED", 403, data);
+  }
+}
+
+/**
+ * 탈퇴하거나 휴면 상태의 사용자
+ */
+export class UserStatusError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "DORMANT_OR_TERMINATED", 403, data);
+  }
+}
+
+/**
+ * 핸드폰 번호가 인증되지 않은 경우
+ */
+export class NotVerifiedError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "NOT_VERIFIED", 401, data);
+  }
+}

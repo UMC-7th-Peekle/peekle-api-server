@@ -20,14 +20,14 @@ export default class UserRestrictions extends Model {
       },
       field: 'user_id'
     },
-    adminId: {
+    adminUserId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
-        model: 'admins',
-        key: 'admin_id'
+        model: 'users',
+        key: 'user_id'
       },
-      field: 'admin_id'
+      field: 'admin_user_id'
     },
     type: {
       type: DataTypes.ENUM('suspend','ban','canceled','expired'),
@@ -71,7 +71,7 @@ export default class UserRestrictions extends Model {
         name: "user_restrictions_admins_admin_id_fk",
         using: "BTREE",
         fields: [
-          { name: "admin_id" },
+          { name: "admin_user_id" },
         ]
       },
       {
