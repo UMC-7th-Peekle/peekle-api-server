@@ -12,6 +12,7 @@ const router = Router();
 // 회원가입
 router.get("/terms", registerController.getTerms);
 router.post("/register/local", registerController.register);
+router.post("/register/oauth", registerController.oauthRegister);
 
 // 테스트용 회원가입
 router.post("/register/test", registerController.testRegister);
@@ -33,7 +34,7 @@ router.get("/login/kakao", kakaoController.kakaoLogin);
 router.get("/login/kakao/callback", kakaoController.kakaoCallback);
 
 // 전화번호 인증
-router.post("/phone/unique", phoneController.phoneUnique);
+router.get("/phone/account/status", phoneController.checkAccountStatus);
 router.post("/phone/send", phoneController.sendTokenToPhone);
 router.post("/phone/verify", phoneController.verifyToken);
 

@@ -63,47 +63,46 @@ export const authenticateRefreshToken = async (req, res, next) => {
 
   if (!refreshToken) {
     logger.error("[authenticateRefreshToken] 쿠키에 RefreshToken이 없습니다.");
-    next(new UnauthorizedError("RefreshToekn이 제공되지 않았습니다."));
+    return next(new UnauthorizedError("RefreshToken이 제공되지 않았습니다."));
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      logger.debug(`[authenticateAccessToken] 토큰 검증 실패: ${err.message}`);
+  // JWT 토큰 검증
+  let decoded;
+  try {
+    decoded = jwt.verify(refreshToken, JWT_SECRET);
+  } catch (err) {
+    logger.debug(`[authenticateRefreshToken] 토큰 검증 실패: ${err.message}`);
 
-      if (err.name === "TokenExpiredError") {
-        next(new TokenError("만료된 토큰입니다."));
-      } else if (err.name === "JsonWebTokenError") {
-        next(new TokenError("토큰이 올바르지 않습니다."));
-      } else if (err.name === "NotBeforeError") {
-        next(new TokenError("아직 유효하지 않은 토큰입니다."));
-      } else {
-        next(new TokenError("알 수 없는 JWT 에러가 발생했습니다."));
-      }
-      return;
+    if (err.name === "TokenExpiredError") {
+      return next(new TokenError("만료된 토큰입니다."));
+    } else if (err.name === "JsonWebTokenError") {
+      return next(new TokenError("토큰이 올바르지 않습니다."));
+    } else if (err.name === "NotBeforeError") {
+      return next(new TokenError("아직 유효하지 않은 토큰입니다."));
+    } else {
+      return next(new TokenError("알 수 없는 JWT 에러가 발생했습니다."));
     }
+  }
 
-    req.user = {
-      userId: user.userId,
-    }; // 검증된 사용자 정보를 요청 객체에 추가
-  });
-
-  // JWT token에 있는 userId가 DB와 일치하는지 확인하기
-
-  // TODO : redis 등의 캐시 서버를 추가로 운용,
-  // 성능 개선을 수치화해서 처리하기.
-  const db = await models.RefreshTokens.findOne({
+  // DB에서 Refresh Token 확인
+  const dbResult = await models.RefreshTokens.findOne({
     attributes: ["userId"],
     where: {
-      userId: req.user.userId,
+      userId: decoded.userId, // JWT의 userId를 사용
       token: refreshToken,
     },
   });
 
-  if (!db) {
-    logger.error("[authenticateRefreshToken] Malformed RefreshToken");
-    next(new NotAllowedError("RefreshToken이 일치하지 않습니다."));
-    return;
+  if (!dbResult) {
+    logger.error(
+      "[authenticateRefreshToken] RefreshToken이 DB와 일치하지 않습니다."
+    );
+    return next(new NotAllowedError("RefreshToken이 일치하지 않습니다."));
   }
 
+  // 요청 객체에 사용자 정보 추가
+  req.user = { userId: decoded.userId };
+
+  // 성공적으로 통과
   next();
 };
