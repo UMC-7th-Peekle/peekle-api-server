@@ -4,6 +4,7 @@ import * as articleReadContoller from "../controllers/community/article.read.com
 import * as commentController from "../controllers/community/comment.community.contorller.js";
 import * as articleLikeController from "../controllers/community/article.like.community.controller.js";
 import * as commentLikeController from "../controllers/community/comment.like.community.controller.js";
+import * as articleReportController from "../controllers/community/article.report.community.controller.js";
 // 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 
@@ -45,14 +46,14 @@ router.patch(
   "/:communityId/articles/:articleId",
   authenticateAccessToken,
   articleCrudController.updateArticle
-); 
+);
 
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 삭제합니다
 router.delete(
   "/:communityId/articles/:articleId",
   authenticateAccessToken,
   articleCrudController.deleteArticle
-); 
+);
 
 /*
   게시글 좋아요
@@ -120,6 +121,17 @@ router.delete(
   "/:community/articles/:articleId/comments/:commentId/like",
   authenticateAccessToken,
   commentLikeController.unlikeComment
+);
+
+/*
+  게시글 신고
+*/
+
+// 게시글을 신고합니다.
+router.post(
+  "/:communityId/articles/:articleId/report",
+  authenticateAccessToken,
+  articleReportController.reportArticle
 );
 
 export default router;
