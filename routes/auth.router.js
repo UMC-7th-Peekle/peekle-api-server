@@ -7,19 +7,46 @@ import * as loginController from "../controllers/auth/login.auth.controller.js";
 import * as kakaoController from "../controllers/auth/kakao.auth.controller.js";
 import { authenticateRefreshToken } from "../middleware/authenticate.jwt.js";
 
+import * as authSchema from "../utils/validators/auth/auth.validators.js";
+import { validate } from "../middleware/validate.js";
+
 const router = Router();
 
-// 회원가입
+/*
+  회원가입
+*/
+
+// 현행 약관 조회
 router.get("/terms", registerController.getTerms);
-router.post("/register/local", registerController.register);
-router.post("/register/oauth", registerController.oauthRegister);
+// 회원가입 (local)
+router.post(
+  "/register/local",
+  validate(authSchema.localRegisterSchema),
+  registerController.register
+);
+// 회원가입 (oauth)
+router.post(
+  "/register/oauth",
+  validate(authSchema.oauthRegisterSchema),
+  registerController.oauthRegister
+);
 
 // 테스트용 회원가입
 router.post("/register/test", registerController.testRegister);
 
-// 로그인, 로그아웃, 토큰 관리
-router.post("/login/local", loginController.localLogin);
+/*
+  로그인, 로그아웃, 토큰 재발급
+*/
+
+// 로그인 (local)
+router.post(
+  "/login/local",
+  validate(authSchema.phoneVerifySchema),
+  loginController.localLogin
+);
+// 로그아웃
 router.delete("/logout", loginController.logout);
+// 토큰 재발급
 router.get(
   "/token/reissue",
   authenticateRefreshToken,
@@ -33,9 +60,23 @@ router.get("/login/test/:userId", loginController.testLogin);
 router.get("/login/kakao", kakaoController.kakaoLogin);
 router.get("/login/kakao/callback", kakaoController.kakaoCallback);
 
-// 전화번호 인증
+/*
+  휴대폰 인증
+*/
+
+// 휴대폰 번호로 계정 상태 확인
 router.get("/phone/account/status", phoneController.checkAccountStatus);
-router.post("/phone/send", phoneController.sendTokenToPhone);
-router.post("/phone/verify", phoneController.verifyToken);
+// 휴대폰 번호로 인증번호 전송
+router.post(
+  "/phone/send",
+  validate(authSchema.sendTokenToPhoneSchema),
+  phoneController.sendTokenToPhone
+);
+// 휴대폰 인증번호 확인
+router.post(
+  "/phone/verify",
+  validate(authSchema.phoneVerifySchema),
+  phoneController.verifyToken
+);
 
 export default router;
