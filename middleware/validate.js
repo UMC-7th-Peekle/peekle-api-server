@@ -1,17 +1,25 @@
 import { AjvError } from "../utils/errors/errors.js";
 
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
+
+const ajv = new Ajv({ allErrors: true });
+addFormats(ajv);
+
 /**
  * 요청 데이터를 주어진 스키마로 검증하는 미들웨어 생성기.
  * @param {Function} schema - 스키마 검증 함수 (예: AJV에서 컴파일된 함수).
  * @returns {Function} - Express 미들웨어 함수.
  */
-const validate = (schema) => {
+export const validate = (schema) => {
   return (req, res, next) => {
-    const isValid = schema(req.body);
+    const validator = ajv.compile(schema);
+    const isValid = validator(req.body);
 
     if (!isValid) {
-      const errorDetails = formatErrors(schema.errors);
-      return next(new AjvError("유효하지 않은 입력입니다.", errorDetails));
+      const errorDetails = formatErrors(validator.errors);
+      console.log(validator.errors);
+      return next(new AjvError("입력 형식이 잘못되었습니다.", errorDetails));
     }
 
     next();
@@ -26,10 +34,19 @@ const validate = (schema) => {
 const formatErrors = (errors) => {
   if (!errors || !Array.isArray(errors)) return [];
 
+  /*
+    original message:
+    {
+      instancePath: '',
+      schemaPath: '#/required',
+      keyword: 'required',
+      params: { missingProperty: 'oauthId' },
+      message: "must have required property 'oauthId'"
+    },
+  */
+
   return errors.map(({ instancePath, message }) => ({
     instancePath,
     message,
   }));
 };
-
-module.exports = validate;

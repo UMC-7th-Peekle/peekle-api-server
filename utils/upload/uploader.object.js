@@ -59,7 +59,7 @@ export const createUploadMiddleware = ({ destination, restrictions }) => {
     storage: storage,
     limits: restrictions.limits,
     fileFilter: (req, file, cb) => {
-      console.log(restrictions);
+      // console.log(restrictions);
       const allowedMimeTypes = restrictions.allowedMimeTypes;
       if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
@@ -96,7 +96,7 @@ export const uploadToS3 = (restrictions) => {
       bucket: BUCKET_NAME,
       // acl: "public-read", // 업로드된 파일의 접근 권한
       metadata: (req, file, cb) => {
-        console.log(req, file);
+        // console.log(req, file);
         logger.debug(
           `[uploadImageToS3] file: ${JSON.stringify(file, null, 2)}`
         );
@@ -134,6 +134,18 @@ export const uploadToS3 = (restrictions) => {
       }
     },
   });
+};
+
+export const deleteLocalFile = async (filePath) => {
+  filePath = path.join("uploads", filePath);
+  try {
+    await fs.promises.unlink(filePath);
+    logger.debug(`[deleteLocalFile] 파일 삭제 성공: ${filePath}`);
+  } catch (err) {
+    logger.error(
+      `[deleteLocalFile] 파일 삭제 실패: ${filePath} - ${err.message}`
+    );
+  }
 };
 
 export const getStaticFilesUrl = (fileKey) =>
