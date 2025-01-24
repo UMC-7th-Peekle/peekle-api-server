@@ -1,12 +1,3 @@
-/**
- * 400 : 데이터가 누락된 경우 (게시글 제목, 게시글 내용)
- * 401 : 인증 정보가 제공되지 않았습니다.
- */
-
-import {
-  AlreadyExistsError,
-  NotExistsError,
-} from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import { Sequelize } from "sequelize";
 
@@ -23,7 +14,6 @@ export const newEvent = async (userId, eventData) => {
     applicationStart,
     applicationEnd,
     schedules,
-    // eventImage,    // 일단 이미지 처리는 너무 복잡할 것 같아서 후순위..
   } = eventData;
 
   // 게시글 제목, 게시글 내용 누락 400
@@ -33,10 +23,29 @@ export const newEvent = async (userId, eventData) => {
 
   // schedules랑 image는 조인해서 가져와야 합니다.
   try {
+    // 이벤트 생성
     const event = await models.Events.create({
-
+      title,
+      content,
+      price,
+      categoryId,
+      location,
+      eventUrl,
+      createdUserId: userId,
+      applicationStart,
+      applicationEnd,
     });
-  } catch(error) {
 
+    // 해당 이벤트 스케줄 부분 튜플 생성
+    const eventSchedules = schedules.map((schedule) => ({
+      ...schedule,
+      eventId: event.eventId,
+    }));
+
+    await models.EventSchedules.bulkCreate(eventSchedules);
+
+    return event;
+  } catch (error) {
+    throw new Sequelize.DatabaseError(error);
   }
 };
