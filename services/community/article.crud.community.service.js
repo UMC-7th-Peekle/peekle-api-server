@@ -4,6 +4,7 @@ import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import fs from "fs/promises";
 import path from "path";
+import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
 /**
  * communityId와 articleId에 해당하는 게시글을 가져옵니다
@@ -41,10 +42,16 @@ export const getArticleById = async ({ communityId, articleId }) => {
   const { articleComments, articleImages, ...articleData } =
     articleWithComments.toJSON();
 
-  // article과 comments를 동일한 depth로 출력
+  // STATIC_FILE_BASE_URL 추가
+  const transformedImages = articleImages.map((image) => ({
+    ...image,
+    imageUrl: addBaseUrl(image.imageUrl), 
+  }));
+
+  // 결과 반환
   return {
     articleData, // 게시글 데이터
-    articleImages, // 이미지 데이터
+    articleImages: transformedImages, // URL이 수정된 이미지 데이터
     articleComments, // 댓글 데이터
   };
 };
