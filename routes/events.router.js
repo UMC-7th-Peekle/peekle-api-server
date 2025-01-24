@@ -20,6 +20,11 @@ router.get("/category", categoryEventController.eventCategory);     // 이벤트
 
 // 이벤트 스크랩
 router.get("/:eventId", detailEventController.detailEvent);    // 이벤트 상세정보 조회
+
+// 이벤트 수정
+router.patch("/:eventId", authMiddleware.authenticateAccessToken, detailEventController.updateEvent);    // 이벤트 상세정보 수정
+
+// 이벤트 스크랩
 router.post("/:eventId/scrap", authMiddleware.authenticateAccessToken, scrapEventController.newScrap);       // 특정 이벤트 스크랩
 router.delete("/:eventId/scrap", authMiddleware.authenticateAccessToken, scrapEventController.deleteScrap);     // 특정 이벤트를 스크랩 취소
 
