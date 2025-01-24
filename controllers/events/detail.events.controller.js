@@ -29,14 +29,22 @@ export const updateEvent = async (req, res, next) => {
     const updateData = req.body;
 
     // 업로드된 파일 정보 추출
-    // const uploadedFiles = req.files?.article_images || [];
-    // const imagePaths = uploadedFiles.map((file) => {
-    //   return file.path.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
-    // });
+    const uploadedFiles = req.files?.article_images || [];
+    const imagePaths = uploadedFiles.map((file) => {
+      const filePath = file.path.replace(/^uploads/, ""); // 'uploads/' 제거
+      
+      // 디버깅용
+      console.debug(`[updateEvent] 업로드된 이미지 경로: ${filePath}`);
+
+      return filePath;
+    });
+
+    // 이미지 경로 추가
+    updateData.imagePaths = imagePaths;
 
     const updateEvent = await detailService.updateEvent(eventId, userId, updateData);
 
-    return res.status(200).success({ message: "이벤트 수정 완료" });
+    return res.status(200).success({ message: "이벤트 수정 완료", updateEvent });
   } catch (error) {
     logError(error);
     next(error);

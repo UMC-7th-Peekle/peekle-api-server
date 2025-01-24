@@ -1,8 +1,11 @@
+import path from "path";
+import fs from "fs/promises";
 import models from "../../models/index.js";
 import {
   NotExistsError,
   NotAllowedError
 } from "../../utils/errors/errors.js";
+import logger from "../../utils/logger/logger.js";
 
 export const detailEvent = async (eventId) => {
   // eventId가 유효하지 않은 경우 400
@@ -25,9 +28,7 @@ export const detailEvent = async (eventId) => {
         as: 'eventImages',
         attributes: [
           'imageUrl',
-          'sequence',
-          'createdAt',
-          'updatedAt'
+          'sequence'
         ],
       },
       {
@@ -53,6 +54,18 @@ export const detailEvent = async (eventId) => {
 
 // 이벤트 내용 수정
 export const updateEvent = async (eventId, userId, updateData) => {
+  const { 
+    title,
+    content,
+    price,
+    categoryId,
+    location,
+    eventUrl,
+    applicationStart,
+    applicationEnd,
+    imagePaths = []
+  } = updateData;
+  
   try {
     const event = await models.Events.findOne({ where: { eventId } });
 
@@ -68,6 +81,43 @@ export const updateEvent = async (eventId, userId, updateData) => {
     Object.assign(event, updateData);
 
     await event.save();
+
+    // 이미지가 새로 들어온 경우에만 처리
+    if (imagePaths.length > 0) {
+      // DB에서 기존 이미지 경로 가져오기
+      const existingImages = await models.EventImages.findAll({
+        where: { eventId },
+        attributes: ["imageUrl"],
+      });
+
+      // 로컬 파일 삭제
+      const deletePromises = existingImages.map(async (img) => {
+        const filePath = path.join("uploads", img.imageUrl.replace(/^/, "")); // 경로에 uploads 추가
+        try {
+          await fs.unlink(filePath); // 로컬 파일 삭제
+          logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
+        } catch (err) {
+          logger.error(
+            `[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`
+          );
+        }
+      });
+
+      // 모든 파일 삭제 완료 대기
+      await Promise.all(deletePromises);
+
+      // 기존 이미지 데이터 삭제
+      await models.EventImages.destroy({ where: { eventId } });
+
+      // 새로운 이미지 추가
+      const eventImageData = imagePaths.map((path, index) => ({
+        eventId,
+        imageUrl: path,
+        sequence: index + 1, // 이미지 순서 설정
+      }));
+
+      await models.EventImages.bulkCreate(eventImageData);
+    }
 
     return event;
   } catch (error) {
