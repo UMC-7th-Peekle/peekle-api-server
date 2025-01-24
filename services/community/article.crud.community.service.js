@@ -4,7 +4,10 @@ import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import fs from "fs/promises";
 import path from "path";
-import { addBaseUrl } from "../../utils/upload/uploader.object.js";
+import {
+  addBaseUrl,
+  deleteLocalFile,
+} from "../../utils/upload/uploader.object.js";
 
 /**
  * communityId와 articleId에 해당하는 게시글을 가져옵니다
@@ -174,23 +177,17 @@ export const updateArticle = async ({
       attributes: ["imageUrl"],
     });
 
-    // 로컬 파일 삭제
-    const deletePromises = existingImages.map(async (img) => {
-      const filePath = path.join("uploads", img.imageUrl.replace(/^/, "")); // 경로에 uploads 추가
-      try {
-        await fs.unlink(filePath); // 로컬 파일 삭제
-        logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
-      } catch (err) {
-        logger.error(
-          `[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`
-        );
-      }
-    });
+    const deletePromises = existingImages.map((img) =>
+      deleteLocalFile(img.imageUrl)
+    );
 
     // 모든 파일 삭제 완료 대기
+    // because, deletePromises 안에 있는 비동기 작업들을
+    // await을 걸어서 처리하지 않았기에
     await Promise.all(deletePromises);
 
     // 기존 이미지 데이터 삭제
+    // 현재는 이미지를 첨부하지 않았을 경우 삭제도 하지 아니함.
     await models.ArticleImages.destroy({
       where: { articleId },
     });
@@ -206,7 +203,7 @@ export const updateArticle = async ({
   }
 
   logger.debug(
-    `[updateArticle] 수정된 게시글 제목: ${article.title}, 수정된 내용: ${article.content}`
+    `[updateArticle] [DB 기준] 수정된 게시글 제목: ${article.title} | 수정된 내용: ${article.content}`
   );
   return { article };
 };

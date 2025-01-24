@@ -1,6 +1,8 @@
 // Description: 게시글 관련 조회, 생성, 수정, 삭제와 관련된 컨트롤러 파일입니다.
 import * as articleCrudService from "../../services/community/article.crud.community.service.js";
+import { InvalidInputError } from "../../utils/errors/errors.js";
 import { logError } from "../../utils/handlers/error.logger.js";
+import logger from "../../utils/logger/logger.js";
 
 // 게시글 조회
 export const getArticleById = async (req, res, next) => {
@@ -73,11 +75,21 @@ export const updateArticle = async (req, res, next) => {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
     const { title, content } = req.body; // Request body에서 title, content 추출
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
+    if (!title && !content && !req.files) {
+      logger.error("[updateArticle] 수정할 내용이 없습니다.");
+      throw new InvalidInputError("수정할 내용이 없습니다.");
+    }
+
     // 업로드된 파일 정보 추출
     const uploadedFiles = req.files?.article_images || [];
-    const imagePaths = uploadedFiles.map((file) => {
-      return file.path.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
-    });
+
+    // 업로드된 파일이 없는 경우 고려
+    let imagePaths = [];
+    if (uploadedFiles.length > 0) {
+      imagePaths = uploadedFiles.map((file) => {
+        return file.path.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
+      });
+    }
 
     const article = await articleCrudService.updateArticle({
       communityId,
@@ -86,7 +98,11 @@ export const updateArticle = async (req, res, next) => {
       title,
       content,
       imagePaths,
-    }); // 게시글 수정 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
+    });
+    // 게시글 수정
+    // 현재는 response에 article을 넣지 않지만,
+    // 추후에 넣을 상황이 생길 수도 있는 것을 고려해
+    // article을 반환 받는 식으로 작성
 
     return res.status(200).success({
       message: "게시글 수정 성공",
