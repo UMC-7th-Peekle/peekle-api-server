@@ -185,9 +185,11 @@ export const updateEvent = async (eventId, userId, updateData) => {
       const uniqueSequences = new Set(combinedSequences);
 
       if (
-        uniqueSequences.size !== combinedSequences.length ||
-        Math.min(...combinedSequences) !== 1 ||
-        Math.max(...combinedSequences) !== combinedSequences.length
+        updateData.existingImageSequence.length !== existingImages.length || // 존재하는 이미지 개수가 다른 경우
+        updateData.newImageSequence.length !== updateData.imagePaths.length || // 새로 추가된 이미지 개수가 다른 경우
+        uniqueSequences.size !== combinedSequences.length || // 중복된 순서가 있는 경우
+        Math.min(...combinedSequences) !== 1 || // 순서가 1부터 시작하지 않는 경우
+        Math.max(...combinedSequences) !== combinedSequences.length // 순서가 중간에 빠진 경우
       ) {
         throw new InvalidInputError(
           "설명은 못하곘는데 이상한 입력 넣지 말아라 진짜"
