@@ -23,8 +23,10 @@ export const localStorage = ({
     upload(req, res, (err) => {
       if (err instanceof multer.MulterError) {
         // Multer 오류 처리
-        logger.error("[localStorage] Multer 오류:", err.message);
-        return next(new MulterError(err.message));
+        logger.error(
+          `[localStorage] 업로드 중 에러 ${err.name} | ${err.code} | ${err.message} | ${err.field}`
+        );
+        return next(new MulterError(err.code));
       } else if (err) {
         // Multer 관련 오류가 아니라면 그대로 next로 전달
         logger.error("[localStorage] Error :", err.message);
@@ -56,8 +58,10 @@ export const s3Storage = ({
     upload(req, res, (err) => {
       if (err instanceof multer.MulterError) {
         // Multer 오류 처리
-        logger.error("[s3Storage] Multer 오류:", err.message);
-        return next(new MulterError(err.message));
+        logger.error(
+          `[localStorage] 업로드 중 에러 ${err.name} | ${err.code} | ${err.message} | ${err.field}`
+        );
+        return next(new MulterError(err.code));
       } else if (err) {
         // Multer 관련 오류가 아니라면 그대로 next로 전달
         logger.error("[s3Storage] Error :", err.message);
