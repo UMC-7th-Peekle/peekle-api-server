@@ -6,7 +6,8 @@ import * as articleLikeController from "../controllers/community/article.like.co
 import * as commentLikeController from "../controllers/community/comment.like.community.controller.js";
 import * as articleReportController from "../controllers/community/article.report.community.controller.js";
 import * as commentReportController from "../controllers/community/comment.report.community.controller.js";
-
+import * as articleAggregateController from "../controllers/community/article.aggregate.community.contoller.js";
+// 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
 import * as articleValidator from "../utils/validators/community/article.validators.js";
 
 // 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
@@ -169,6 +170,16 @@ router.post(
   "/:communityId/articles/:articleId/comments/:commentId/report",
   authenticateAccessToken,
   commentReportController.reportComment
+);
+
+/*
+  인기글 집계
+*/
+
+// 특정 communityId에 startTime부터 endTime까지의 인기글을 가져옵니다.
+router.get(
+  "/:communityId/popular-articles",
+  articleAggregateController.getPopularArticles
 );
 
 export default router;
