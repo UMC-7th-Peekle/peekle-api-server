@@ -28,6 +28,13 @@ const ensureDirectoryExists = (destination) => {
 };
 
 /**
+ * 파일 경로 앞에 STATIC_FILE_BASE_URL을 붙여주는 함수
+ */
+export const addBaseUrl = (filePath) => {
+  return `${STATIC_FILE_BASE_URL}${filePath.startsWith("/") ? "" : "/"}${filePath}`;
+};
+
+/**
  * 업로드 미들웨어를 생성하는 팩토리 함수
  * @param {string} destination - 업로드 디렉토리 경로
  * @returns {multer.Multer} - multer 미들웨어 인스턴스
