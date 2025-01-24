@@ -165,3 +165,32 @@ export const createCommentReply = async ({
 
   return { comment };
 };
+
+/**
+ * communityId, articleId에 해당하는 댓글 목록을 조회합니다
+ */
+export const getComments = async ({ communityId, articleId }) => {
+  const articleWithComments = await models.Articles.findOne({
+    where: {
+      communityId,
+      articleId,
+    },
+    include: [
+      {
+        model: models.ArticleComments,
+        as: "articleComments",
+      },
+    ],
+  });
+
+  // 게시글이 없는 경우 404 에러 반환
+  if (!articleWithComments) {
+    logger.error(
+      `[getComments] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
+    );
+    throw new NotExistsError("게시글이 존재하지 않습니다");
+  }
+
+  // 댓글만 반환
+  return { comments: articleWithComments.articleComments } ;
+};

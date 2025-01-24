@@ -2,6 +2,8 @@
 import { NotAllowedError, NotExistsError } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
+import fs from "fs/promises";
+import path from "path";
 
 /**
  * communityId와 articleId에 해당하는 게시글을 가져옵니다
@@ -18,6 +20,11 @@ export const getArticleById = async ({ communityId, articleId }) => {
         model: models.ArticleComments,
         as: "articleComments",
       },
+      {
+        model: models.ArticleImages,
+        as: "articleImages",
+        attributes: ["imageUrl", "sequence"], // 필요한 필드만 가져오기
+      },
     ],
   });
 
@@ -29,12 +36,15 @@ export const getArticleById = async ({ communityId, articleId }) => {
     throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
   }
 
+  
   // 게시글 데이터와 댓글 데이터를 분리
-  const { articleComments, ...articleData } = articleWithComments.toJSON();
+  const { articleComments, articleImages, ...articleData } =
+    articleWithComments.toJSON();
 
   // article과 comments를 동일한 depth로 출력
   return {
     articleData, // 게시글 데이터
+    articleImages, // 이미지 데이터
     articleComments, // 댓글 데이터
   };
 };
@@ -48,6 +58,7 @@ export const createArticle = async ({
   title,
   content,
   isAnonymous = true,
+  imagePaths,
 }) => {
   // 게시판 검색
   const community = await models.Communities.findOne({
@@ -58,6 +69,7 @@ export const createArticle = async ({
 
   // 게시글 생성
   let article;
+  let articleImageData;
   /*try-catch 블록 외부에서 article 선언
   try-catch 블록 내부에서 article을 생성하고 반환하면
   "article is not defined" 에러가 발생합니다.
@@ -71,6 +83,17 @@ export const createArticle = async ({
       content,
       isAnonymous,
     });
+
+    // 이미지 경로를 ArticleImages 테이블에 저장
+    if (imagePaths.length > 0) {
+      articleImageData = imagePaths.map((path, index) => ({
+        articleId: article.articleId,
+        imageUrl: path,
+        sequence: index + 1, // 이미지 순서 설정
+      }));
+    }
+
+    await models.ArticleImages.bulkCreate(articleImageData);
   } catch (error) {
     if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
       // 게시판이 존재하지 않는 경우
@@ -83,7 +106,7 @@ export const createArticle = async ({
   }
 
   logger.debug(
-    `[updateArticle] 생성된 게시글 제목: ${article.title}, 생성된 내용: ${article.content}`
+    `[createArticle] 생성된 게시글 제목: ${article.title}, 생성된 내용: ${article.content}`
   );
 
   return { article };
@@ -98,6 +121,7 @@ export const updateArticle = async ({
   authorId,
   title,
   content,
+  imagePaths,
 }) => {
   // 게시글 검색
   const article = await models.Articles.findOne({
@@ -132,6 +156,46 @@ export const updateArticle = async ({
     content,
   });
 
+  // 사진이 새로 들어온 경우에만 사진 업데이트
+  // 기존 이미지 삭제
+  if (imagePaths.length > 0) {
+    // DB에서 기존 이미지 경로 가져오기
+    const existingImages = await models.ArticleImages.findAll({
+      where: { articleId },
+      attributes: ["imageUrl"],
+    });
+
+    // 로컬 파일 삭제
+    const deletePromises = existingImages.map(async (img) => {
+      const filePath = path.join("uploads", img.imageUrl.replace(/^/, "")); // 경로에 uploads 추가
+      try {
+        await fs.unlink(filePath); // 로컬 파일 삭제
+        logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
+      } catch (err) {
+        logger.error(
+          `[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`
+        );
+      }
+    });
+
+    // 모든 파일 삭제 완료 대기
+    await Promise.all(deletePromises);
+
+    // 기존 이미지 데이터 삭제
+    await models.ArticleImages.destroy({
+      where: { articleId },
+    });
+
+    // 새로운 이미지 추가
+    const articleImageData = imagePaths.map((path, index) => ({
+      articleId,
+      imageUrl: path,
+      sequence: index + 1, // 이미지 순서 설정
+    }));
+
+    await models.ArticleImages.bulkCreate(articleImageData);
+  }
+
   logger.debug(
     `[updateArticle] 수정된 게시글 제목: ${article.title}, 수정된 내용: ${article.content}`
   );
@@ -144,7 +208,7 @@ export const updateArticle = async ({
 export const deleteArticle = async ({ communityId, articleId, authorId }) => {
   // 게시글 검색
   const article = await models.Articles.findOne({
-    where: {
+    where: { 
       communityId,
       articleId,
     },
@@ -167,6 +231,33 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
     );
     throw new NotAllowedError("게시글 작성자만 삭제할 수 있습니다");
   }
+
+  // DB에서 기존 이미지 경로 가져오기
+  const existingImages = await models.ArticleImages.findAll({
+    where: { articleId },
+    attributes: ["imageUrl"],
+  });
+
+  // 로컬 파일 삭제
+  const deletePromises = existingImages.map(async (img) => {
+    const filePath = path.join("uploads", img.imageUrl.replace(/^/, ""));  // 경로에 uploads/ 추가
+    try {
+      await fs.unlink(filePath); // 로컬 파일 삭제
+      logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
+    } catch (err) {
+      logger.error(
+        `[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`
+      );
+    }
+  });
+
+  // 모든 파일 삭제 완료 대기
+  await Promise.all(deletePromises);
+
+  // 기존 이미지 데이터 삭제
+  await models.ArticleImages.destroy({
+    where: { articleId },
+  });
 
   // 게시글 삭제
   await article.destroy();

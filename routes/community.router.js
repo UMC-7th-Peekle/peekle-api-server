@@ -6,7 +6,9 @@ import * as articleLikeController from "../controllers/community/article.like.co
 import * as commentLikeController from "../controllers/community/comment.like.community.controller.js";
 import * as articleReportController from "../controllers/community/article.report.community.controller.js";
 // 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
+
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
+import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
 
 const router = Router();
 
@@ -38,6 +40,11 @@ router.get(
 router.post(
   "/:communityId/articles",
   authenticateAccessToken,
+  fileUploadMiddleware.localStorage({
+    restrictions: fileUploadMiddleware.restrictions("article"),
+    field: [{ name: "article_images", maxCount: 5 }], // `field`에 따라 다중 업로드 설정
+    destination: "uploads/articles", // 저장 경로 설정
+  }),
   articleCrudController.createArticle
 );
 
@@ -45,6 +52,11 @@ router.post(
 router.patch(
   "/:communityId/articles/:articleId",
   authenticateAccessToken,
+  fileUploadMiddleware.localStorage({
+    restrictions: fileUploadMiddleware.restrictions("article"),
+    field: [{ name: "article_images", maxCount: 5 }], // 다중 파일 업로드 설정
+    destination: "uploads/articles", // 저장 경로 설정
+  }),
   articleCrudController.updateArticle
 );
 
@@ -104,6 +116,13 @@ router.post(
   authenticateAccessToken,
   commentController.createCommentReply
 );
+
+// communityId에 해당하는 게시판의 articleId에 해당하는 게시글의 댓글 정보를 가져옵니다.
+router.get(
+  "/:communityId/articles/:articleId/comments", 
+  commentController.getComments
+);
+
 
 /*
   게시글 댓글 좋아요
