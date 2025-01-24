@@ -5,6 +5,7 @@ import * as commentController from "../controllers/community/comment.community.c
 import * as articleLikeController from "../controllers/community/article.like.community.controller.js";
 import * as commentLikeController from "../controllers/community/comment.like.community.controller.js";
 import * as articleReportController from "../controllers/community/article.report.community.controller.js";
+import * as commentReportController from "../controllers/community/comment.report.community.controller.js";
 // 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
 
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
@@ -151,6 +152,13 @@ router.post(
   "/:communityId/articles/:articleId/report",
   authenticateAccessToken,
   articleReportController.reportArticle
+);
+
+// 댓글을 신고합니다.
+router.post(
+  "/:communityId/articles/:articleId/comments/:commentId/report",
+  authenticateAccessToken,
+  commentReportController.reportComment
 );
 
 export default router;
