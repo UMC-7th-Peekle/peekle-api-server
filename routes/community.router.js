@@ -6,10 +6,13 @@ import * as articleLikeController from "../controllers/community/article.like.co
 import * as commentLikeController from "../controllers/community/comment.like.community.controller.js";
 import * as articleReportController from "../controllers/community/article.report.community.controller.js";
 import * as commentReportController from "../controllers/community/comment.report.community.controller.js";
-// 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
 
+import * as articleValidator from "../utils/validators/community/article.validators.js";
+
+// 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
+import { validate } from "../middleware/validate.js";
 
 const router = Router();
 
@@ -37,6 +40,8 @@ router.get(
   articleCrudController.getArticleById
 );
 
+// TODO : 형식에 맞지 않는 요청의 사진도 우선 업로드가 되는 문제가 발생함
+
 // communityId에 해당하는 게시판에 새로운 게시글을 추가합니다
 router.post(
   "/:communityId/articles",
@@ -46,6 +51,9 @@ router.post(
     field: [{ name: "article_images", maxCount: 5 }], // `field`에 따라 다중 업로드 설정
     destination: "uploads/articles", // 저장 경로 설정
   }),
+  // validator는 body를 검증하기에 순서에 유의
+  // form-data의 경우 multer가 body에 채워주는 것임
+  validate(articleValidator.postArticleSchema),
   articleCrudController.createArticle
 );
 
@@ -58,6 +66,9 @@ router.patch(
     field: [{ name: "article_images", maxCount: 5 }], // 다중 파일 업로드 설정
     destination: "uploads/articles", // 저장 경로 설정
   }),
+  // validator는 body를 검증하기에 순서에 유의
+  // form-data의 경우 multer가 body에 채워주는 것임
+  validate(articleValidator.patchArticleSchema),
   articleCrudController.updateArticle
 );
 
@@ -120,10 +131,9 @@ router.post(
 
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글의 댓글 정보를 가져옵니다.
 router.get(
-  "/:communityId/articles/:articleId/comments", 
+  "/:communityId/articles/:articleId/comments",
   commentController.getComments
 );
-
 
 /*
   게시글 댓글 좋아요

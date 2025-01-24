@@ -44,9 +44,7 @@ if (key.length !== 32) {
 export const encrypt62 = (text) => {
   try {
     if (typeof text === "number") {
-      logger.error(
-        `[encrypt62] int값을 암호화하려 시도했습니다. string으로 수정하는 것을 권고합니다. text: ${text}`
-      );
+      logger.error(`[encrypt62] int를 암호화합니다. Text: ${text}`);
       text = text.toString();
     }
     const iv = crypto.randomBytes(16); // 16바이트 IV 생성
