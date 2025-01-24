@@ -32,7 +32,7 @@ export const createArticle = async (req, res, next) => {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
     // 사용자 인증 검증
     const { communityId } = req.params; // URL에서 communityId 추출
-    const { title, content, isAnonymous } = req.body; // Request body에서 title, content 추출
+    const { title, content, isAnonymous } = JSON.parse(req.body.data); // Request body에서 title, content 추출
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     // 업로드된 파일 정보 추출
@@ -66,7 +66,13 @@ export const updateArticle = async (req, res, next) => {
   // 사용자 인증 검증
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
-    const { title, content } = req.body; // Request body에서 title, content 추출
+    const {
+      title,
+      content,
+      isAnonymous,
+      existingImageSequence,
+      newImageSequence,
+    } = JSON.parse(req.body.data); // Request body에서 title, content 추출
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
     if (!title && !content && !req.files) {
       logger.error("[updateArticle] 수정할 내용이 없습니다.");
@@ -91,6 +97,9 @@ export const updateArticle = async (req, res, next) => {
       authorId,
       title,
       content,
+      isAnonymous,
+      existingImageSequence,
+      newImageSequence,
       imagePaths,
     });
     // 게시글 수정

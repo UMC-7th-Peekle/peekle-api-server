@@ -107,32 +107,20 @@ export const updateEvent = async (eventId, userId, updateData) => {
         attributes: ["imageId", "imageUrl", "sequence"],
       });
 
-      // DB에 존재하지 않는 Sequence의 이미지를 요청한 경우
-      const validImageCount = updateData.imageSequence.filter(
-        (seq) => seq > 0
-      ).length;
-      if (existingImages.length < validImageCount) {
-        logger.debug({
-          action: "event:image:update",
-          actionType: "error",
-          message: "이미지 개수가 일치하지 않는 요청입니다.",
-          data: {
-            requestedUserId: userId,
-            requestedData: updateData,
-            lengths: {
-              existingImages: existingImages.length,
-              validImageCount,
-            },
-          },
-        });
-        throw new InvalidInputError("잘못된 입력입니다.");
-      }
-
-      console.log(existingImages);
+      logger.silly({
+        action: "event:image:getCurrent",
+        actionType: "log",
+        data: {
+          requestedUserId: userId,
+          existingImages,
+        },
+      });
 
       // 이미지 순서 변경
 
       /*
+        ** 이거 아님. 그냥 고민했던 흔적을 남기고 싶어서 남겨둠 **
+
         imageSequence field를 받아서 수정을 진행합니다.
         해당 field는 숫자들의 배열이며, 
         각 숫자는 이미지 순서 및 삭제/추가 여부를 나타냅니다.
@@ -161,43 +149,100 @@ export const updateEvent = async (eventId, userId, updateData) => {
         2. [기존 1번, 3번] 이미지를 DB에서 삭제
       */
 
-      let deletedImages = [];
-      let changedImageIdx = 0;
-      updateData.imageSequence.map(async (seq, idx) => {
+      /*
+        ** 이거 보면 됩니다 **
+
+        기존 이미지 Sequence와
+        Input으로 추가한 이미지의 Sequence를 
+        모두 받아서 하는 방향으로 수정하자.
+
+        existingImageSequence : 기존 파일들의 순서 및 삭제 여부
+        newImageSequence : 새로 추가된 파일들의 순서 (들어갈 곳)
+
+
+        동일하게 -1 삭제, 그 이외에는 수정하면 될듯.
+
+        existingImageSequence: [2, 1, -2]
+        newImageSequence: [4, 5, 6]
+
+        TODO : DB에 Unique key를 안 걸어둬서, 
+        eventId & sequence가 동일한 컬럼이 존재할 수 있지만 (가능하지만),
+        Unique key를 걸어서 중복을 방지함과 동시에 데이터 무결성을 지켜야 함.
+        아직 코드에선 해당 부분에 대한 예외 처리를 하지 않음.
+
+        (client가 잘못된 데이터를 보내는 경우에 대한 처리를 하지 않았다는 말)
+        근데 그냥 바로 해버림 6시 40분인데 자고 싶다
+      */
+
+      // 사용자가 보낸 이미지 순서가 이상한지 확인
+      const filteredExisting = updateData.existingImageSequence.filter(
+        (seq) => seq !== -1
+      );
+      const combinedSequences = [
+        ...filteredExisting,
+        ...updateData.newImageSequence,
+      ];
+      const uniqueSequences = new Set(combinedSequences);
+
+      if (
+        uniqueSequences.size !== combinedSequences.length ||
+        Math.min(...combinedSequences) !== 1 ||
+        Math.max(...combinedSequences) !== combinedSequences.length
+      ) {
+        throw new InvalidInputError(
+          "설명은 못하곘는데 이상한 입력 넣지 말아라 진짜"
+        );
+      }
+
+      // 기존 이미지 순서 변경
+      updateData.existingImageSequence.map(async (seq, idx) => {
         if (seq === -1) {
-          // 삭제된 이미지
-          deletedImages.push(existingImages[idx].imageUrl);
-          await existingImages[idx].destroy();
-        } else if (seq === -2) {
-          // 새로 추가된 이미지
-          await models.EventImages.create({
-            eventId,
-            imageUrl: updateData.imagePaths[changedImageIdx++],
-            sequence: idx + 1,
+          // 삭제할 이미지
+          logger.silly({
+            action: "event:image:update:delete",
+            actionType: "log",
+            data: {
+              requestedUserId: userId,
+              imageId: existingImages[idx].imageId,
+              originalSequence: idx + 1,
+              newSequence: seq,
+            },
           });
+          await existingImages[idx].destroy();
+          await deleteLocalFile(existingImages[idx].imageUrl);
         } else {
           // 이미지 순서 변경
+          logger.silly({
+            action: "event:image:update:modify",
+            actionType: "log",
+            data: {
+              requestedUserId: userId,
+              imageId: existingImages[idx].imageId,
+              originalSequence: existingImages[idx].sequence,
+              newSequence: seq,
+            },
+          });
           await existingImages[idx].update({ sequence: seq });
         }
       });
 
-      // 로컬 파일 삭제
-      const deletePromises = deletedImages.map((img) => {
-        deleteLocalFile(img);
+      // 새로 추가된 이미지
+      updateData.newImageSequence.map(async (seq, idx) => {
+        logger.silly({
+          action: "event:image:update:create",
+          actionType: "log",
+          data: {
+            requestedUserId: userId,
+            imageUrl: updateData.imagePaths[idx],
+            newSequence: seq,
+          },
+        });
+        await models.EventImages.create({
+          eventId,
+          imageUrl: updateData.imagePaths[idx],
+          sequence: seq,
+        });
       });
-      await Promise.all(deletePromises);
-
-      // 기존 이미지 데이터 삭제
-      await models.EventImages.destroy({ where: { eventId } });
-
-      // // 새로운 이미지 추가
-      // const eventImageData = imagePaths.map((path, index) => ({
-      //   eventId,
-      //   imageUrl: path,
-      //   sequence: index + 1, // 이미지 순서 설정
-      // }));
-
-      // await models.EventImages.bulkCreate(eventImageData);
 
       logger.debug({
         action: "event:image:update",
