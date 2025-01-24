@@ -1,5 +1,9 @@
 // Description: 게시글 관련 조회, 생성, 수정, 삭제 로직을 처리하는 파일입니다.
-import { NotAllowedError, NotExistsError } from "../../utils/errors/errors.js";
+import {
+  InvalidInputError,
+  NotAllowedError,
+  NotExistsError,
+} from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import fs from "fs/promises";
@@ -184,14 +188,14 @@ export const updateArticle = async ({
     // DB에서 기존 이미지 경로 가져오기
     const existingImages = await models.ArticleImages.findAll({
       where: { articleId },
-      attributes: ["imageId", "imageUrl", "sequence"],
+      attributes: ["articleImageId", "imageUrl", "sequence"],
     });
 
     logger.silly({
       action: "article:image:getCurrent",
       actionType: "log",
       data: {
-        requestedUserId: userId,
+        requestedUserId: authorId,
         existingImages,
       },
     });
@@ -277,8 +281,7 @@ export const updateArticle = async ({
           action: "article:image:update:delete",
           actionType: "log",
           data: {
-            requestedUserId: userId,
-            imageId: existingImages[idx].imageId,
+            requestedUserId: authorId,
             originalSequence: idx + 1,
             newSequence: seq,
           },
@@ -291,8 +294,7 @@ export const updateArticle = async ({
           action: "article:image:update:modify",
           actionType: "log",
           data: {
-            requestedUserId: userId,
-            imageId: existingImages[idx].imageId,
+            requestedUserId: authorId,
             originalSequence: existingImages[idx].sequence,
             newSequence: seq,
           },
@@ -307,13 +309,13 @@ export const updateArticle = async ({
         action: "article:image:update:create",
         actionType: "log",
         data: {
-          requestedUserId: userId,
+          requestedUserId: authorId,
           imageUrl: imagePaths[idx],
           newSequence: seq,
         },
       });
       await models.ArticleImages.create({
-        eventId,
+        articleId,
         imageUrl: imagePaths[idx],
         sequence: seq,
       });
@@ -324,8 +326,7 @@ export const updateArticle = async ({
       actionType: "success",
       message: "이미지 업데이트 완료",
       data: {
-        requestedUserId: userId,
-        updatedData: updateData,
+        requestedUserId: authorId,
       },
     });
   }

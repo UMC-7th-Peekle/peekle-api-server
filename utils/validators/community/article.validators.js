@@ -14,6 +14,9 @@ export const patchArticleSchema = {
   properties: {
     title: { type: "string" },
     content: { type: "string" },
+    isAnonymous: { type: "boolean" },
+    existingImageSequence: { type: "array", items: { type: "number" } },
+    newImageSequence: { type: "array", items: { type: "number" } },
   },
   required: [],
   additionalProperties: false,
