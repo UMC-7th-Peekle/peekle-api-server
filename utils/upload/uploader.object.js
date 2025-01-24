@@ -9,13 +9,8 @@ import { NotAllowedError } from "../errors/errors.js";
 import logger from "../logger/logger.js";
 
 import config from "../../config.json" with { type: "json" };
-const {
-  REGION,
-  ACCESS_KEY_ID,
-  SECRET_ACCESS_KEY,
-  BUCKET_NAME,
-  CLOUDFRONT_URL,
-} = config.AWS;
+const { REGION, ACCESS_KEY_ID, SECRET_ACCESS_KEY, BUCKET_NAME } = config.AWS;
+const { STATIC_FILE_BASE_URL } = config.SERVER;
 
 /**
  * 업로드 디렉토리의 존재 여부를 확인하고, 없을 경우 생성합니다.
@@ -134,4 +129,5 @@ export const uploadToS3 = (restrictions) => {
   });
 };
 
-export const getCloudfrontUrl = (fileKey) => `${CLOUDFRONT_URL}/${fileKey}`;
+export const getStaticFilesUrl = (fileKey) =>
+  `${STATIC_FILE_BASE_URL}/${fileKey}`;
