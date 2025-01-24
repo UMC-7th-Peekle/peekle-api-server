@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { notImplementedController } from "../controllers/empty.cotroller.js";
 
 import * as phoneController from "../controllers/auth/phone.auth.controller.js";
 import * as registerController from "../controllers/auth/register.auth.controller.js";
