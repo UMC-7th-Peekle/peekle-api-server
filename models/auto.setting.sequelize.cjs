@@ -26,7 +26,6 @@ const auto = new SequelizeAuto(
     caseProp: "c", // 'c' for camelCase, 'o' for original
     caseFile: "p", // 'c' for camelCase, 'l' for lower, 'p' for pascal
     // camelCase: true, // convert snake_case column names to camelCase field names: user_id -> userId
-    // noAlias: true // as 별칭 미설정 여부
   }
 );
 

@@ -22,7 +22,7 @@ export default class UserRestrictions extends Model {
     },
     adminUserId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'users',
         key: 'user_id'

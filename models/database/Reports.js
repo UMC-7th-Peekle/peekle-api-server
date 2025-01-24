@@ -22,7 +22,7 @@ export default class Reports extends Model {
     },
     reportedUserId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'users',
         key: 'user_id'
@@ -32,6 +32,11 @@ export default class Reports extends Model {
     reason: {
       type: DataTypes.STRING(1024),
       allowNull: false
+    },
+    status: {
+      type: DataTypes.ENUM('open','pending','closed'),
+      allowNull: false,
+      defaultValue: "open"
     },
     createdAt: {
       type: DataTypes.DATE(6),

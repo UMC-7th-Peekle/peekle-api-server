@@ -140,13 +140,41 @@ export const deleteLocalFile = async (filePath) => {
   filePath = path.join("uploads", filePath);
   try {
     await fs.promises.unlink(filePath);
-    logger.debug(`[deleteLocalFile] 파일 삭제 성공: ${filePath}`);
+    logger.debug({
+      action: "function:deleteLocalFile",
+      actionType: "success",
+      filePath,
+    });
   } catch (err) {
-    logger.error(
-      `[deleteLocalFile] 파일 삭제 실패: ${filePath} - ${err.message}`
-    );
+    logger.error({
+      action: "function:deleteLocalFile",
+      actionType: "error",
+      filePath,
+      error: err.message,
+    });
   }
 };
 
 export const getStaticFilesUrl = (fileKey) =>
   `${STATIC_FILE_BASE_URL}/${fileKey}`;
+
+export const parseImagePaths = (files) => {
+  // 업로드된 파일이 없는 경우 고려
+  let imagePaths = [];
+  if (files.length > 0) {
+    imagePaths = files.map((file) => {
+      const filePath = file.path.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
+
+      // 디버깅용
+      logger.debug({
+        action: "function:parseImagePaths",
+        message: "업로드된 이미지 경로",
+        filePath,
+      });
+
+      return filePath;
+    });
+  }
+
+  return imagePaths;
+};

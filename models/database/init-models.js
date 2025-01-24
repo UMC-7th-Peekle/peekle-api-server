@@ -11,6 +11,7 @@ import _EventImages from  "./EventImages.js";
 import _EventSchedules from  "./EventSchedules.js";
 import _EventScraps from  "./EventScraps.js";
 import _Events from  "./Events.js";
+import _Logs from  "./Logs.js";
 import _NoticeCategory from  "./NoticeCategory.js";
 import _NoticeImages from  "./NoticeImages.js";
 import _Notices from  "./Notices.js";
@@ -47,6 +48,7 @@ export default function initModels(sequelize) {
   const EventSchedules = _EventSchedules.init(sequelize, DataTypes);
   const EventScraps = _EventScraps.init(sequelize, DataTypes);
   const Events = _Events.init(sequelize, DataTypes);
+  const Logs = _Logs.init(sequelize, DataTypes);
   const NoticeCategory = _NoticeCategory.init(sequelize, DataTypes);
   const NoticeImages = _NoticeImages.init(sequelize, DataTypes);
   const Notices = _Notices.init(sequelize, DataTypes);
@@ -129,6 +131,8 @@ export default function initModels(sequelize) {
   Users.hasMany(EventScraps, { as: "eventScraps", foreignKey: "userId"});
   Events.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
   Users.hasMany(Events, { as: "events", foreignKey: "createdUserId"});
+  Logs.belongsTo(Users, { as: "user", foreignKey: "userId"});
+  Users.hasMany(Logs, { as: "logs", foreignKey: "userId"});
   Notices.belongsTo(Users, { as: "author", foreignKey: "authorId"});
   Users.hasMany(Notices, { as: "notices", foreignKey: "authorId"});
   Peekling.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
@@ -149,10 +153,10 @@ export default function initModels(sequelize) {
   Users.hasMany(UserFilters, { as: "userFilters", foreignKey: "userId"});
   UserOauth.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserOauth, { as: "userOauths", foreignKey: "userId"});
-  UserRestrictions.belongsTo(Users, { as: "user", foreignKey: "userId"});
-  Users.hasMany(UserRestrictions, { as: "userRestrictions", foreignKey: "userId"});
   UserRestrictions.belongsTo(Users, { as: "adminUser", foreignKey: "adminUserId"});
-  Users.hasMany(UserRestrictions, { as: "adminUserUserRestrictions", foreignKey: "adminUserId"});
+  Users.hasMany(UserRestrictions, { as: "userRestrictions", foreignKey: "adminUserId"});
+  UserRestrictions.belongsTo(Users, { as: "user", foreignKey: "userId"});
+  Users.hasMany(UserRestrictions, { as: "userUserRestrictions", foreignKey: "userId"});
   UserRoles.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserRoles, { as: "userRoles", foreignKey: "userId"});
   UserTerms.belongsTo(Users, { as: "user", foreignKey: "userId"});
@@ -170,6 +174,7 @@ export default function initModels(sequelize) {
     EventSchedules,
     EventScraps,
     Events,
+    Logs,
     NoticeCategory,
     NoticeImages,
     Notices,

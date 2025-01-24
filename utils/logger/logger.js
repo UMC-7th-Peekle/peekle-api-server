@@ -1,49 +1,68 @@
 import winston from "winston";
-const { format } = winston;
-const { combine, timestamp, printf } = format;
+import fs from "fs";
+import path from "path";
 
-// 함수명 트래킹을 위한 커스텀 포맷
-const customFormat = printf(({ level, message, timestamp, stack }) => {
-  const functionName = stack ? stack.split("\n")[1].trim() : "N/A"; // 스택에서 함수명 추출
-  return `${timestamp} [${level}] [${functionName}]: ${message}`;
-});
+// import { createClient } from "redis";
+// import config from "../../config.json" with { type: "json" };
+// const { REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD } =
+//   config.DATABASE.REDIS;
+
+const { format } = winston;
+const { combine, timestamp, errors, json, prettyPrint } = format;
+
+// 로그 파일 디렉토리 설정
+const logDirectory = "./logs/winston";
+if (!fs.existsSync(logDirectory)) {
+  fs.mkdirSync(logDirectory); // 디렉토리가 없으면 생성
+}
+
+// const redisClient = createClient({
+//   url: `redis://${REDIS_USER}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}`,
+//   socket: {
+//     reconnectStrategy: (retries) => {
+//       if (retries > 10) {
+//         return new Error("Redis 연결 재시도 한도 초과");
+//       }
+//       return Math.min(retries * 50, 2000);
+//     },
+//   },
+// });
 
 // 로거 설정
 const logger = winston.createLogger({
-  level: "silly", // 기본 로그 레벨: 가장 낮은 수준의 로그까지 모두 기록
+  level: "silly", // 기본 로그 레벨: 가장 낮은 수준까지 기록
   format: combine(
-    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // 타임스탬프 형식 지정
-    winston.format.errors({ stack: true }), // 스택 트레이스 추가
-    customFormat // 커스텀 포맷 적용
+    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // 타임스탬프 추가
+    errors({ stack: true }), // 에러 스택 트레이스 추가
+    json() // JSON 포맷으로 기록
   ),
   transports: [
-    // 각 로그 레벨별로 다른 파일에 기록
+    // 각 로그 레벨별로 JSON 파일 저장
     new winston.transports.File({
-      filename: "./logs/error.winston.log",
+      filename: path.join(logDirectory, "error.log"),
       level: "error", // ERROR 레벨 로그만 기록
     }),
     new winston.transports.File({
-      filename: "./logs/warn.winston.log",
+      filename: path.join(logDirectory, "warn.log"),
       level: "warn", // WARN 레벨 로그만 기록
     }),
     new winston.transports.File({
-      filename: "./logs/info.winston.log",
+      filename: path.join(logDirectory, "info.log"),
       level: "info", // INFO 레벨 로그만 기록
     }),
     new winston.transports.File({
-      filename: "./logs/debug.winston.log",
+      filename: path.join(logDirectory, "debug.log"),
       level: "debug", // DEBUG 레벨 로그만 기록
     }),
     // 모든 로그를 기록하는 파일
     new winston.transports.File({
-      filename: "./logs/combined.winston.log",
+      filename: path.join(logDirectory, "combined.log"),
     }),
-    // 콘솔에 모든 로그 출력
+    // 콘솔에 JSON 형태로 출력 (개발 시 유용)
     new winston.transports.Console({
       format: combine(
-        timestamp(),
-        winston.format.colorize(), // 콘솔 로그에 색상 추가
-        customFormat
+        timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // 타임스탬프 추가
+        prettyPrint({ colorize: true }) // JSON 포맷을 사람이 읽기 쉬운 형태로 콘솔 출력
       ),
     }),
   ],
@@ -59,4 +78,4 @@ const logger = winston.createLogger({
  * - silly: 가장 낮은 수준의 로그. 매우 상세한 정보를 기록할 때 사용.
  */
 
-export default logger; // 다른 모듈에서 사용 가능하도록 내보내기
+export default logger;

@@ -21,7 +21,7 @@ export default class Tickets extends Model {
     },
     createdUserId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'users',
         key: 'user_id'

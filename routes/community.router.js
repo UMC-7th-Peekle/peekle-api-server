@@ -54,7 +54,7 @@ router.post(
   }),
   // validator는 body를 검증하기에 순서에 유의
   // form-data의 경우 multer가 body에 채워주는 것임
-  validate(articleValidator.postArticleSchema),
+  validate(articleValidator.postArticleSchema, true),
   articleCrudController.createArticle
 );
 
@@ -69,7 +69,7 @@ router.patch(
   }),
   // validator는 body를 검증하기에 순서에 유의
   // form-data의 경우 multer가 body에 채워주는 것임
-  validate(articleValidator.patchArticleSchema),
+  validate(articleValidator.patchArticleSchema, true),
   articleCrudController.updateArticle
 );
 

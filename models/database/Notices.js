@@ -13,7 +13,7 @@ export default class Notices extends Model {
     },
     categoryId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'notice_category',
         key: 'category_id'
@@ -22,7 +22,7 @@ export default class Notices extends Model {
     },
     authorId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'users',
         key: 'user_id'

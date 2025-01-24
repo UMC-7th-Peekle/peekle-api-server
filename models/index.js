@@ -13,7 +13,12 @@ const sequelize = new Sequelize(
     host: DATABASE.MYSQL_HOST,
     port: DATABASE.MYSQL_PORT,
     dialect: "mysql",
-    logging: (msg) => logger.debug(`[Sequelize Log]: ${msg} ✨`),
+    logging: (msg) =>
+      logger.debug({
+        action: "sequelize:query",
+        actionType: "log ✨",
+        message: msg,
+      }),
     // timezone: "+09:00",
     pool: {
       max: 10, // 최대 연결 수
