@@ -208,7 +208,7 @@ export const updateArticle = async ({
 export const deleteArticle = async ({ communityId, articleId, authorId }) => {
   // 게시글 검색
   const article = await models.Articles.findOne({
-    where: {
+    where: { 
       communityId,
       articleId,
     },

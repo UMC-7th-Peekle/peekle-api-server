@@ -12,9 +12,6 @@ export const getArticleById = async (req, res, next) => {
       articleId,
     }); // 게시글 조회
 
-    // TODO : article과 comment의 depth가 달라요, 이름도 명확하지 않고요.
-    // service 단도 TODO 남겨드렸으니, 수정하면서 이 부분도
-    // 동일한 depth로 return 하는 것으로 수정해주세요.
 
     // 게시글이 존재하는 경우
     return res.status(200).success({
@@ -54,25 +51,7 @@ export const createArticle = async (req, res, next) => {
 
     // TODO: 사진 업로드 안 되었을 시 적용할 transaction 처리
 
-    // 이미지 파일 처리
-    if (req.files && req.files.images) {
-      // 필드명은 uploader.js와 통일
-      const imageFiles = req.files.images;
-
-      const imageRecords = imageFiles.map((image) => ({
-        articleId: article.articleId, // 게시글 ID와 연계
-        imageUrl: image.location, // 업로드된 이미지의 URL (로컬 또는 S3 경로)
-        sequence: 0, // 이미지 순서 (0부터 시작)
-      }));
-
-      logger.debug(
-        `[createArticle] imageRecords: ${JSON.stringify(imageRecords)}`
-      );
-
-      // 이미지 업로드
-      await articleCrudService.createArticleImages(imageRecords); // 이미지 데이터를 DB에 저장
-    }
-
+    
     return res.status(201).success({
       message: "게시글 작성 성공",
     });
