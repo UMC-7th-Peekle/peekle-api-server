@@ -158,7 +158,7 @@ export const deleteLocalFile = async (filePath) => {
 export const getStaticFilesUrl = (fileKey) =>
   `${STATIC_FILE_BASE_URL}/${fileKey}`;
 
-export const getUploadedImagePaths = (files) => {
+export const parseImagePaths = (files) => {
   // 업로드된 파일이 없는 경우 고려
   let imagePaths = [];
   if (files.length > 0) {
@@ -167,7 +167,7 @@ export const getUploadedImagePaths = (files) => {
 
       // 디버깅용
       logger.debug({
-        action: "function:getUploadedImagePaths",
+        action: "function:parseImagePaths",
         message: "업로드된 이미지 경로",
         filePath,
       });

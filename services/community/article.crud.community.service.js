@@ -109,17 +109,25 @@ export const createArticle = async ({
   } catch (error) {
     if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
       // 게시판이 존재하지 않는 경우
-      logger.error(
-        `[createArticle] 존재하지 않는 communityId - ${communityId}`
-      );
-      throw new NotExistsError("해당 게시판이 존재하지 않습니다.");
+      logger.error({
+        layer: "service",
+        action: "article:create",
+        actionType: "error",
+        message: "존재하지 않는 게시판에 게시글을 생성하려 시도했습니다.",
+        data: { communityId },
+      });
+      throw new NotExistsError("존재하지 않는 게시판입니다.");
     }
     throw error;
   }
 
-  logger.debug(
-    `[createArticle] 생성된 게시글 제목: ${article.title}, 생성된 내용: ${article.content}`
-  );
+  logger.debug({
+    layer: "service",
+    action: "article:create",
+    actionType: "success",
+    message: "게시글 생성 완료",
+    data: { ...article.dataValues },
+  });
 
   return { article };
 };

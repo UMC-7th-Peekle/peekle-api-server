@@ -1,7 +1,7 @@
 import * as detailService from "../../services/events/detail.events.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
-import { getUploadedImagePaths } from "../../utils/upload/uploader.object.js";
+import { parseImagePaths } from "../../utils/upload/uploader.object.js";
 
 /**
  * events 테이블 중 주어진 eventId에 해당하는 튜플의 정보를 반환
@@ -35,7 +35,7 @@ export const updateEvent = async (req, res, next) => {
     // 업로드된 파일 정보 추출
     const uploadedFiles = req.files?.event_images || [];
     // 이미지 경로 추가
-    updateData.imagePaths = getUploadedImagePaths(uploadedFiles);
+    updateData.imagePaths = parseImagePaths(uploadedFiles);
 
     logger.debug({
       action: "event:update",

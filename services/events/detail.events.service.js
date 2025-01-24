@@ -1,7 +1,11 @@
 import path from "path";
 import fs from "fs/promises";
 import models from "../../models/index.js";
-import { NotExistsError, NotAllowedError } from "../../utils/errors/errors.js";
+import {
+  NotExistsError,
+  NotAllowedError,
+  InvalidInputError,
+} from "../../utils/errors/errors.js";
 import logger from "../../utils/logger/logger.js";
 import { deleteLocalFile } from "../../utils/upload/uploader.object.js";
 
@@ -48,18 +52,6 @@ export const detailEvent = async (eventId) => {
 
 // 이벤트 내용 수정
 export const updateEvent = async (eventId, userId, updateData) => {
-  const {
-    title,
-    content,
-    price,
-    categoryId,
-    location,
-    eventUrl,
-    applicationStart,
-    applicationEnd,
-    imagePaths = [],
-  } = updateData;
-
   try {
     const event = await models.Events.findByPk(eventId);
 
@@ -108,30 +100,74 @@ export const updateEvent = async (eventId, userId, updateData) => {
     });
 
     // 이미지가 새로 들어온 경우에만 처리
-    if (imagePaths.length > 0) {
+    if (updateData.imagePaths.length > 0) {
       // DB에서 기존 이미지 경로 가져오기
       const existingImages = await models.EventImages.findAll({
         where: { eventId },
-        attributes: ["imageUrl"],
+        attributes: ["imageId", "imageUrl", "sequence"],
+      });
+
+      // DB에 존재하지 않는 Sequence의 이미지를 요청한 경우
+      const validImageCount = updateData.imageSequence.filter(
+        (seq) => seq > 0
+      ).length;
+      if (existingImages.length < validImageCount) {
+        logger.debug({
+          action: "event:image:update",
+          actionType: "error",
+          message: "이미지 개수가 일치하지 않는 요청입니다.",
+          data: {
+            requestedUserId: userId,
+            requestedData: updateData,
+            lengths: {
+              existingImages: existingImages.length,
+              validImageCount,
+            },
+          },
+        });
+        throw new InvalidInputError("잘못된 입력입니다.");
+      }
+
+      console.log(existingImages);
+
+      // 이미지 순서 변경
+      let deletedImages = [];
+      let changedImageIdx = 0;
+      updateData.imageSequence.map(async (seq, idx) => {
+        if (seq === -1) {
+          // 삭제된 이미지
+          deletedImages.push(existingImages[idx].imageUrl);
+          await existingImages[idx].destroy();
+        } else if (seq === -2) {
+          // 새로 추가된 이미지
+          await models.EventImages.create({
+            eventId,
+            imageUrl: updateData.imagePaths[changedImageIdx++],
+            sequence: idx + 1,
+          });
+        } else {
+          // 이미지 순서 변경
+          await existingImages[idx].update({ sequence: seq });
+        }
       });
 
       // 로컬 파일 삭제
-      const deletePromises = existingImages.map((img) => {
-        deleteLocalFile(img.imageUrl);
+      const deletePromises = deletedImages.map((img) => {
+        deleteLocalFile(img);
       });
       await Promise.all(deletePromises);
 
       // 기존 이미지 데이터 삭제
       await models.EventImages.destroy({ where: { eventId } });
 
-      // 새로운 이미지 추가
-      const eventImageData = imagePaths.map((path, index) => ({
-        eventId,
-        imageUrl: path,
-        sequence: index + 1, // 이미지 순서 설정
-      }));
+      // // 새로운 이미지 추가
+      // const eventImageData = imagePaths.map((path, index) => ({
+      //   eventId,
+      //   imageUrl: path,
+      //   sequence: index + 1, // 이미지 순서 설정
+      // }));
 
-      await models.EventImages.bulkCreate(eventImageData);
+      // await models.EventImages.bulkCreate(eventImageData);
 
       logger.debug({
         action: "event:image:update",
@@ -139,7 +175,7 @@ export const updateEvent = async (eventId, userId, updateData) => {
         message: "이미지 업데이트 완료",
         data: {
           requestedUserId: userId,
-          updatedData: imagePaths,
+          updatedData: updateData,
         },
       });
     }
