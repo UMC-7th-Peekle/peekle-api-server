@@ -2,6 +2,11 @@ import winston from "winston";
 import fs from "fs";
 import path from "path";
 
+// import { createClient } from "redis";
+// import config from "../../config.json" with { type: "json" };
+// const { REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD } =
+//   config.DATABASE.REDIS;
+
 const { format } = winston;
 const { combine, timestamp, errors, json, prettyPrint } = format;
 
@@ -10,6 +15,18 @@ const logDirectory = "./logs/winston";
 if (!fs.existsSync(logDirectory)) {
   fs.mkdirSync(logDirectory); // 디렉토리가 없으면 생성
 }
+
+// const redisClient = createClient({
+//   url: `redis://${REDIS_USER}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}`,
+//   socket: {
+//     reconnectStrategy: (retries) => {
+//       if (retries > 10) {
+//         return new Error("Redis 연결 재시도 한도 초과");
+//       }
+//       return Math.min(retries * 50, 2000);
+//     },
+//   },
+// });
 
 // 로거 설정
 const logger = winston.createLogger({

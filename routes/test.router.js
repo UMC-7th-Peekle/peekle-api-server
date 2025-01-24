@@ -8,11 +8,16 @@ import * as uploader from "../middleware/uploader.js";
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 import { validate } from "../middleware/validate.js";
 import { oauthRegisterSchema } from "../utils/validators/auth/auth.validators.js";
+import logger from "../utils/logger/logger.js";
 
 const router = Router();
 
 router.get("/encrypted/:text", (req, res) => {
   const { text } = req.params;
+  logger.silly({
+    message: `[${text}]를 암호화합니다.`,
+    action: "encrypt62",
+  });
   res.status(201).success({
     encrypted: encrypt62(text),
   });

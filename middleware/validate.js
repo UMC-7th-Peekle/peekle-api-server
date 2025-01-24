@@ -2,6 +2,7 @@ import { AjvError } from "../utils/errors/errors.js";
 
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
+import logger from "../utils/logger/logger.js";
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
@@ -11,14 +12,16 @@ addFormats(ajv);
  * @param {Function} schema - 스키마 검증 함수 (예: AJV에서 컴파일된 함수).
  * @returns {Function} - Express 미들웨어 함수.
  */
-export const validate = (schema) => {
+export const validate = (schema, option = false) => {
   return (req, res, next) => {
     const validator = ajv.compile(schema);
-    const isValid = validator(req.body);
+    const data = option ? JSON.parse(req.body.data) : req.body;
+
+    logger.silly(data);
+    const isValid = validator(data);
 
     if (!isValid) {
       const errorDetails = formatErrors(validator.errors);
-      console.log(validator.errors);
       return next(new AjvError("입력 형식이 잘못되었습니다.", errorDetails));
     }
 

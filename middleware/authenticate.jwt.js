@@ -26,9 +26,11 @@ export const authenticateAccessToken = (req, res, next) => {
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
       if (err) {
-        logger.debug(
-          `[authenticateAccessToken] 토큰 검증 실패: ${err.message}`
-        );
+        logger.debug({
+          action: "token:authenticate",
+          actionType: "토큰 검증 실패",
+          message: err.message,
+        });
 
         if (err.name === "TokenExpiredError") {
           next(new TokenError("만료된 토큰입니다."));
