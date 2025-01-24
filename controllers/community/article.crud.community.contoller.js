@@ -87,6 +87,7 @@ export const updateArticle = async (req, res, next) => {
     let imagePaths = [];
     if (uploadedFiles.length > 0) {
       imagePaths = uploadedFiles.map((file) => {
+        console.log(file);
         return file.path.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
       });
     }

@@ -40,16 +40,20 @@ router.get(
   articleCrudController.getArticleById
 );
 
+// TODO : 형식에 맞지 않는 요청의 사진도 우선 업로드가 되는 문제가 발생함
+
 // communityId에 해당하는 게시판에 새로운 게시글을 추가합니다
 router.post(
   "/:communityId/articles",
-  validate(articleValidator.postArticleSchema),
   authenticateAccessToken,
   fileUploadMiddleware.localStorage({
     restrictions: fileUploadMiddleware.restrictions("article"),
     field: [{ name: "article_images", maxCount: 5 }], // `field`에 따라 다중 업로드 설정
     destination: "uploads/articles", // 저장 경로 설정
   }),
+  // validator는 body를 검증하기에 순서에 유의
+  // form-data의 경우 multer가 body에 채워주는 것임
+  validate(articleValidator.postArticleSchema),
   articleCrudController.createArticle
 );
 
@@ -62,6 +66,8 @@ router.patch(
     field: [{ name: "article_images", maxCount: 5 }], // 다중 파일 업로드 설정
     destination: "uploads/articles", // 저장 경로 설정
   }),
+  // validator는 body를 검증하기에 순서에 유의
+  // form-data의 경우 multer가 body에 채워주는 것임
   validate(articleValidator.patchArticleSchema),
   articleCrudController.updateArticle
 );
