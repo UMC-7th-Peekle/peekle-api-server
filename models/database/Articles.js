@@ -21,7 +21,7 @@ export default class Articles extends Model {
     },
     authorId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'users',
         key: 'user_id'
@@ -35,7 +35,7 @@ export default class Articles extends Model {
     },
     communityId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'communities',
         key: 'community_id'

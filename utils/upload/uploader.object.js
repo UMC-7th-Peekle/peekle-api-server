@@ -140,7 +140,7 @@ export const deleteLocalFile = async (filePath) => {
   filePath = path.join("uploads", filePath);
   try {
     await fs.promises.unlink(filePath);
-    logger.debug(`[deleteLocalFile] 파일 삭제 성공: ${filePath}`);
+    logger.debug(`[deleteLocalFile] File Deleted: ${filePath}`);
   } catch (err) {
     logger.error(
       `[deleteLocalFile] 파일 삭제 실패: ${filePath} - ${err.message}`

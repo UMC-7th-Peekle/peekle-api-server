@@ -50,7 +50,7 @@ export default class RefreshTokens extends Model {
         ]
       },
       {
-        name: "refresh_token_users_user_id_fk",
+        name: "refresh_tokens_users_user_id_fk",
         using: "BTREE",
         fields: [
           { name: "user_id" },

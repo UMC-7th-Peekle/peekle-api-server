@@ -22,7 +22,7 @@ export default class EventScraps extends Model {
     },
     userId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'users',
         key: 'user_id'

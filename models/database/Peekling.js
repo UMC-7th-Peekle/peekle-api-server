@@ -35,7 +35,7 @@ export default class Peekling extends Model {
     },
     categoryId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'peekling_category',
         key: 'category_id'
@@ -44,7 +44,7 @@ export default class Peekling extends Model {
     },
     createdUserId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'users',
         key: 'user_id'
