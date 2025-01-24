@@ -37,7 +37,6 @@ export const getArticleById = async ({ communityId, articleId }) => {
     throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
   }
 
-  
   // 게시글 데이터와 댓글 데이터를 분리
   const { articleComments, articleImages, ...articleData } =
     articleWithComments.toJSON();
@@ -45,7 +44,7 @@ export const getArticleById = async ({ communityId, articleId }) => {
   // STATIC_FILE_BASE_URL 추가
   const transformedImages = articleImages.map((image) => ({
     ...image,
-    imageUrl: addBaseUrl(image.imageUrl), 
+    imageUrl: addBaseUrl(image.imageUrl),
   }));
 
   // 결과 반환
@@ -77,9 +76,11 @@ export const createArticle = async ({
   // 게시글 생성
   let article;
   let articleImageData;
-  /*try-catch 블록 외부에서 article 선언
-  try-catch 블록 내부에서 article을 생성하고 반환하면
-  "article is not defined" 에러가 발생합니다.
+
+  /*
+    try-catch 블록 외부에서 article 선언
+    try-catch 블록 내부에서 article을 생성하고 반환하면
+    "article is not defined" 에러가 발생합니다.
   */
 
   try {
@@ -98,9 +99,10 @@ export const createArticle = async ({
         imageUrl: path,
         sequence: index + 1, // 이미지 순서 설정
       }));
-    }
 
-    await models.ArticleImages.bulkCreate(articleImageData);
+      // 없는 경우 bulkCreate가 되지 않음 -> if문 안으로 이동
+      await models.ArticleImages.bulkCreate(articleImageData);
+    }
   } catch (error) {
     if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
       // 게시판이 존재하지 않는 경우
@@ -215,7 +217,7 @@ export const updateArticle = async ({
 export const deleteArticle = async ({ communityId, articleId, authorId }) => {
   // 게시글 검색
   const article = await models.Articles.findOne({
-    where: { 
+    where: {
       communityId,
       articleId,
     },
@@ -247,7 +249,7 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
 
   // 로컬 파일 삭제
   const deletePromises = existingImages.map(async (img) => {
-    const filePath = path.join("uploads", img.imageUrl.replace(/^/, ""));  // 경로에 uploads/ 추가
+    const filePath = path.join("uploads", img.imageUrl.replace(/^/, "")); // 경로에 uploads/ 추가
     try {
       await fs.unlink(filePath); // 로컬 파일 삭제
       logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
