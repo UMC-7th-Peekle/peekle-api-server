@@ -28,7 +28,7 @@ router.patch("/:eventId", authMiddleware.authenticateAccessToken,
   fileUploadMiddleware.localStorage({
     restrictions: fileUploadMiddleware.restrictions("article"),
     field: [{ name: "article_images", maxCount: 5 }],
-    destination: "upload/articles",
+    destination: "uploads/articles",
   }),
   detailEventController.updateEvent);    // 이벤트 상세정보 수정
 

@@ -91,20 +91,9 @@ export const updateEvent = async (eventId, userId, updateData) => {
       });
 
       // 로컬 파일 삭제
-      const deletePromises = existingImages.map(async (img) => {
-        const filePath = path.join("uploads", img.imageUrl.replace(/^/, "")); // 경로에 uploads 추가
-        try {
-          await fs.unlink(filePath); // 로컬 파일 삭제
-          logger.debug(`[updateArticle] 파일 삭제 성공: ${filePath}`);
-        } catch (err) {
-          logger.error(
-            `[updateArticle] 파일 삭제 실패: ${filePath} - ${err.message}`
-          );
-        }
+      const deletePromises = existingImages.map((img) => {
+        deleteLocalFile(img.imageUrl)
       });
-
-      // 모든 파일 삭제 완료 대기
-      await Promise.all(deletePromises);
 
       // 기존 이미지 데이터 삭제
       await models.EventImages.destroy({ where: { eventId } });
@@ -119,7 +108,7 @@ export const updateEvent = async (eventId, userId, updateData) => {
       await models.EventImages.bulkCreate(eventImageData);
     }
 
-    return event;
+    return { event };
   } catch (error) {
     throw error;
   }
