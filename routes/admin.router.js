@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { notImplementedController } from "../controllers/empty.cotroller.js";
+import * as reportListController from "../controllers/admin/report.list.admin.controller.js";
+import * as reportManageController from "../controllers/admin/report.manage.admin.controller.js";
 
 const router = Router();
 
@@ -13,9 +15,8 @@ router.delete("/users/status", notImplementedController);
 /*
   접수된 신고사항 조회
 */
-router.get("/reports/user", notImplementedController);
-router.get("/reports/article", notImplementedController);
-router.get("/reports/comment", notImplementedController);
+router.get("/reports", notImplementedController);
+
 
 /*
   약관 관리
