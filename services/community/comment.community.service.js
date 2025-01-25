@@ -68,7 +68,6 @@ export const updateComment = async ({
     where: {
       articleId,
       commentId,
-      authorId,
     },
   });
 
@@ -107,7 +106,6 @@ export const deleteComment = async ({
     where: {
       articleId,
       commentId,
-      authorId,
     },
   });
 
