@@ -1,8 +1,5 @@
 // Description: 게시글 목록 조회를 위한 서비스 파일입니다.
-import {
-  InvalidInputError,
-  NotExistsError,
-} from "../../utils/errors/errors.js";
+import { NotExistsError } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Op } from "sequelize";
