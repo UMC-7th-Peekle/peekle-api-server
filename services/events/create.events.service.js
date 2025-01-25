@@ -21,19 +21,25 @@ export const newEvent = async (userId, eventData) => {
     throw new InvalidInputError("게시글 제목 또는 내용이 누락되었습니다.");
   }
 
+  // 트랙잭션 시작
+  const transaction = await models.sequelize.transaction();
+
   try {
     // 이벤트 생성
-    const event = await models.Events.create({
-      title,
-      content,
-      price,
-      categoryId,
-      location,
-      eventUrl,
-      createdUserId: userId,
-      applicationStart,
-      applicationEnd,
-    });
+    const event = await models.Events.create(
+      {
+        title,
+        content,
+        price,
+        categoryId,
+        location,
+        eventUrl,
+        createdUserId: userId,
+        applicationStart,
+        applicationEnd,
+      },
+      { transaction }
+    );
 
     // 이미지가 새로 들어온 경우에만 처리
     if (imagePaths.length > 0) {
@@ -44,7 +50,7 @@ export const newEvent = async (userId, eventData) => {
         sequence: index + 1, // 이미지 순서 설정
       }));
 
-      await models.EventImages.bulkCreate(eventImageData);
+      await models.EventImages.bulkCreate(eventImageData, { transaction });
     }
 
     // 해당 이벤트 스케줄 부분 튜플 생성
@@ -55,10 +61,15 @@ export const newEvent = async (userId, eventData) => {
       eventId: event.eventId,
     }));
 
-    await models.EventSchedules.bulkCreate(eventSchedules);
+    await models.EventSchedules.bulkCreate(eventSchedules, { transaction });
+
+    // 트랜잭션 커밋
+    await transaction.commit();
 
     return event;
   } catch (error) {
+    // 트랜잭션 롤백
+    await transaction.rollback();
     throw error;
   }
 };
