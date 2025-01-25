@@ -2,6 +2,7 @@ import { Router } from "express";
 import { notImplementedController } from "../controllers/empty.cotroller.js";
 import * as reportListController from "../controllers/admin/report.list.admin.controller.js";
 import * as reportManageController from "../controllers/admin/report.manage.admin.controller.js";
+import * as authenticatMiddleware from "../middleware/authenticate.jwt.js";
 
 const router = Router();
 
@@ -15,8 +16,11 @@ router.delete("/users/status", notImplementedController);
 /*
   접수된 신고사항 조회
 */
-router.get("/reports", notImplementedController);
-
+router.get(
+  "/reports",
+  authenticatMiddleware.authenticateAccessToken,
+  reportListController.getReports
+);
 
 /*
   약관 관리
