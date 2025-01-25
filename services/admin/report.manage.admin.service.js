@@ -1,5 +1,8 @@
 // Description: 관리자 페이지에서 신고를 처리하는 서비스 파일입니다.
-import { NotExistsError, AlreadyExistsError } from "../../utils/errors/errors.js";
+import {
+  NotExistsError,
+  AlreadyExistsError,
+} from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Op } from "sequelize";
@@ -14,7 +17,7 @@ export const getPenalizedUsers = async ({ limit, cursor = null }) => {
       ...(cursor && { userRestrictionId: { [Op.lt]: cursor } }), // 커서 조건: userRestrictionId 기준
     },
     order: [["createdAt", "DESC"]], // 최신순 정렬
-    limit: limit + 1, // 조회 개수 제한 
+    limit: limit + 1, // 조회 개수 제한
   });
 
   // 다음 커서 설정
@@ -44,7 +47,7 @@ export const penalizeUser = async ({
   const restrictionExists = await models.UserRestrictions.findOne({
     where: {
       userId,
-      type: { [Op.in]: ['suspend', 'ban'] }, // 일시 정지나 영구 정지인 경우
+      type: { [Op.in]: ["suspend", "ban"] }, // 일시 정지나 영구 정지인 경우
       endsAt: { [Op.or]: [null, { [Op.gt]: new Date() }] }, // 종료일이 없거나 종료일이 현재 시간 이후인 경우
     },
   }); // 이 경우 현재 유효한 제재가 있는 상태
@@ -69,8 +72,6 @@ export const penalizeUser = async ({
     throw error;
   }
 
-  
-
   return;
 };
 
@@ -79,12 +80,29 @@ export const penalizeUser = async ({
  */
 
 export const unpenalizeUser = async ({ userId }) => {
-  // 사용자 제재 해제
-  await models.PenalizedUsers.destroy({
+  // userId에 해당하는 유효한 userRestrictionId 찾기
+  const restriction = await models.UserRestrictions.findOne({
     where: {
       userId,
+      type: { [Op.in]: ["suspend", "ban"] }, // suspend 또는 ban 상태
+      endsAt: { [Op.or]: [null, { [Op.gt]: new Date() }] }, // 유효한 제재
     },
   });
 
-  return;
+  // 유효한 제재가 없을 경우 에러 처리
+  if (!restriction) {
+    throw new NotExistsError("해당 사용자에게 유효한 제재가 없습니다.");
+  }
+
+  // 찾은 userRestrictionId를 기준으로 type을 'cancelled'로 업데이트
+  await models.UserRestrictions.update(
+    {
+      type: "cancelled",
+    },
+    {
+      where: {
+        userRestrictionId: restriction.userRestrictionId,
+      },
+    }
+  );
 };
