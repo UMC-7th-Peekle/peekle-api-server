@@ -1,5 +1,5 @@
 // Description: 커뮤니티의 게시글에 대한 집계를 다루는 서비스 파일입니다.
-import { InvalidInputError } from "../../utils/errors/errors.js";
+import { InvalidInputError, NotExistsError } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Sequelize } from "sequelize";
@@ -8,6 +8,12 @@ import { Sequelize } from "sequelize";
  * 인기 게시글을 조회합니다
  */
 export const getPopularArticles = async (communityId, startTime, endTime) => {
+  // 커뮤니티 존재 여부 확인
+  const communityExists = await models.Communities.findOne({ where: { communityId } });
+
+  if (!communityExists) {
+    throw new NotExistsError("해당 커뮤니티가 존재하지 않습니다."); // 404
+}
   // 인기 게시글 조회 쿼리
   const popularArticles = await models.Articles.findAll({
     where: {
