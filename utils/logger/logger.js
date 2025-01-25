@@ -3,8 +3,6 @@ import "winston-mongodb"; // winston-mongodb 패키지 임포트
 
 import fs from "fs";
 import path from "path";
-
-import { MongoClient } from "mongodb";
 import config from "../../config.json" with { type: "json" };
 const {
   MONGODB_USER,
