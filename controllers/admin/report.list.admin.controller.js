@@ -1,5 +1,4 @@
 // Description: 관리자 페이지에서 신고 목록을 조회하는 컨트롤러 파일입니다.
-import { authenticateAccessToken } from "../../middleware/authenticate.jwt.js";
 import * as reportListService from "../../services/admin/report.list.admin.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
@@ -11,7 +10,6 @@ import logger from "../../utils/logger/logger.js";
 export const getReports = async (req, res, next) => {
   try {
     // 사용자 인증 확인
-    const userId = req.user.userId; // JWT에서 사용자 ID 추출
     const { type, limit, cursor } = req.query; // 쿼리 파라미터에서 type, limit, cursor 추출 
 
     // 페이지네이션 기본값 설정

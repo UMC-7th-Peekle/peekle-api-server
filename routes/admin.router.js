@@ -9,9 +9,21 @@ const router = Router();
 /* 
   사용자 제재
 */
-router.get("/users/status", notImplementedController);
-router.post("/users/status", notImplementedController);
-router.delete("/users/status", notImplementedController);
+router.get(
+  "/users/status",
+  authenticatMiddleware.authenticateAccessToken,
+  reportManageController.getPenalizedUsers
+);
+router.post(
+  "/users/status",
+  authenticatMiddleware.authenticateAccessToken,
+  reportManageController.penalizeUser
+);
+router.delete(
+  "/users/status",
+  authenticatMiddleware.authenticateAccessToken,
+  reportManageController.unpenalizeUser
+);
 
 /*
   접수된 신고사항 조회
