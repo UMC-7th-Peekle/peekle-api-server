@@ -1,32 +1,41 @@
 import winston from "winston";
+import "winston-mongodb"; // winston-mongodb 패키지 임포트
+
 import fs from "fs";
 import path from "path";
 
-// import { createClient } from "redis";
-// import config from "../../config.json" with { type: "json" };
-// const { REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD } =
-//   config.DATABASE.REDIS;
+import { MongoClient } from "mongodb";
+import config from "../../config.json" with { type: "json" };
+const {
+  MONGODB_USER,
+  MONGODB_PASSWORD,
+  MONGODB_HOST,
+  MONGODB_PORT,
+  MONGODB_DATABASE,
+} = config.DATABASE.MONGODB;
+const MONGO_URI = `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}`;
 
 const { format } = winston;
 const { combine, timestamp, errors, json, prettyPrint } = format;
+
+// const client = new MongoClient(MONGO_URI, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// });
+// await client.connect();
+
+const mongoTransportOptions = {
+  db: MONGO_URI,
+  dbName: MONGODB_DATABASE,
+  level: "silly",
+  collection: "peekle_logs",
+};
 
 // 로그 파일 디렉토리 설정
 const logDirectory = "./logs/winston";
 if (!fs.existsSync(logDirectory)) {
   fs.mkdirSync(logDirectory); // 디렉토리가 없으면 생성
 }
-
-// const redisClient = createClient({
-//   url: `redis://${REDIS_USER}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}`,
-//   socket: {
-//     reconnectStrategy: (retries) => {
-//       if (retries > 10) {
-//         return new Error("Redis 연결 재시도 한도 초과");
-//       }
-//       return Math.min(retries * 50, 2000);
-//     },
-//   },
-// });
 
 // 로거 설정
 const logger = winston.createLogger({
@@ -37,6 +46,8 @@ const logger = winston.createLogger({
     json() // JSON 포맷으로 기록
   ),
   transports: [
+    // MongoDB로 로그 전송
+    new winston.transports.MongoDB(mongoTransportOptions),
     // 각 로그 레벨별로 JSON 파일 저장
     new winston.transports.File({
       filename: path.join(logDirectory, "error.log"),
