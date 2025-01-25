@@ -96,3 +96,18 @@ export const getTerms = async (req, res, next) => {
     next(error);
   }
 };
+
+export const checkNicknameUnique = async (req, res, next) => {
+  try {
+    const { nickname } = req.query;
+
+    await registerService.checkNicknameUnique(nickname);
+
+    return res.status(200).success({
+      message: "사용 가능한 닉네임 입니다.",
+    });
+  } catch (error) {
+    logError(error);
+    next(error);
+  }
+};

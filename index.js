@@ -67,7 +67,10 @@ app.use(errorHandler);
 const server = http.createServer(app);
 
 server.listen(PORT, "0.0.0.0", () => {
-  logger.info(`Server is running on PORT ${PORT}`);
+  logger.info(`Server is running on PORT ${PORT}`, {
+    action: "server:start",
+    actionType: "log ✨",
+  });
 });
 
 // 상단에 socket.io import 주석을 해제하고 사용하시면 됩니다.

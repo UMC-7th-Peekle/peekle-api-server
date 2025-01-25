@@ -1,4 +1,5 @@
 import models from "../../models/index.js";
+import { AlreadyExistsError } from "../../utils/errors/errors.js";
 import logger from "../../utils/logger/logger.js";
 const { sequelize } = models;
 
@@ -98,4 +99,27 @@ export const getTerms = async () => {
   const terms = await models.Terms.findAll();
 
   return terms;
+};
+
+export const checkNicknameUnique = async (nickname) => {
+  const user = await models.Users.findOne({
+    where: {
+      nickname,
+    },
+  });
+
+  logger.debug("닉네임 중복확인", {
+    action: "register:checkNicknameUnique",
+    actionType: "log",
+    data: {
+      nickname,
+      isUnique: !user,
+    },
+  });
+
+  if (user) {
+    throw new AlreadyExistsError("이미 사용 중인 닉네임입니다.");
+  }
+
+  return;
 };
