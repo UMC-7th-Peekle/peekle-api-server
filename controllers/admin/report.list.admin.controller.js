@@ -2,6 +2,7 @@
 import { authenticateAccessToken } from "../../middleware/authenticate.jwt.js";
 import * as reportListService from "../../services/admin/report.list.admin.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
+import logger from "../../utils/logger/logger.js";
 
 
 // TODO: admin 사용자 검증 로직 추가
@@ -30,6 +31,14 @@ export const getReports = async (req, res, next) => {
     }
 
     // 신고가 있는 경우
+    logger.debug("신고 목록 조회", {
+      action: "report: getReports",
+      actionType: "success",
+      reportsCount: reports.length,
+      nextCursor,
+      hasNextPage,
+    });
+
     return res.status(200).success({
       message: "신고 목록 조회 성공",
       reports,
