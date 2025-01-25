@@ -14,10 +14,9 @@ const sequelize = new Sequelize(
     port: DATABASE.MYSQL_PORT,
     dialect: "mysql",
     logging: (msg) =>
-      logger.debug({
+      logger.debug(msg, {
         action: "sequelize:query",
         actionType: "log ✨",
-        message: msg,
       }),
     // timezone: "+09:00",
     pool: {

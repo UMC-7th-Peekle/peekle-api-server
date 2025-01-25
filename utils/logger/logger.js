@@ -27,6 +27,9 @@ const mongoTransportOptions = {
   dbName: MONGODB_DATABASE,
   level: "silly",
   collection: "peekle_logs",
+  label: true,
+  storeHost: true,
+  tryReconnect: true,
 };
 
 // 로그 파일 디렉토리 설정
