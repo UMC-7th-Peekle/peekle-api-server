@@ -167,3 +167,12 @@ export class NotVerifiedError extends CustomError {
     super(reason, "NOT_VERIFIED", 401, data);
   }
 }
+
+/**
+ * 올바르지 않은 쿼리문일 경우
+ */
+export class InvalidQueryError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "INVALID_QUERY", 400, data);
+  }
+}

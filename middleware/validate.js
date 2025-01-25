@@ -17,7 +17,7 @@ export const validate = (schema, option = false) => {
     const validator = ajv.compile(schema);
     const data = option ? JSON.parse(req.body.data) : req.body;
 
-    logger.silly(data);
+    // logger.silly(data);
     const isValid = validator(data);
 
     if (!isValid) {

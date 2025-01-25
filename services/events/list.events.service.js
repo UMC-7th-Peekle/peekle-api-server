@@ -19,10 +19,12 @@ export const listEvent = async (category = "all", paginationOptions) => {
     whereCategory = { name: category }; // 카테고리 이름으로 필터링
   }
 
+  // TODO : category Id로 filtering 해도 되지 않을까 하는 생각
+
   const events = await models.Events.findAll({
-    where: whereCursor,   // 커서 기준 조건 추가
-    limit: limit + 1,     // 다음 페이지 존재 여부 확인을 위해 하나 더 조회
-    order: [['eventId', 'DESC']],
+    where: whereCursor, // 커서 기준 조건 추가
+    limit: limit + 1, // 다음 페이지 존재 여부 확인을 위해 하나 더 조회
+    order: [["eventId", "DESC"]],
 
     attributes: { exclude: ["categoryId", "createdUserId"] },
     include: [

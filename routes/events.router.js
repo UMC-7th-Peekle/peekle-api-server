@@ -14,7 +14,7 @@ import { validate } from "../middleware/validate.js";
 const router = Router();
 
 // 이벤트 조회
-router.get("/", listEventController.listEvent); // 이벤트 목록 조회
+router.get("/", listEventController.listEvent);
 
 // 이벤트 생성
 router.post(
@@ -27,7 +27,7 @@ router.post(
   }),
   validate(eventValidator.postEventSchema, true),
   createEventController.createEvent
-); // 이벤트 생성
+);
 
 // 이벤트 카테고리 조회
 router.get("/category", categoryEventController.eventCategory); // 이벤트 카테고리 조회
