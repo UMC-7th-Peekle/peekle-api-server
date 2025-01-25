@@ -25,6 +25,17 @@ export const getPenalizedUsers = async (req, res, next) => {
     if (penalizedUsers.length === 0) {
       return res.status(204).success();
     }
+
+    // 신고가 있는 경우
+    logger.debug("사용자 제재 내역 조회", {
+      action: "report: getPenalizedUsers",
+      actionType: "success",
+      penalizedUsersCount: penalizedUsers.length,
+      nextCursor,
+      hasNextPage,
+    });
+
+
     // 사용자 제재 내역이 있는 경우
     return res.status(200).success({
       message: "사용자 제재 내역 조회 성공",
@@ -42,11 +53,21 @@ export const getPenalizedUsers = async (req, res, next) => {
 export const penalizeUser = async (req, res, next) => {
   try {
     // TODO: JWT 토큰에서 admin 사용자 ID 추출
+    // 형식 검증은 완료된 상태로 들어온다고 가정 (type, reason, endsAt 등)
     const { userId, type, reason, endsAt } = req.body;
 
     await reportManageService.penalizeUser({
       userId,
       adminUserId: 1, // 임시로 1로 설정
+      type,
+      reason,
+      endsAt,
+    });
+
+    logger.debug("사용자 제재 성공", {
+      action: "report: penalizeUser",
+      actionType: "success",
+      userId,
       type,
       reason,
       endsAt,

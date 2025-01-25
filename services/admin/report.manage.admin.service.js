@@ -1,5 +1,5 @@
 // Description: 관리자 페이지에서 신고를 처리하는 서비스 파일입니다.
-import { NotExistsError } from "../../utils/errors/errors.js";
+import { NotExistsError, AlreadyExistsError } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Op } from "sequelize";
@@ -40,26 +40,36 @@ export const penalizeUser = async ({
   reason,
   endsAt,
 }) => {
-  // 사용자 조회
-  const user = await models.Users.findOne({
+  // 제재 내역 조회
+  const restrictionExists = await models.UserRestrictions.findOne({
     where: {
       userId,
+      type: { [Op.in]: ['suspend', 'ban'] }, // 일시 정지나 영구 정지인 경우
+      endsAt: { [Op.or]: [null, { [Op.gt]: new Date() }] }, // 종료일이 없거나 종료일이 현재 시간 이후인 경우
     },
-  });
-  // FK로 해결?????
+  }); // 이 경우 현재 유효한 제재가 있는 상태
 
-  if (!user) {
-    // 사용자가 존재하지 않는 경우
-    throw new NotExistsError("해당 사용자가 존재하지 않습니다.");
+  // 이미 유효한 제재가 있는 경우
+  if (restrictionExists) {
+    throw new AlreadyExistsError("이미 제재된 사용자입니다.");
   }
 
-  await models.UserRestrictions.create({
-    userId,
-    adminUserId,
-    type,
-    reason,
-    endsAt,
-  });
+  try {
+    await models.UserRestrictions.create({
+      userId,
+      adminUserId,
+      type,
+      reason,
+      endsAt,
+    });
+  } catch (error) {
+    if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
+      throw new NotExistsError("해당 사용자가 존재하지 않습니다.");
+    }
+    throw error;
+  }
+
+  
 
   return;
 };
