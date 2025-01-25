@@ -173,7 +173,7 @@ export const updateArticle = async ({
       `[updateArticle] 잘못된 수정 요청 - 작성자: ${article.authorId}, 요청자: ${authorId}`
     );
 
-    throw new NotAllowedError("게시글 작성자만 삭제할 수 있습니다");
+    throw new NotAllowedError("게시글 작성자만 수정할 수 있습니다");
   }
 
   // 게시글 수정
