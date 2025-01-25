@@ -68,7 +68,6 @@ export const updateComment = async ({
     where: {
       articleId,
       commentId,
-      authorId,
     },
   });
 
@@ -107,7 +106,6 @@ export const deleteComment = async ({
     where: {
       articleId,
       commentId,
-      authorId,
     },
   });
 
@@ -144,23 +142,26 @@ export const createCommentReply = async ({
   // 형식 검증 필요
 
   // 댓글 생성
-
-  const comment = await models.ArticleComments.create({
-    articleId,
-    parentCommentId: commentId,
-    authorId,
-    content,
-    status: "active",
-    isAnonymous,
-  });
-
-  if (!comment) {
-    logger.error(
-      `[createCommentReply] 댓글 생성 실패 - parentCommentId: ${commentId}`
-    );
-
-    throw new NotExistsError("댓글이 존재하지 않습니다");
+  let comment;
+  try {
+    comment = await models.ArticleComments.create({
+      articleId,
+      parentCommentId: commentId,
+      authorId,
+      content,
+      status: "active",
+      isAnonymous,
+    });
+  } catch (error) {
+    if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
+      logger.error(
+        `[createCommentReply] 해당 댓글이 존재하지 않음 - parentCommentId: ${commentId}`
+      );
+      throw new NotExistsError("해당 댓글이 존재하지 않습니다");
+    }
+    throw error;
   }
+
 
 
   return { comment };
