@@ -12,6 +12,7 @@ const {
   MONGODB_DATABASE,
 } = config.DATABASE.MONGODB;
 const MONGO_URI = `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}`;
+const { SENDER_HOST } = config.LOGGER.TELEGRAM;
 
 const { format } = winston;
 const { combine, timestamp, errors, json, prettyPrint } = format;
@@ -76,6 +77,13 @@ const logger = winston.createLogger({
         timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // 타임스탬프 추가
         prettyPrint({ colorize: true }) // JSON 포맷을 사람이 읽기 쉬운 형태로 콘솔 출력
       ),
+    }),
+    new winston.transports.Http({
+      host: SENDER_HOST,
+      port: 42001,
+      path: "/peekle",
+      method: "POST",
+      json: true,
     }),
   ],
 });
