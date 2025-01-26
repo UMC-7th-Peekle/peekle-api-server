@@ -8,12 +8,24 @@ import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 /**
  * 카테고리별 공지사항 조회
  */
-export const getNoticesByCategory = async ({ categoryId, limit, cursor }) => {};
+export const getNoticesByCategory = async ({ categoryId }) => {
+  // 공지사항 조회
+  const notices = await models.Notices.findAll({
+    where: { categoryId },
+    order: [["createdAt", "DESC"]], // 최신순 정렬
+  });
+
+  return {
+    notices,
+  };
+};
 
 /**
  * 카테고리와 검색어로 공지사항 검색
  */
-export const searchNotices = async ({ category, query, limit, cursor }) => {};
+export const searchNotices = async ({ category, query, limit, cursor }) => {
+  
+};
 
 /**
  * 공지사항 세부 내용 조회

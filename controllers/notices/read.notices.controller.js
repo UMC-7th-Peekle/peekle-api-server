@@ -7,12 +7,9 @@ import logger from "../../utils/logger/logger.js";
 export const getNoticesByCategory = async (req, res, next) => {
   try {
     const { categoryId } = req.params; // URL에서 categoryId 추출
-    const { limit, cursor } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
 
-    const notices = await readNoticesService.getNoticesByCategory({
+    const { notices } = await readNoticesService.getNoticesByCategory({
       categoryId,
-      limit,
-      cursor,
     }); // 카테고리별 공지사항 조회
 
     return res.status(200).success({
@@ -28,13 +25,11 @@ export const getNoticesByCategory = async (req, res, next) => {
 // 카테고리와 검색어로 공지사항 검색
 export const searchNotices = async (req, res, next) => {
   try {
-    const { category, query, limit, cursor } = req.query; // Query에서 category, query, limit, cursor 추출
+    const { category, query } = req.query; // Query에서 category, query, limit, cursor 추출
 
-    const notices = await readNoticesService.searchNotices({
+    const { notices } = await readNoticesService.searchNotices({
       category,
       query,
-      limit,
-      cursor,
     });
 
     return res.status(200).success({
