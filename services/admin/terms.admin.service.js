@@ -22,8 +22,8 @@ export const updateTerm = async ({
     },
   });
 
+  // 약관이 존재하지 않는 경우
   if (!term) {
-    // 약관이 존재하지 않는 경우
     throw new NotExistsError("약관이 존재하지 않습니다");
   }
 
@@ -42,7 +42,23 @@ export const updateTerm = async ({
 /**
  * termId에 해당하는 약관을 삭제합니다.
  */
-export const deleteTerm = async ({ termId }) => {};
+export const deleteTerm = async ({ termId }) => {
+  // 약관 검색
+  const term = await models.Terms.findOne({
+    where: {
+      termId
+    }
+  });
+
+  // 약관이 존재하지 않는 경우
+  if (!term) {
+    throw new NotExistsError("약관이 존재하지 않습니다");
+  }
+
+  await term.destroy();
+
+  return;
+};
 
 /**
  * 약관을 생성합니다.

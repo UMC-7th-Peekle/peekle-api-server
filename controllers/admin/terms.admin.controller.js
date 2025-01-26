@@ -36,7 +36,7 @@ export const deleteTerm = async (req, res, next) => {
 
     await termService.deleteTerm({ termId }); // 약관 삭제
 
-    return res.staus(200).success({
+    return res.status(200).success({
       message: "약관 삭제 성공",
     });
   } catch (error) {
