@@ -23,12 +23,12 @@ router.get("/reports/comment", notImplementedController);
   약관 관리
 */
 router.patch(
-  "/terms/:termid",
+  "/terms/:termId",
   authenticatMiddleware.authenticateAccessToken,
   termController.updateTerm
 );
 router.delete(
-  "/terms/:termid",
+  "/terms/:termId",
   authenticatMiddleware.authenticateAccessToken,
   termController.deleteTerm
 );

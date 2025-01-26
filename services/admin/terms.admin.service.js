@@ -14,7 +14,30 @@ export const updateTerm = async ({
   isRequired,
   status,
   version,
-}) => {};
+}) => {
+  // 약관 조회
+  const term = await models.Terms.findOne({
+    where: {
+      termId,
+    },
+  });
+
+  if (!term) {
+    // 약관이 존재하지 않는 경우
+    throw new NotExistsError("약관이 존재하지 않습니다");
+  }
+
+  // 약관 수정
+  await term.update({
+    title,
+    content,
+    isRequired,
+    status,
+    version,
+  });
+
+  return;
+};
 
 /**
  * termId에 해당하는 약관을 삭제합니다.
