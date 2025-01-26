@@ -1,5 +1,6 @@
 import models from "../../models/index.js";
 import { InvalidInputError } from "../../utils/errors/errors.js";
+import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
 
 // 새로운 이벤트 생성
@@ -60,12 +61,13 @@ export const createEvent = async (userId, eventData) => {
 
     return event;
   } catch (error) {
-    await transaction.rollback();
+    logError(error);
     logger.error("이벤트 생성 실패, Rollback 실행됨.", {
       action: "event:create",
       actionType: "error",
       userId: userId,
     });
+    await transaction.rollback();
     throw error;
   }
 };

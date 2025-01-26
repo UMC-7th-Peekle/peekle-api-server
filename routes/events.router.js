@@ -9,7 +9,7 @@ import * as groupController from "../controllers/events/groups.events.controller
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
 import * as eventValidator from "../utils/validators/events/events.validators.js";
 
-import { validate } from "../middleware/validate.js";
+import { validateRequestBody } from "../middleware/validate.js";
 
 const router = Router();
 
@@ -26,7 +26,7 @@ router.patch(
     field: [{ name: "event_images", maxCount: 5 }],
     destination: "uploads/events",
   }),
-  validate(eventValidator.patchEventSchema, true),
+  validateRequestBody(eventValidator.patchEventSchema, true),
   detailEventController.updateEvent
 );
 
@@ -39,7 +39,7 @@ router.post(
     field: [{ name: "event_images", maxCount: 5 }],
     destination: "uploads/events",
   }),
-  validate(eventValidator.postEventSchema, true),
+  validateRequestBody(eventValidator.postEventSchema, true),
   createEventController.createEvent
 );
 

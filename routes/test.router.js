@@ -6,7 +6,10 @@ import {
 } from "../utils/tokens/create.jwt.tokens.js";
 import * as uploader from "../middleware/uploader.js";
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
-import { validate } from "../middleware/validate.js";
+import {
+  validateContentType,
+  validateRequestBody,
+} from "../middleware/validate.js";
 import { oauthRegisterSchema } from "../utils/validators/auth/auth.validators.js";
 import logger from "../utils/logger/logger.js";
 import { eventLocationGroup } from "../models/seed/location.group.js";
@@ -117,12 +120,18 @@ router.post(
 // Validator test
 router.get(
   "/validator/oauth-register",
-  validate(oauthRegisterSchema),
+  validateRequestBody(oauthRegisterSchema),
   (req, res) => {
     res.status(200).success({
       message: "검증에 성공했습니다.",
     });
   }
 );
+
+router.post("/validator/content-type", validateContentType, (req, res) => {
+  res.status(200).success({
+    message: "검증에 성공했습니다.",
+  });
+});
 
 export default router;
