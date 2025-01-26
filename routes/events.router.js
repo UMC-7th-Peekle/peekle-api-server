@@ -9,7 +9,10 @@ import * as groupController from "../controllers/events/groups.events.controller
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
 import * as eventValidator from "../utils/validators/events/events.validators.js";
 
-import { validateRequestBody } from "../middleware/validate.js";
+import {
+  validateContentType,
+  validateRequestBody,
+} from "../middleware/validate.js";
 
 const router = Router();
 
@@ -20,6 +23,7 @@ router.get("/:eventId", detailEventController.detailEvent); // 이벤트 상세�
 // 이벤트 수정
 router.patch(
   "/:eventId",
+  validateContentType,
   authMiddleware.authenticateAccessToken,
   fileUploadMiddleware.localStorage({
     restrictions: fileUploadMiddleware.restrictions("event"),
@@ -33,6 +37,7 @@ router.patch(
 // 이벤트 생성
 router.post(
   "/",
+  validateContentType,
   authMiddleware.authenticateAccessToken,
   fileUploadMiddleware.localStorage({
     restrictions: fileUploadMiddleware.restrictions("event"),
@@ -49,12 +54,14 @@ router.get("/groups/location", groupController.eventLocation); // 이벤트 지�
 
 // 이벤트 스크랩
 router.post(
-  "/:eventId/scrap",
+  "/scrap",
+  validateRequestBody(eventValidator.scrapEventSchema),
   authMiddleware.authenticateAccessToken,
   scrapEventController.newScrap
 ); // 특정 이벤트 스크랩
 router.delete(
-  "/:eventId/scrap",
+  "/scrap",
+  validateRequestBody(eventValidator.scrapEventSchema),
   authMiddleware.authenticateAccessToken,
   scrapEventController.deleteScrap
 ); // 특정 이벤트를 스크랩 취소
@@ -62,6 +69,7 @@ router.delete(
 // 이벤트 신고하기
 router.post(
   "/report",
+  validateRequestBody(eventValidator.reportEventSchema),
   authMiddleware.authenticateAccessToken,
   reportEventController.newReport
 ); // 특정 이벤트 신고

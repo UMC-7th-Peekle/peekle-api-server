@@ -98,3 +98,22 @@ export const patchEventSchema = {
   required: [],
   additionalProperties: false,
 };
+
+export const scrapEventSchema = {
+  type: "object",
+  properties: {
+    eventId: { type: "number" },
+  },
+  required: ["eventId"],
+  additionalProperties: false,
+};
+
+export const reportEventSchema = {
+  type: "object",
+  properties: {
+    eventId: { type: "number" },
+    reason: { type: "string" },
+  },
+  required: ["eventId", "reason"],
+  additionalProperties: false,
+};
