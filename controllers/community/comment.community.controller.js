@@ -99,7 +99,6 @@ export const createCommentReply = async (req, res, next) => {
   }
 };
 
-
 // 댓글 조회
 export const getComments = async (req, res, next) => {
   try {
@@ -111,7 +110,7 @@ export const getComments = async (req, res, next) => {
     }); // 댓글 조회
 
     if (comments && comments.length === 0) {
-      return res.status(204).success(); // 응답 본문 없이 204 반환
+      return res.status(204).end(); // 응답 본문 없이 204 반환
     }
     return res.status(200).success({
       message: "댓글 조회 성공",
@@ -121,4 +120,4 @@ export const getComments = async (req, res, next) => {
     logError(error);
     next(error); // 에러 핸들러로 전달
   }
-}
+};

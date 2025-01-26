@@ -18,7 +18,7 @@ import {
  */
 export const getArticleById = async ({ communityId, articleId }) => {
   // 게시글 조회 및 댓글 포함
-  const articleWithComments = await models.Articles.findOne({
+  const data = await models.Articles.findOne({
     where: {
       communityId,
       articleId,
@@ -36,7 +36,7 @@ export const getArticleById = async ({ communityId, articleId }) => {
     ],
   });
 
-  if (!articleWithComments) {
+  if (!data) {
     // 게시글이 존재하지 않는 경우
     logger.error(
       `[getArticleById] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
@@ -45,20 +45,20 @@ export const getArticleById = async ({ communityId, articleId }) => {
   }
 
   // 게시글 데이터와 댓글 데이터를 분리
-  const { articleComments, articleImages, ...articleData } =
-    articleWithComments.toJSON();
+  // const { articleComments, articleImages, ...articleData } =
+  //   data;
 
   // STATIC_FILE_BASE_URL 추가
-  const transformedImages = articleImages.map((image) => ({
-    ...image,
+  const transformedImages = data.articleImages.map((image) => ({
     imageUrl: addBaseUrl(image.imageUrl),
+    sequence: image.sequence,
   }));
 
   // 결과 반환
   return {
-    articleData, // 게시글 데이터
+    articleData: data, // 게시글 데이터
     articleImages: transformedImages, // URL이 수정된 이미지 데이터
-    articleComments, // 댓글 데이터
+    articleComments: data.articleComments, // 댓글 데이터
   };
 };
 

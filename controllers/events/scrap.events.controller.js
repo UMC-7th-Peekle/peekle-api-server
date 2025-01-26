@@ -7,7 +7,7 @@ import { logError } from "../../utils/handlers/error.logger.js";
  */
 export const newScrap = async (req, res, next) => {
   try {
-    const { eventId } = req.params;
+    const { eventId } = req.body;
     const { userId } = req.user;
 
     const scrap = await scrapService.newScrap(eventId, userId);
@@ -28,7 +28,7 @@ export const newScrap = async (req, res, next) => {
  */
 export const deleteScrap = async (req, res, next) => {
   try {
-    const { eventId } = req.params;
+    const { eventId } = req.body;
     const { userId } = req.user;
 
     const scrap = await scrapService.deleteScrap(eventId, userId);
