@@ -5,7 +5,7 @@ import * as reportEventController from "../controllers/events/report.events.cont
 import * as detailEventController from "../controllers/events/detail.events.controller.js";
 import * as listEventController from "../controllers/events/list.events.controller.js";
 import * as createEventController from "../controllers/events/create.events.controller.js";
-import * as categoryEventController from "../controllers/events/category.events.controller.js";
+import * as categoryEventController from "../controllers/events/groups.events.controller.js";
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
 import * as eventValidator from "../utils/validators/events/events.validators.js";
 
@@ -30,7 +30,8 @@ router.post(
 );
 
 // 이벤트 카테고리 조회
-router.get("/category", categoryEventController.eventCategory); // 이벤트 카테고리 조회
+router.get("/groups/category", categoryEventController.eventCategory); // 이벤트 카테고리 조회
+router.get("/groups/location", categoryEventController.eventLocation); // 이벤트 지역 조회
 
 // 이벤트 스크랩
 router.get("/:eventId", detailEventController.detailEvent); // 이벤트 상세정보 조회
