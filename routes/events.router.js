@@ -17,19 +17,6 @@ const router = Router();
 router.get("/", listEventController.listEvent);
 router.get("/:eventId", detailEventController.detailEvent); // 이벤트 상세정보 조회
 
-// 이벤트 생성
-router.post(
-  "/",
-  authMiddleware.authenticateAccessToken,
-  fileUploadMiddleware.localStorage({
-    restrictions: fileUploadMiddleware.restrictions("event"),
-    field: [{ name: "event_images", maxCount: 5 }],
-    destination: "uploads/events",
-  }),
-  validate(eventValidator.postEventSchema, true),
-  createEventController.createEvent
-);
-
 // 이벤트 수정
 router.patch(
   "/:eventId",
@@ -41,6 +28,19 @@ router.patch(
   }),
   validate(eventValidator.patchEventSchema, true),
   detailEventController.updateEvent
+);
+
+// 이벤트 생성
+router.post(
+  "/",
+  authMiddleware.authenticateAccessToken,
+  fileUploadMiddleware.localStorage({
+    restrictions: fileUploadMiddleware.restrictions("event"),
+    field: [{ name: "event_images", maxCount: 5 }],
+    destination: "uploads/events",
+  }),
+  validate(eventValidator.postEventSchema, true),
+  createEventController.createEvent
 );
 
 // 이벤트 카테고리 조회
