@@ -1,6 +1,7 @@
 // Description: 약관 관리를 담당하는 컨트롤러 파일입니다.
 import * as termService from "../../services/admin/terms.admin.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
+import logger from "../../utils/logger/logger.js";
 
 // 약관 내용 수정
 export const updateTerm = async (req, res, next) => {
@@ -19,6 +20,12 @@ export const updateTerm = async (req, res, next) => {
       version,
     }); // 약관 내용 수정
 
+    logger.debug("약관 수정", {
+      action: "terms:updateTerm",
+      actionType: "success",
+      termId,
+    });
+
     return res.status(200).success({
       message: "약관 내용 수정 성공",
     });
@@ -35,6 +42,12 @@ export const deleteTerm = async (req, res, next) => {
     const { termId } = req.params; // URL에서 termid 추출
 
     await termService.deleteTerm({ termId }); // 약관 삭제
+
+    logger.debug("약관 삭제", {
+      action: "terms:deleteTerm",
+      actionType: "success",
+      termId,
+    });
 
     return res.status(200).success({
       message: "약관 삭제 성공",
@@ -60,6 +73,11 @@ export const createTerm = async (req, res, next) => {
       version,
     }); // 약관 생성
 
+    logger.debug("약관 생성", {
+      action: "terms:createTerm",
+      actionType: "success",
+    });
+
     return res.status(201).success({
       message: "약관 생성 성공",
     });
@@ -76,6 +94,12 @@ export const getTermById = async (req, res, next) => {
     const { termId } = req.params; // URL에서 termid 추출
 
     const { term } = await termService.getTermById({ termId }); // 약관 내용 조회
+
+    logger.debug("약관 조회", {
+      action: "terms:getTermById",
+      actionType: "success",
+      termId,
+    });
 
     return res.status(200).success({
       message: "약관 내용 조회 성공",
@@ -99,6 +123,12 @@ export const getTerms = async (req, res, next) => {
         message: "생성된 약관이 없습니다",
       });
     }
+
+    logger.debug("약관 목록 조회", {
+      action: "terms:getTerms",
+      actionType: "success",
+      termsCount: terms.length,
+    });
 
     return res.status(200).success({
       message: "약관 목록 조회 성공",
