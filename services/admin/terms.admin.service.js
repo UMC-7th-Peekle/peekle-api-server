@@ -84,7 +84,7 @@ export const createTerm = async ({
 /**
  * termId에 해당하는 약관을 조회합니다.
  */
-export const getTerm = async ({ termId }) => {
+export const getTermById = async ({ termId }) => {
   const term = await models.Terms.findOne({
     where: {
       termId,
@@ -98,3 +98,12 @@ export const getTerm = async ({ termId }) => {
 
   return { term };
 }
+
+/**
+ * 약관 목록을 조회합니다.
+ */
+export const getTerms = async () => {
+  const terms = await models.Terms.findAll();
+
+  return { terms };
+};

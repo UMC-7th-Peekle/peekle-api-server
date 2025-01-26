@@ -44,7 +44,13 @@ router.post(
 router.get(
   "/terms/:termId",
   authenticatMiddleware.authenticateAccessToken,
-  termController.getTerm
+  termController.getTermById
+);
+// 약관 목록을 조회합니다.
+router.get(
+  "/terms",
+  authenticatMiddleware.authenticateAccessToken,
+  termController.getTerms
 );
 
 
