@@ -12,10 +12,7 @@ export const detailEvent = async (req, res, next) => {
 
     const detail = await detailService.detailEvent(eventId);
 
-    if (!detail)
-      return res
-        .status(204)
-        .success({ message: "해당 이벤트의 상세 정보가 비어있습니다." });
+    if (!detail) return res.status(204).end();
 
     return res.status(200).success({ detail });
   } catch (error) {

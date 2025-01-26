@@ -8,8 +8,7 @@ export const eventCategory = async (req, res, next) => {
   try {
     const category = await categoryService.eventCategory();
 
-    if (!category)
-      return res.status(204).success({ message: "카테고리가 비어있습니다." });
+    if (!category) return res.status(204).end();
 
     return res.status(200).success({ category });
   } catch (error) {
@@ -22,8 +21,7 @@ export const eventLocation = async (req, res, next) => {
   try {
     const location = await categoryService.eventLocation();
 
-    if (!location)
-      return res.status(204).success({ message: "위치가 비어있습니다." });
+    if (!location.length) return res.status(204).end();
 
     return res.status(200).success({ location });
   } catch (error) {

@@ -27,9 +27,8 @@ export const listEvent = async (req, res, next) => {
     );
 
     if (!events || events.length === 0) {
-      return res
-        .status(204)
-        .success({ events: [], nextCursor: null, hasNextPage: false });
+      return res.status(204).end();
+      // .success({ events: [], nextCursor: null, hasNextPage: false });
     }
 
     // 200

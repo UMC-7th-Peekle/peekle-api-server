@@ -3,14 +3,13 @@ import * as reportListService from "../../services/admin/report.list.admin.servi
 import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
 
-
 // TODO: admin 사용자 검증 로직 추가
 
 // 신고 목록 조회
 export const getReports = async (req, res, next) => {
   try {
     // 사용자 인증 확인
-    const { type, limit, cursor } = req.query; // 쿼리 파라미터에서 type, limit, cursor 추출 
+    const { type, limit, cursor } = req.query; // 쿼리 파라미터에서 type, limit, cursor 추출
 
     // 페이지네이션 기본값 설정
     const paginationOptions = {
@@ -18,14 +17,12 @@ export const getReports = async (req, res, next) => {
       cursor: cursor || null, // cursor가 없으면 null
     };
 
-    const { reports, nextCursor, hasNextPage } = await reportListService.getReports(
-      type,
-      paginationOptions
-    );
+    const { reports, nextCursor, hasNextPage } =
+      await reportListService.getReports(type, paginationOptions);
 
     // 신고가 없는 경우
     if (reports.length === 0) {
-      return res.status(204).success(); // 응답 본문 없이 204 반환
+      return res.status(204).end(); // 응답 본문 없이 204 반환
     }
 
     // 신고가 있는 경우
