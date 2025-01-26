@@ -26,6 +26,13 @@ export const getNoticesByCategory = async (req, res, next) => {
       return res.status(204).success(); // 응답 본문 없이 204 반환
     }
 
+    logger.debug("공지사항 목록 조회 성공", {
+      action: "notices:getNoticesByCategory",
+      actionType: "success",
+      categoryId,
+      noticesCount: notices.length,
+    });
+
     return res.status(200).success({
       message: "카테고리별 공지사항 조회 성공",
       notices,
@@ -60,6 +67,14 @@ export const searchNotices = async (req, res, next) => {
     if (notices && notices.length === 0) {
       return res.status(204).success(); // 응답 본문 없이 204 반환
     }
+
+    logger.debug("공지사항 검색 성공", {
+      action: "notices:searchNotices",
+      actionType: "success",
+      category,
+      query,
+      noticesCount: notices.length,
+    });
 
     return res.status(200).success({
       message: "공지사항 검색 성공",
