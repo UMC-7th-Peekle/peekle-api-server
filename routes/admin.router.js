@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { notImplementedController } from "../controllers/empty.cotroller.js";
+import * as termsController from "../controllers/admin/terms.admin.controller.js";
+import * as authenticatMiddleware from "../middleware/authenticate.jwt.js";
 
 const router = Router();
 
@@ -20,9 +22,21 @@ router.get("/reports/comment", notImplementedController);
 /*
   약관 관리
 */
-router.patch("/terms/:termsid", notImplementedController);
-router.delete("/terms/:termsid", notImplementedController);
-router.post("/terms", notImplementedController);
+router.patch(
+  "/terms/:termsid",
+  authenticatMiddleware.authenticateAccessToken,
+  termsController.updateTerms
+);
+router.delete(
+  "/terms/:termsid",
+  authenticatMiddleware.authenticateAccessToken,
+  termsController.deleteTerms
+);
+router.post(
+  "/terms",
+  authenticatMiddleware.authenticateAccessToken,
+  termsController.createTerms
+);
 
 /*
   서비스 통계
