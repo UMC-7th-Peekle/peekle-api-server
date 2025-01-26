@@ -281,3 +281,49 @@ export const updateEvent = async (eventId, userId, updateData) => {
     throw error;
   }
 };
+
+export const deleteEvent = async ({ eventId, userId }) => {
+  try {
+    const event = await models.Events.findByPk(eventId);
+
+    if (!event) {
+      logger.warn({
+        action: "event:delete",
+        actionType: "error",
+        message: "존재하지 않는 이벤트에 대한 삭제 요청입니다.",
+        userId: userId,
+      });
+      throw new NotExistsError("존재하지 않는 이벤트입니다.");
+    }
+
+    if (event.createdUserId.toString() !== userId) {
+      logger.warn({
+        action: "event:delete",
+        actionType: "error",
+        message: "권한이 없는 이벤트에 대한 삭제 요청입니다.",
+        data: {
+          authorId: event.createdUserId,
+          requestedUserId: userId,
+        },
+      });
+      throw new NotAllowedError("이벤트 삭제 권한이 없습니다.");
+    }
+
+    // TODO : 로컬에 저장된 이미지 또한 삭제하여야 함
+    await event.destroy();
+
+    logger.debug({
+      action: "event:delete",
+      actionType: "success",
+      message: "이벤트 삭제 완료",
+      data: {
+        requestedUserId: userId,
+        eventId,
+      },
+    });
+
+    return;
+  } catch (error) {
+    throw error;
+  }
+};
