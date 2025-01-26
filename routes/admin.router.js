@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { notImplementedController } from "../controllers/empty.cotroller.js";
+
 import * as termController from "../controllers/admin/terms.admin.controller.js";
+
+import * as reportListController from "../controllers/admin/report.list.admin.controller.js";
+import * as reportManageController from "../controllers/admin/report.manage.admin.controller.js";
+
 import * as authenticatMiddleware from "../middleware/authenticate.jwt.js";
 
 const router = Router();
@@ -8,16 +13,30 @@ const router = Router();
 /* 
   사용자 제재
 */
-router.get("/users/status", notImplementedController);
-router.post("/users/status", notImplementedController);
-router.delete("/users/status", notImplementedController);
+router.get(
+  "/users/status",
+  authenticatMiddleware.authenticateAccessToken,
+  reportManageController.getPenalizedUsers
+);
+router.post(
+  "/users/status",
+  authenticatMiddleware.authenticateAccessToken,
+  reportManageController.penalizeUser
+);
+router.delete(
+  "/users/status",
+  authenticatMiddleware.authenticateAccessToken,
+  reportManageController.unpenalizeUser
+);
 
 /*
   접수된 신고사항 조회
 */
-router.get("/reports/user", notImplementedController);
-router.get("/reports/article", notImplementedController);
-router.get("/reports/comment", notImplementedController);
+router.get(
+  "/reports",
+  authenticatMiddleware.authenticateAccessToken,
+  reportListController.getReports
+);
 
 /*
   약관 관리
