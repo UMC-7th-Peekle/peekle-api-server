@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { notImplementedController } from "../controllers/empty.cotroller.js";
-import * as termsController from "../controllers/admin/terms.admin.controller.js";
+import * as termController from "../controllers/admin/terms.admin.controller.js";
 import * as authenticatMiddleware from "../middleware/authenticate.jwt.js";
 
 const router = Router();
@@ -23,19 +23,19 @@ router.get("/reports/comment", notImplementedController);
   약관 관리
 */
 router.patch(
-  "/terms/:termsid",
+  "/terms/:termid",
   authenticatMiddleware.authenticateAccessToken,
-  termsController.updateTerms
+  termController.updateTerm
 );
 router.delete(
-  "/terms/:termsid",
+  "/terms/:termid",
   authenticatMiddleware.authenticateAccessToken,
-  termsController.deleteTerms
+  termController.deleteTerm
 );
 router.post(
   "/terms",
   authenticatMiddleware.authenticateAccessToken,
-  termsController.createTerms
+  termController.createTerm
 );
 
 /*

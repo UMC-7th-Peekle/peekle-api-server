@@ -1,15 +1,17 @@
 // Description: 약관 관리를 담당하는 컨트롤러 파일입니다.
-import * as termsService from "../../services/admin/terms.admin.service.js";
+import * as termService from "../../services/admin/terms.admin.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 // 약관 내용 수정
-export const updateTerms = async (req, res, next) => {
+export const updateTerm = async (req, res, next) => {
+  // TODO: 형식 검증
+  // TODO: 관리자 검증
   try {
-    const { termsId } = req.params; // URL에서 termsid 추출
+    const { termId } = req.params; // URL에서 termid 추출
     const { title, content, isRequired, status, version } = req.body; // Request body에서 content 추출
 
-    await termsService.updateTerms({
-      termsId,
+    await termService.updateTerm({
+      termId,
       title,
       content,
       isRequired,
@@ -27,11 +29,12 @@ export const updateTerms = async (req, res, next) => {
 };
 
 // 약관 삭제
-export const deleteTerms = async (req, res, next) => {
+export const deleteTerm = async (req, res, next) => {
+  // TODO: 관리자 검증
   try {
-    const { termsId } = req.params; // URL에서 termsid 추출
+    const { termId } = req.params; // URL에서 termid 추출
 
-    await termsService.deleteTerms({ termsId }); // 약관 삭제
+    await termService.deleteTerm({ termId }); // 약관 삭제
 
     return res.staus(200).success({
       message: "약관 삭제 성공",
@@ -43,11 +46,13 @@ export const deleteTerms = async (req, res, next) => {
 };
 
 // 약관 생성
-export const createTerms = async (req, res, next) => {
+export const createTerm = async (req, res, next) => {
+  // TODO: 형식 검증
+  // TODO: 관리자 검증
   try {
     const { title, content, isRequired, status, version } = req.body; // Request body에서 content 추출
 
-    await termsService.createTerms({
+    await termService.createTerm({
       title,
       content,
       isRequired,
