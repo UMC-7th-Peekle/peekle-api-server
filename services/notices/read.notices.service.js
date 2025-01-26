@@ -8,15 +8,29 @@ import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 /**
  * 카테고리별 공지사항 조회
  */
-export const getNoticesByCategory = async ({ categoryId }) => {
+export const getNoticesByCategory = async (categoryId, { limit, cursor = null }) => {
   // 공지사항 조회
   const notices = await models.Notices.findAll({
-    where: { categoryId },
+    where: {
+      categoryId,
+      ...(cursor && { noticeId: { [Op.lt]: cursor } }), // 커서 조건: noticeId 기준
+    },
     order: [["createdAt", "DESC"]], // 최신순 정렬
+    limit: limit + 1,
   });
+
+  // 다음 커서 설정
+  const hasNextPage = notices.length > limit; // limit + 1개를 가져왔으면 다음 페이지 있음
+  const nextCursor = hasNextPage ? notices[limit - 1].noticeId : null;
+
+  if (hasNextPage) {
+    notices.pop(); // limit + 1개를 가져왔으면 마지막 요소는 버림
+  }
 
   return {
     notices,
+    nextCursor,
+    hasNextPage,
   };
 };
 
@@ -25,34 +39,33 @@ export const getNoticesByCategory = async ({ categoryId }) => {
  */
 export const searchNotices = async ({ category, query, limit, cursor }) => {
   const notices = await models.NoticeCategory.findOne({
-      where: { name: category },
-      include: [
-        {
-          model: models.Notices,
-          as: "notices",
-          where: {
-            [Op.or]: [
-              {
-                title: {
-                  [Op.like]: `%${query}%`, // 제목에 검색어 포함
-                },
+    where: { name: category },
+    include: [
+      {
+        model: models.Notices,
+        as: "notices",
+        where: {
+          [Op.or]: [
+            {
+              title: {
+                [Op.like]: `%${query}%`, // 제목에 검색어 포함
               },
-              {
-                content: {
-                  [Op.like]: `%${query}%`, // 내용에 검색어 포함
-                },
+            },
+            {
+              content: {
+                [Op.like]: `%${query}%`, // 내용에 검색어 포함
               },
-            ],
-          },
-          order: [["createdAt", "DESC"]], // 최신순 정렬
-         
+            },
+          ],
         },
-      ],
-    });
+        order: [["createdAt", "DESC"]], // 최신순 정렬
+      },
+    ],
+  });
 
-    return {
-      notices,
-    }
+  return {
+    notices,
+  };
 };
 
 /**

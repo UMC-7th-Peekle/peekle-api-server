@@ -7,14 +7,24 @@ import logger from "../../utils/logger/logger.js";
 export const getNoticesByCategory = async (req, res, next) => {
   try {
     const { categoryId } = req.params; // URL에서 categoryId 추출
+    const { limit, cursor } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
 
-    const { notices } = await readNoticesService.getNoticesByCategory({
+    // 페이지네이션 기본값 설정
+    const paginationOptions = {
+      limit: limit ? parseInt(limit, 10) : 10, // 기본 limit은 10
+      cursor: cursor || null, // cursor가 없으면 null
+    };
+
+    const { notices, nextCursor, hasNextPage } = await readNoticesService.getNoticesByCategory(
       categoryId,
-    }); // 카테고리별 공지사항 조회
+      paginationOptions
+    ); // 카테고리별 공지사항 조회
 
     return res.status(200).success({
       message: "카테고리별 공지사항 조회 성공",
       notices,
+      nextCursor,
+      hasNextPage
     });
   } catch (error) {
     logError(error);
