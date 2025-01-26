@@ -4,6 +4,8 @@ import "winston-mongodb"; // winston-mongodb 패키지 임포트
 import fs from "fs";
 import path from "path";
 import config from "../../config.json" with { type: "json" };
+import os from "os";
+
 const {
   MONGODB_USER,
   MONGODB_PASSWORD,
@@ -22,6 +24,17 @@ const { combine, timestamp, errors, json, prettyPrint } = format;
 //   useUnifiedTopology: true,
 // });
 // await client.connect();
+
+const systemInfo = {
+  platform: os.platform(),
+  // release: os.release(),
+  totalMemory: `${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
+  // freeMemory: `${(os.freemem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
+  cpuModel: os.cpus()[0].model,
+  uptime: `${Math.floor(os.uptime() / 3600)} hours ${Math.floor((os.uptime() % 3600) / 60)} minutes`,
+  hostname: os.hostname(),
+  // networkInterfaces: os.networkInterfaces(),
+};
 
 const mongoTransportOptions = {
   db: MONGO_URI,
@@ -47,6 +60,12 @@ const logger = winston.createLogger({
     errors({ stack: true }), // 에러 스택 트레이스 추가
     json() // JSON 포맷으로 기록
   ),
+  defaultMeta: {
+    action: "undefined",
+    actionType: "log ✨",
+    service: "peekle",
+    ...systemInfo,
+  }, // 기본 메타데이터
   transports: [
     // MongoDB로 로그 전송
     new winston.transports.MongoDB(mongoTransportOptions),
