@@ -29,6 +29,8 @@ router.post(
   validate(authSchema.oauthRegisterSchema),
   registerController.oauthRegister
 );
+// 닉네임 중복확인 제공
+router.get("/register/nickname/check", registerController.checkNicknameUnique);
 
 // 테스트용 회원가입
 router.post("/register/test", registerController.testRegister);
