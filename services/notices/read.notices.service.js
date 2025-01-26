@@ -24,7 +24,35 @@ export const getNoticesByCategory = async ({ categoryId }) => {
  * 카테고리와 검색어로 공지사항 검색
  */
 export const searchNotices = async ({ category, query, limit, cursor }) => {
-  
+  const notices = await models.NoticeCategory.findOne({
+      where: { name: category },
+      include: [
+        {
+          model: models.Notices,
+          as: "notices",
+          where: {
+            [Op.or]: [
+              {
+                title: {
+                  [Op.like]: `%${query}%`, // 제목에 검색어 포함
+                },
+              },
+              {
+                content: {
+                  [Op.like]: `%${query}%`, // 내용에 검색어 포함
+                },
+              },
+            ],
+          },
+          order: [["createdAt", "DESC"]], // 최신순 정렬
+         
+        },
+      ],
+    });
+
+    return {
+      notices,
+    }
 };
 
 /**
