@@ -7,7 +7,7 @@ import * as kakaoController from "../controllers/auth/kakao.auth.controller.js";
 import { authenticateRefreshToken } from "../middleware/authenticate.jwt.js";
 
 import * as authSchema from "../utils/validators/auth/auth.validators.js";
-import { validate } from "../middleware/validate.js";
+import { validateRequestBody } from "../middleware/validate.js";
 
 const router = Router();
 
@@ -20,13 +20,13 @@ router.get("/terms", registerController.getTerms);
 // 회원가입 (local)
 router.post(
   "/register/local",
-  validate(authSchema.localRegisterSchema),
+  validateRequestBody(authSchema.localRegisterSchema),
   registerController.register
 );
 // 회원가입 (oauth)
 router.post(
   "/register/oauth",
-  validate(authSchema.oauthRegisterSchema),
+  validateRequestBody(authSchema.oauthRegisterSchema),
   registerController.oauthRegister
 );
 // 닉네임 중복확인 제공
@@ -42,7 +42,7 @@ router.post("/register/test", registerController.testRegister);
 // 로그인 (local)
 router.post(
   "/login/local",
-  validate(authSchema.phoneVerifySchema),
+  validateRequestBody(authSchema.phoneVerifySchema),
   loginController.localLogin
 );
 // 로그아웃
@@ -70,13 +70,13 @@ router.get("/phone/account/status", phoneController.checkAccountStatus);
 // 휴대폰 번호로 인증번호 전송
 router.post(
   "/phone/send",
-  validate(authSchema.sendTokenToPhoneSchema),
+  validateRequestBody(authSchema.sendTokenToPhoneSchema),
   phoneController.sendTokenToPhone
 );
 // 휴대폰 인증번호 확인
 router.post(
   "/phone/verify",
-  validate(authSchema.phoneVerifySchema),
+  validateRequestBody(authSchema.phoneVerifySchema),
   phoneController.verifyToken
 );
 

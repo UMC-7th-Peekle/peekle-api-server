@@ -1,4 +1,4 @@
-import { AjvError } from "../utils/errors/errors.js";
+import { AjvError, InvalidContentTypeError } from "../utils/errors/errors.js";
 
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
@@ -12,7 +12,7 @@ addFormats(ajv);
  * @param {Function} schema - 스키마 검증 함수 (예: AJV에서 컴파일된 함수).
  * @returns {Function} - Express 미들웨어 함수.
  */
-export const validate = (schema, option = false) => {
+export const validateRequestBody = (schema, option = false) => {
   return (req, res, next) => {
     const validator = ajv.compile(schema);
     const data = option ? JSON.parse(req.body.data) : req.body;
@@ -52,4 +52,13 @@ const formatErrors = (errors) => {
     instancePath,
     message,
   }));
+};
+
+export const validateContentType = (req, res, next) => {
+  if (!req.is("multipart/form-data")) {
+    next(
+      new InvalidContentTypeError("Content-Type should be: multipart/form-data")
+    );
+  }
+  next();
 };
