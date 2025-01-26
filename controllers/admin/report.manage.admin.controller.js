@@ -54,6 +54,7 @@ export const penalizeUser = async (req, res, next) => {
   try {
     // TODO: JWT 토큰에서 admin 사용자 ID 추출
     // 형식 검증은 완료된 상태로 들어온다고 가정 (type, reason, endsAt 등)
+    // type이 'ban'인 경우 endsAt은 null로 들어온다고 가정
     const { userId, type, reason, endsAt } = req.body;
 
     await reportManageService.penalizeUser({
@@ -88,6 +89,12 @@ export const unpenalizeUser = async (req, res, next) => {
     const { userId } = req.body;
 
     await reportManageService.unpenalizeUser({ userId });
+
+    logger.debug("사용자 제재 해제 성공", {
+      action: "report: unpenalizeUser",
+      actionType: "success",
+      userId,
+    });
 
     return res.status(200).success({
       message: "사용자 제재 해제 성공",

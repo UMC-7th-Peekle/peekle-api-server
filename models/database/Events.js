@@ -36,6 +36,15 @@ export default class Events extends Model {
       type: DataTypes.STRING(512),
       allowNull: false
     },
+    locationGroupId: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      references: {
+        model: 'event_location_groups',
+        key: 'group_id'
+      },
+      field: 'location_group_id'
+    },
     eventUrl: {
       type: DataTypes.STRING(1024),
       allowNull: false,
@@ -97,6 +106,13 @@ export default class Events extends Model {
         using: "BTREE",
         fields: [
           { name: "created_user_id" },
+        ]
+      },
+      {
+        name: "events_event_location_groups_group_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "location_group_id" },
         ]
       },
     ]
