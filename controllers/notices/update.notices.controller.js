@@ -8,14 +8,23 @@ export const updateNotice = async (req, res, next) => {
     try {
       const { noticeId } = req.params;
 			const { userId } = req.user;
-			const updateData = JSON.parse(req.body.data || "{}");
+			const updateData = JSON.parse(req.body.data);
 			// 업로드된 파일 정보 추출
-			const uploadedFiles = req.files?.notice_images || [];
+			const uploadedFiles = req.files?.peekle_images || [];
 			// 이미지 경로 추가
 			updateData.imagePaths = parseImagePaths(uploadedFiles);
 
+      // 업로드된 파일이 없는 경우
+      let imagePaths = [];
+      if (uploadedFiles.length > 0) {
+        imagePaths = uploadedFiles.map((file) => {
+          console.log(file);
+          return file.path.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
+        });
+      }
+
 			logger.debug("공지사항 수정", {
-				action: "notice: update",
+				action: "notice:update",
 				actionType: "log",
 				userId: userId,
 				data: updateData,

@@ -11,9 +11,17 @@ export const createNotice = async (req, res, next) => {
 		const { userId } = req.user;
 		const { categoryId } = req.params;
 		const noticeData = JSON.parse(req.body.data);
-		const uploadedFiles = req.files?.notice_images || [];
+		const uploadedFiles = req.files?.peekle_images || [];
 		// 이미지 경로 추가
 		noticeData.imagePaths = parseImagePaths(uploadedFiles);
+
+		// 로깅해서 이미지 경로 확인 (확인용)
+		logger.debug("업로드된 이미지 경로", {
+			action: "notice:create",
+			actionType: "success",
+			userId: userId,
+			imagePaths: noticeData.imagePaths
+		});
 
 		logger.debug("공지사항 생성", {
 			action: "notice:create",

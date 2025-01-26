@@ -1,22 +1,9 @@
 import models from "../../models/index.js";
-import { 
-	InvalidInputError,
-	NotAllowedError
-} from "../../utils/errors/errors.js";
+import { InvalidInputError } from "../../utils/errors/errors.js";
 import logger from "../../utils/logger/logger.js";
 
 // 공지사항 생성
 export const newNotice = async(userId, categoryId, noticeData) => {
-	const {
-		title,
-		content,
-		isNotice,
-		authorId = userId,
-		createdAt,
-		updatedAt,
-		imagePaths = [],
-	} = noticeData;
-
 	// 게시글 제목, 게시글 내용 누락 400
 	if (!noticeData.title || !noticeData.content) {
 		logger.debug("게시글 제목 또는 내용 누락", {
