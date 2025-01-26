@@ -1,5 +1,6 @@
 import models from "../../models/index.js";
 import { InvalidInputError } from "../../utils/errors/errors.js";
+import logger from "../../utils/logger/logger.js";
 
 // 새로운 이벤트 생성
 export const createEvent = async (userId, eventData) => {
@@ -11,7 +12,7 @@ export const createEvent = async (userId, eventData) => {
   // imagePaths : multer가 req.files로 전달한 것을 parsing 후에 전달
 
   // 게시글 제목, 게시글 내용 누락 400
-  if (!title || !content) {
+  if (!eventData.title || !eventData.content) {
     throw new InvalidInputError("게시글 제목 또는 내용이 누락되었습니다.");
   }
 
@@ -56,10 +57,10 @@ export const createEvent = async (userId, eventData) => {
       actionType: "success",
       userId: userId,
     });
+
     return event;
   } catch (error) {
     await transaction.rollback();
-
     logger.error("이벤트 생성 실패, Rollback 실행됨.", {
       action: "event:create",
       actionType: "error",

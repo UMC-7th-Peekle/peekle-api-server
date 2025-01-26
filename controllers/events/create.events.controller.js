@@ -39,6 +39,7 @@ export const createEvent = async (req, res, next) => {
     "price": 10000,
     "categoryId": 1,
     "location": "서울특별시 강남구",
+    "locationGroupId": 2,
     "eventUrl": "https://example.com/event",
     "applicationStart": "2025-03-01",
     "applicationEnd": "2025-03-31",
