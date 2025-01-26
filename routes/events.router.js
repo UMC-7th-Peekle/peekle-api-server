@@ -29,13 +29,6 @@ router.post(
   createEventController.createEvent
 );
 
-// 이벤트 카테고리 조회
-router.get("/groups/category", groupController.eventCategory); // 이벤트 카테고리 조회
-router.get("/groups/location", groupController.eventLocation); // 이벤트 지역 조회
-
-// 이벤트 스크랩
-router.get("/:eventId", detailEventController.detailEvent); // 이벤트 상세정보 조회
-
 // 이벤트 수정
 router.patch(
   "/:eventId",
@@ -47,7 +40,14 @@ router.patch(
   }),
   validate(eventValidator.patchEventSchema, true),
   detailEventController.updateEvent
-); // 이벤트 상세정보 수정
+);
+
+// 이벤트 카테고리 조회
+router.get("/groups/category", groupController.eventCategory); // 이벤트 카테고리 조회
+router.get("/groups/location", groupController.eventLocation); // 이벤트 지역 조회
+
+// 이벤트 스크랩
+router.get("/:eventId", detailEventController.detailEvent); // 이벤트 상세정보 조회
 
 // 이벤트 스크랩
 router.post(

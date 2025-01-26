@@ -1,29 +1,30 @@
 import models from "../../models/index.js";
 import { Op } from "sequelize";
 import { InvalidQueryError } from "../../utils/errors/errors.js";
+import logger from "../../utils/logger/logger.js";
 
 // 이벤트 목록 조회
 export const listEvent = async (category = "all", paginationOptions) => {
   const { limit, cursor } = paginationOptions;
 
   // 커서 기준 조건 설정
-  let whereCursor = {};
+  let cursorWhereClause = {};
   if (cursor) {
-    whereCursor = {
+    cursorWhereClause = {
       eventId: { [Op.lt]: cursor }, // 해당 커서 기준, 더 과거의 값 (더 작은 값)
     };
   }
 
   // 카테고리 조건 설정
-  let whereCategory = {};
-  if (category !== "all") {
-    whereCategory = { name: category }; // 카테고리 이름으로 필터링
+  let categoryWhereClause = {};
+  if (category !== "전체") {
+    categoryWhereClause = { name: category }; // 카테고리 이름으로 필터링
   }
 
   // TODO : category Id로 filtering 해도 되지 않을까 하는 생각
 
   const events = await models.Events.findAll({
-    where: whereCursor, // 커서 기준 조건 추가
+    where: cursorWhereClause, // 커서 기준 조건 추가
     limit: limit + 1, // 다음 페이지 존재 여부 확인을 위해 하나 더 조회
     order: [["eventId", "DESC"]],
 
@@ -32,7 +33,7 @@ export const listEvent = async (category = "all", paginationOptions) => {
       {
         model: models.EventCategory,
         as: "category",
-        where: whereCategory,
+        where: categoryWhereClause,
         attributes: ["name", "description"],
       },
       {
@@ -75,14 +76,24 @@ export const validateQuery = (query) => {
   const { limit, cursor, category, location, price, startDate, endDate } =
     query;
   // limit 및 cursor 유효성 검증 (정수형 확인)
+
   const isInteger = (value) => /^\d+$/.test(value); // 정수만 허용
-  if ((limit && !isInteger(limit)) || (cursor && !isInteger(cursor))) {
+  if (
+    (limit && (!isInteger(limit) || limit === "")) ||
+    (cursor && (!isInteger(cursor) || cursor === ""))
+  ) {
     throw new InvalidQueryError("limit, cursor는 정수여야 합니다.");
   }
 
+  // price 유효성 검증 (boolean 확인)
+  const pricePool = ["true", "false"];
+  if (price && (price === "" || !pricePool.includes(price))) {
+    throw new InvalidQueryError("price는 true 또는 false여야 합니다.");
+  }
+
   // 카테고리 검증
-  const categoryPool = ["all", "education", "culture", "activity"];
-  if (category && !categoryPool.includes(category)) {
+  const categoryPool = ["전체", "교육", "문화", "활동"];
+  if (category && (category === "" || !categoryPool.includes(category))) {
     throw new InvalidQueryError(
       "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
       categoryPool

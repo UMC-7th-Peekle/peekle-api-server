@@ -2,6 +2,7 @@ import { Sequelize } from "sequelize";
 import initModels from "./database/init-models.js";
 import logger from "../utils/logger/logger.js";
 import config from "../config.json" with { type: "json" };
+import { format } from "sql-formatter";
 
 const DATABASE = config.DATABASE;
 
@@ -14,10 +15,18 @@ const sequelize = new Sequelize(
     port: DATABASE.MYSQL_PORT,
     dialect: "mysql",
     logging: (msg) =>
-      logger.debug(msg, {
-        action: "sequelize:query",
-        actionType: "log ✨",
-      }),
+      logger.debug(
+        format(msg.replace(/^Executing \(default\):/, "").trim(), {
+          language: "mysql",
+          indent: "  ",
+          uppercase: true,
+          linesBetweenQueries: 2,
+        }),
+        {
+          action: "sequelize:query",
+          actionType: "log ✨",
+        }
+      ),
     // timezone: "+09:00",
     pool: {
       max: 10, // 최대 연결 수
