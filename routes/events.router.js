@@ -18,8 +18,15 @@ const router = Router();
 
 // 이벤트 조회
 router.get("/", listEventController.listEvent);
-router.get("/:eventId", detailEventController.detailEvent); // 이벤트 상세정보 조회
+// 이벤트 삭제
+router.delete(
+  "/",
+  authMiddleware.authenticateAccessToken,
+  detailEventController.deleteEvent
+);
 
+// 이벤트 상세정보 조회
+router.get("/:eventId", detailEventController.detailEvent);
 // 이벤트 수정
 router.patch(
   "/:eventId",
