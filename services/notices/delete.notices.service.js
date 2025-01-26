@@ -5,20 +5,8 @@ import {
 } from "../../utils/errors/errors.js";
 import logger from "../../utils/logger/logger.js";
 
-export const deleteNotice = async (categoryId, noticeId, userId) => {
+export const deleteNotice = async (noticeId, userId) => {
   try {
-		// 카테고리 확인
-    const category = await models.NoticeCategory.findByPk(categoryId);
-    if (!category) {
-      logger.debug("존재하지 않는 카테고리 공지사항 삭제", {
-        action: "notice: delete",
-        actionType: "error",
-        authorId: notice.authorId,
-        requestedUserId: userId,
-      });
-      throw new NotExistsError("존재하지 않는 카테고리입니다.");
-    }
-
 		const notice = await models.Notices.findByPk(noticeId);
 
 		// 해당 공지사항이 존재하지 않는 경우
@@ -47,7 +35,7 @@ export const deleteNotice = async (categoryId, noticeId, userId) => {
 
 		// 공지 삭제하기
 		const deleteNotice = await models.Notices.destroy({
-			where: { categoryId, noticeId, authorId: userId }
+			where: { noticeId, authorId: userId }
 		});
 
 		if (deleteNotice === 0) {    // 반환값이 0일 경우 404 

@@ -5,7 +5,7 @@ import logger from "../../utils/logger/logger.js";
 
 export const deleteNotice = async (req, res, next) => {
 	try {
-		const { categoryId, noticeId } = req.params;
+		const { noticeId } = req.params;
 		const { userId } = req.user;
 
 		logger.debug("공지사항 삭제", {
@@ -14,7 +14,7 @@ export const deleteNotice = async (req, res, next) => {
 			userId: userId,
 		});
 
-		const notice = await deleteService.deleteNotice(categoryId, noticeId, userId);
+		const notice = await deleteService.deleteNotice(noticeId, userId);
 
 		if (notice) return res.status(200).success({ message: "공지사항 삭제 완료" });
 	} catch (error) {

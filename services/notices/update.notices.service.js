@@ -10,20 +10,8 @@ import logger from "../../utils/logger/logger.js";
 import { deleteLocalFile } from "../../utils/upload/uploader.object.js";
 
 // 공지 수정
-export const updateNotice = async (categoryId, noticeId, userId, updateData) => {
+export const updateNotice = async (noticeId, userId, updateData) => {
   try {
-    // 카테고리 확인
-    const category = await models.NoticeCategory.findByPk(categoryId);
-    if (!category) {
-      logger.debug("존재하지 않는 카테고리 공지사항 수정", {
-        action: "notice: update",
-        actionType: "error",
-        userId: userId,
-        data: updateData,
-      });
-      throw new NotExistsError("존재하지 않는 카테고리입니다.");
-    }
-
     const notice = await models.Notices.findByPk(noticeId);
 
     // 해당 공지사항이 존재하지 않는 경우

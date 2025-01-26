@@ -16,23 +16,23 @@ router.post("/category/:categoryId",
   authMiddleware.authenticateAccessToken,
   fileUploadMiddleware.localStorage({
     restrictions: fileUploadMiddleware.restrictions("notice"),
-    field: [{ name: "notice_images", maxCount: 5 }],
+    field: [{ name: "peekle_images", maxCount: 5 }],
     destination: "uploads/notices",
   }),
   createNoticeController.createNotice
 );   // 생성
 router.patch(
-  "/category/:categoryId/notice/:noticeId",
+  "/:noticeId",
   authMiddleware.authenticateAccessToken,
   fileUploadMiddleware.localStorage({
     restrictions: fileUploadMiddleware.restrictions("notice"),
-    field: [{ name: "notice_images", maxCount: 5 }],
+    field: [{ name: "peekle_images", maxCount: 5 }],
     destination: "uploads/notices",
   }),
   updateNoticeController.updateNotice
 );    // 수정
 router.delete(
-  "/category/:categoryId/notice/:noticeId",
+  "/:noticeId",
   authMiddleware.authenticateAccessToken,
   deleteNoticeController.deleteNotice
 );    // 삭제

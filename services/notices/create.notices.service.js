@@ -18,7 +18,7 @@ export const newNotice = async(userId, categoryId, noticeData) => {
 	} = noticeData;
 
 	// 게시글 제목, 게시글 내용 누락 400
-	if (!title || !content) {
+	if (!noticeData.title || !noticeData.content) {
 		logger.debug("게시글 제목 또는 내용 누락", {
 			action: "notice:create",
 			actionType: "error",
@@ -47,21 +47,16 @@ export const newNotice = async(userId, categoryId, noticeData) => {
 		// 공지 생성
 		const notice = await models.Notices.create(
 			{
-				categoryId,
-				title,
-				content,
-				isNotice,
+				...noticeData,
 				authorId: userId,
-				createdAt,
-				updatedAt
 			},
 			{ transaction }
 		);
 
 		// 이미지가 새로 들어온 경우에만 처리
-		if (imagePaths.length > 0) {
+		if (noticeData.imagePaths.length > 0) {
 			// 새로운 이미지 추가
-			const noticeImageData = imagePaths.map((path, index) => ({
+			const noticeImageData = noticeData.imagePaths.map((path, index) => ({
 				noticeId: notice.noticeId,
 				imageUrl: path,
 				sequence: index + 1, // 이미지 순서 설정
@@ -73,10 +68,21 @@ export const newNotice = async(userId, categoryId, noticeData) => {
 		// 트랜잭션 커밋
     await transaction.commit();
 
+    logger.debug("공지사항 생성 성공", {
+      action: "notice:create",
+      actionType: "success",
+      userId: userId,
+    });
+
 		return notice;
 	} catch (error) {
     // 트랜잭션 롤백
     await transaction.rollback();
+    logger.error("공지사항 생성 실패, Rollback 실행됨.", {
+      action: "notice:create",
+      actionType: "error",
+      userId: userId,
+    });
     throw error;
   }
 };

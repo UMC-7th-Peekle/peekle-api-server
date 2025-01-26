@@ -6,7 +6,7 @@ import { parseImagePaths } from "../../utils/upload/uploader.object.js";
 
 export const updateNotice = async (req, res, next) => {
     try {
-      const { categoryId, noticeId } = req.params;
+      const { noticeId } = req.params;
 			const { userId } = req.user;
 			const updateData = JSON.parse(req.body.data || "{}");
 			// 업로드된 파일 정보 추출
@@ -22,7 +22,6 @@ export const updateNotice = async (req, res, next) => {
 			});
 
 			const update = await updateService.updateNotice(
-				categoryId,
 				noticeId,
 				userId,
 				updateData
