@@ -16,7 +16,7 @@ export const createNotice = async (req, res, next) => {
 		noticeData.imagePaths = parseImagePaths(uploadedFiles);
 
 		logger.debug("공지사항 생성", {
-			action: "notice: create",
+			action: "notice:create",
 			actionType: "success",
 			userId: userId,
 			data: noticeData,

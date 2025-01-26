@@ -20,7 +20,7 @@ export const newNotice = async(userId, categoryId, noticeData) => {
 	// 게시글 제목, 게시글 내용 누락 400
 	if (!title || !content) {
 		logger.debug("게시글 제목 또는 내용 누락", {
-			action: "notice: create",
+			action: "notice:create",
 			actionType: "error",
 			userId: userId
 		});

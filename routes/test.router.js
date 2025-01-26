@@ -9,8 +9,19 @@ import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 import { validate } from "../middleware/validate.js";
 import { oauthRegisterSchema } from "../utils/validators/auth/auth.validators.js";
 import logger from "../utils/logger/logger.js";
+import { eventLocationGroup } from "../models/seed/location.group.js";
 
 const router = Router();
+
+router.get("/seed/:type", async (req, res) => {
+  const { type } = req.params;
+  if (type === "event-location") {
+    await eventLocationGroup();
+  }
+  res.status(201).success({
+    message: "Seed 작업이 완료되었습니다.",
+  });
+});
 
 router.get("/encrypted/:text", (req, res) => {
   const { text } = req.params;
@@ -104,10 +115,14 @@ router.post(
 );
 
 // Validator test
-router.get("/validator", validate(oauthRegisterSchema), (req, res) => {
-  res.status(200).success({
-    message: "검증에 성공했습니다.",
-  });
-});
+router.get(
+  "/validator/oauth-register",
+  validate(oauthRegisterSchema),
+  (req, res) => {
+    res.status(200).success({
+      message: "검증에 성공했습니다.",
+    });
+  }
+);
 
 export default router;

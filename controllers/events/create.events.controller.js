@@ -20,7 +20,7 @@ export const createEvent = async (req, res, next) => {
       data: eventData,
     });
 
-    const event = await createService.newEvent(userId, eventData);
+    const event = await createService.createEvent(userId, eventData);
 
     if (event) {
       // 201
@@ -31,3 +31,29 @@ export const createEvent = async (req, res, next) => {
     next(error);
   }
 };
+
+/*
+  {
+    "title": "es",
+    "content": "아주 재미있는 이벤트입니다.",
+    "price": 10000,
+    "categoryId": 1,
+    "location": "서울특별시 강남구",
+    "locationGroupId": 2,
+    "eventUrl": "https://example.com/event",
+    "applicationStart": "2025-03-01",
+    "applicationEnd": "2025-03-31",
+    "schedules": [
+      {
+        "repeatType": "daily",
+        "repeatEndDate": null,
+        "isAllDay": false,
+        "customText": "매일",
+        "startDate": "2025-04-01",
+        "endDate": "2025-04-01",
+        "startTime": "10:00:00Z",
+        "endTime": "18:00:00Z"
+      }
+    ]
+  }
+  */

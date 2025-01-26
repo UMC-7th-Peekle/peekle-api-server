@@ -82,9 +82,7 @@ export const getTerms = async (req, res, next) => {
     const terms = await registerService.getTerms();
 
     if (terms.length === 0) {
-      return res.status(204).success({
-        message: "어머나? 조회할 약관이 없네요. 수고!",
-      });
+      return res.status(204).end();
     }
 
     return res.status(200).success({
