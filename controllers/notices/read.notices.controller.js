@@ -48,7 +48,7 @@ export const searchNotices = async (req, res, next) => {
 };
 
 // 공지사항 세부 내용 조회
-export const getNoticesById = async (req, res, next) => {
+export const getNoticeById = async (req, res, next) => {
   try {
     const { noticeId } = req.params; // URL에서 noticeId 추출
 
