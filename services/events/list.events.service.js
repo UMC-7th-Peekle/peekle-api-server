@@ -2,9 +2,10 @@ import models from "../../models/index.js";
 import { Op } from "sequelize";
 import { InvalidQueryError } from "../../utils/errors/errors.js";
 import logger from "../../utils/logger/logger.js";
+import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
 // 이벤트 목록 조회
-export const listEvent = async (category = "all", paginationOptions) => {
+export const listEvent = async (category = "전체", paginationOptions) => {
   const { limit, cursor } = paginationOptions;
 
   // 커서 기준 조건 설정
@@ -69,7 +70,19 @@ export const listEvent = async (category = "all", paginationOptions) => {
   // 더 과거의 이벤트가 있으면 nextCursor를 설정
   const nextCursor = hasNextPage ? events[events.length - 1].eventId : null;
 
-  return { events, nextCursor, hasNextPage };
+  const modifiedEvents = events.map((event) => {
+    const transformedImages = event.eventImages.map((image) => ({
+      imageUrl: addBaseUrl(image.imageUrl),
+      sequence: image.sequence,
+    }));
+
+    return {
+      ...event.dataValues,
+      eventImages: transformedImages,
+    };
+  });
+
+  return { events: modifiedEvents, nextCursor, hasNextPage };
 };
 
 export const validateQuery = (query) => {

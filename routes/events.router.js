@@ -15,6 +15,7 @@ const router = Router();
 
 // 이벤트 조회
 router.get("/", listEventController.listEvent);
+router.get("/:eventId", detailEventController.detailEvent); // 이벤트 상세정보 조회
 
 // 이벤트 생성
 router.post(
@@ -45,9 +46,6 @@ router.patch(
 // 이벤트 카테고리 조회
 router.get("/groups/category", groupController.eventCategory); // 이벤트 카테고리 조회
 router.get("/groups/location", groupController.eventLocation); // 이벤트 지역 조회
-
-// 이벤트 스크랩
-router.get("/:eventId", detailEventController.detailEvent); // 이벤트 상세정보 조회
 
 // 이벤트 스크랩
 router.post(

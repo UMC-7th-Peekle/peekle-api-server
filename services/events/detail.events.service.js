@@ -7,7 +7,10 @@ import {
   InvalidInputError,
 } from "../../utils/errors/errors.js";
 import logger from "../../utils/logger/logger.js";
-import { deleteLocalFile } from "../../utils/upload/uploader.object.js";
+import {
+  addBaseUrl,
+  deleteLocalFile,
+} from "../../utils/upload/uploader.object.js";
 
 export const detailEvent = async (eventId) => {
   // eventId가 유효하지 않은 경우 400
@@ -15,7 +18,7 @@ export const detailEvent = async (eventId) => {
    * 아직 Ajv로 유효성 검사 안했어요
    */
 
-  const detail = await models.Events.findOne({
+  const data = await models.Events.findOne({
     where: { eventId: eventId },
 
     attributes: { exclude: ["categoryId", "createdUserId"] },
@@ -47,7 +50,23 @@ export const detailEvent = async (eventId) => {
     ],
   });
 
-  return detail;
+  if (!data) {
+    logger.warn("존재하지 않는 이벤트에 대한 조회 요청입니다.", {
+      action: "event:getDetail",
+      actionType: "error",
+      data: {
+        eventId,
+      },
+    });
+    throw new NotExistsError("존재하지 않는 이벤트입니다.");
+  }
+
+  const transformedImages = data.eventImages.map((image) => ({
+    imageUrl: addBaseUrl(image.imageUrl),
+    sequence: image.sequence,
+  }));
+
+  return { ...data.dataValues, eventImages: transformedImages };
 };
 
 // 이벤트 내용 수정
@@ -57,7 +76,7 @@ export const updateEvent = async (eventId, userId, updateData) => {
 
     // 해당 이벤트가 존재하지 않는 경우
     if (!event) {
-      logger.debug({
+      logger.warn({
         action: "event:update",
         actionType: "error",
         message: "존재하지 않는 이벤트에 대한 수정 요청입니다.",
