@@ -80,3 +80,21 @@ export const createTerm = async ({
 
   return;
 };
+
+/**
+ * termId에 해당하는 약관을 조회합니다.
+ */
+export const getTerm = async ({ termId }) => {
+  const term = await models.Terms.findOne({
+    where: {
+      termId,
+    },
+  });
+
+  // 해당 약관이 없는 경우
+  if(!term) {
+    throw new NotExistsError("약관이 존재하지 않습니다");
+  }
+
+  return { term };
+}

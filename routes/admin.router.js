@@ -22,21 +22,31 @@ router.get("/reports/comment", notImplementedController);
 /*
   약관 관리
 */
+// 약관 내용을 수정합니다.
 router.patch(
   "/terms/:termId",
   authenticatMiddleware.authenticateAccessToken,
   termController.updateTerm
 );
+// 약관을 삭제합니다.
 router.delete(
   "/terms/:termId",
   authenticatMiddleware.authenticateAccessToken,
   termController.deleteTerm
 );
+// 약관을 생성합니다.
 router.post(
   "/terms",
   authenticatMiddleware.authenticateAccessToken,
   termController.createTerm
 );
+// 약관 내용을 조회합니다.
+router.get(
+  "/terms/:termId",
+  authenticatMiddleware.authenticateAccessToken,
+  termController.getTerm
+);
+
 
 /*
   서비스 통계

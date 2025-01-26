@@ -68,3 +68,21 @@ export const createTerm = async (req, res, next) => {
     next(error);
   }
 };
+
+// 약관 내용 조회
+export const getTerm = async (req, res, next) => {
+  // TODO: 관리자 검증
+  try {
+    const { termId } = req.params; // URL에서 termid 추출
+
+    const term = await termService.getTerm({ termId }); // 약관 내용 조회
+
+    return res.status(200).success({
+      message: "약관 내용 조회 성공",
+      term,
+    });
+  } catch (error) {
+    logError(error);
+    next(error);
+  }
+};
