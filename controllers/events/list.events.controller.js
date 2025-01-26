@@ -1,5 +1,4 @@
 import * as listService from "../../services/events/list.events.service.js";
-import { InvalidQueryError } from "../../utils/errors/errors.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 /**

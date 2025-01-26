@@ -30,7 +30,7 @@ export default class UserRestrictions extends Model {
       field: 'admin_user_id'
     },
     type: {
-      type: DataTypes.ENUM('suspend','ban','canceled','expired'),
+      type: DataTypes.ENUM('suspend','ban','cancelled','expired'),
       allowNull: false
     },
     reason: {
