@@ -8,7 +8,10 @@ import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 /**
  * 카테고리별 공지사항 조회
  */
-export const getNoticesByCategory = async (categoryId, { limit, cursor = null }) => {
+export const getNoticesByCategory = async (
+  categoryId,
+  { limit, cursor = null }
+) => {
   // 공지사항 조회
   const notices = await models.Notices.findAll({
     where: {
@@ -37,7 +40,11 @@ export const getNoticesByCategory = async (categoryId, { limit, cursor = null })
 /**
  * 카테고리와 검색어로 공지사항 검색
  */
-export const searchNotices = async ({ category, query, limit, cursor }) => {
+export const searchNotices = async (
+  category,
+  query,
+  { limit, cursor = null }
+) => {
   const notices = await models.NoticeCategory.findOne({
     where: { name: category },
     include: [
@@ -57,14 +64,27 @@ export const searchNotices = async ({ category, query, limit, cursor }) => {
               },
             },
           ],
+          ...(cursor && { noticeId: { [Op.lt]: cursor } }), // 커서 조건: noticeId 기준
         },
         order: [["createdAt", "DESC"]], // 최신순 정렬
+        limit: limit + 1, // 조회 개수 제한
+        required: false, // 검색 결과가 없는 경우에도 반환
       },
     ],
   });
 
+  // 다음 커서 설정
+  const hasNextPage = notices.length > limit; // limit + 1개를 가져왔으면 다음 페이지 있음
+  const nextCursor = hasNextPage ? notices[limit - 1].noticeId : null;
+
+  if (hasNextPage) {
+    notices.pop(); // limit + 1개를 가져왔으면 마지막 요소는 버림
+  }
+
   return {
-    notices,
+    ...notices.dataValues,
+    nextCursor,
+    hasNextPage,
   };
 };
 
