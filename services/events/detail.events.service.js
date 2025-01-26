@@ -284,7 +284,15 @@ export const updateEvent = async (eventId, userId, updateData) => {
 
 export const deleteEvent = async ({ eventId, userId }) => {
   try {
-    const event = await models.Events.findByPk(eventId);
+    const event = await models.Events.findByPk(eventId, {
+      include: [
+        {
+          model: models.EventImages,
+          as: "eventImages",
+          attributes: ["imageId", "imageUrl"],
+        },
+      ],
+    });
 
     if (!event) {
       logger.warn({
@@ -308,6 +316,16 @@ export const deleteEvent = async ({ eventId, userId }) => {
       });
       throw new NotAllowedError("이벤트 삭제 권한이 없습니다.");
     }
+
+    // 로컬 파일 삭제
+    const deletePromises = event.eventImages.map((img) =>
+      deleteLocalFile(img.imageUrl)
+    );
+
+    // 모든 파일 삭제 완료 대기
+    // because, deletePromises 안에 있는 비동기 작업들을
+    // await을 걸어서 처리하지 않았기에
+    await Promise.all(deletePromises);
 
     // TODO : 로컬에 저장된 이미지 또한 삭제하여야 함
     await event.destroy();
