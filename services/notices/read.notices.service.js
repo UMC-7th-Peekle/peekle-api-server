@@ -1,5 +1,5 @@
 // Description: 공지사항 조회와 관련된 서비스 파일입니다.
-import { NotExistsError } from "../../utils/errors/errors.js";
+import { NotExistsError, InvalidQueryError } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Op } from "sequelize";
@@ -45,6 +45,16 @@ export const searchNotices = async (
   query,
   { limit, cursor = null }
 ) => {
+  // 검색어가 없는 경우
+  if (!category.trim() || !query.trim()) {
+    logger.error("검색어가 누락되었습니다.", {
+      action: "notices:searchNotices",
+      actionType: "error",
+    });
+    throw new InvalidQueryError("검색어가 누락되었습니다.");
+  }
+
+
   const notices = await models.NoticeCategory.findOne({
     where: { name: category },
     include: [
