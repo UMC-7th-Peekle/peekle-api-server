@@ -185,6 +185,14 @@ export const isEditInputCorrect = ({
   existingImagesLength,
   newImageLength,
 }) => {
+  if (
+    !existingImageSequence ||
+    !newImageSequence ||
+    !existingImagesLength ||
+    !newImageLength
+  ) {
+    throw new InvalidInputError("요청 제대로 안 보낼래?");
+  }
   // 사용자가 보낸 이미지 순서가 이상한지 확인
   const filteredExisting = existingImageSequence.filter((seq) => seq !== -1);
   const combinedSequences = [...filteredExisting, ...newImageSequence];
@@ -198,7 +206,7 @@ export const isEditInputCorrect = ({
     Math.max(...combinedSequences) !== combinedSequences.length // 순서가 중간에 빠진 경우
   ) {
     throw new InvalidInputError(
-      "설명은 못하겠는데 이상한 입력 넣지 말아라 진짜"
+      "설명은 못하겠는데 이상한 입력 넣지 말아라 진짜;;"
     );
   }
 

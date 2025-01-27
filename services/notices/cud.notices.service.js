@@ -13,7 +13,7 @@ import {
 // 공지사항 생성
 export const newNotice = async ({ userId, categoryId, noticeData }) => {
   // 게시글 제목, 게시글 내용 누락 400
-  if (!noticeData.title || !noticeData.content) {
+  if (!noticeData.title || !noticeData.content || !categoryId) {
     logger.debug("게시글 제목 또는 내용 누락", {
       action: "notice:create",
       actionType: "error",
@@ -35,6 +35,13 @@ export const newNotice = async ({ userId, categoryId, noticeData }) => {
     throw new InvalidInputError("해당 카테고리가 존재하지 않습니다.");
   }
 
+  logger.debug("공지사항 생성", {
+    action: "notice:create",
+    actionType: "log",
+    userId: userId,
+    data: noticeData,
+  });
+
   // 트랙잭션 시작
   const transaction = await models.sequelize.transaction();
 
@@ -44,6 +51,7 @@ export const newNotice = async ({ userId, categoryId, noticeData }) => {
       {
         ...noticeData,
         authorId: userId,
+        categoryId: categoryId,
       },
       { transaction }
     );

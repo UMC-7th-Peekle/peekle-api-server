@@ -30,7 +30,7 @@ const sequelize = new Sequelize(
       } catch (err) {
         console.error(err);
       }
-      logger.debug(formattedMsg, {
+      logger.silly(formattedMsg, {
         action: "sequelize:query",
         actionType: "log ✨",
       });
