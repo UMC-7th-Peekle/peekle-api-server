@@ -1,8 +1,6 @@
 import { Router } from "express";
 import * as authMiddleware from "../middleware/authenticate.jwt.js";
-import * as createNoticeController from "../controllers/notices/create.notices.controller.js";
-import * as updateNoticeController from "../controllers/notices/update.notices.controller.js";
-import * as deleteNoticeController from "../controllers/notices/delete.notices.controller.js";
+import * as noticeController from "../controllers/notices/cud.notices.controller.js";
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
 
 const router = Router();
@@ -11,7 +9,7 @@ const router = Router();
 // router.get("/category/:categoryId", notImplementedController);
 // router.get("/category/:categoryId/notice/:noticeId", notImplementedController);
 
-// 공지사항 생성, 수정, 삭제
+// 공지사항 생성
 router.post(
   "/category/:categoryId",
   authMiddleware.authenticateAccessToken,
@@ -20,8 +18,10 @@ router.post(
     field: [{ name: "notice_images", maxCount: 5 }],
     destination: "uploads/notices",
   }),
-  createNoticeController.createNotice
-); // 생성
+  noticeController.createNotice
+);
+
+// 공지사항 수정
 router.patch(
   "/:noticeId",
   authMiddleware.authenticateAccessToken,
@@ -31,11 +31,13 @@ router.patch(
     destination: "uploads/notices",
   }),
   updateNoticeController.updateNotice
-); // 수정
+);
+
+// 공지사항 삭제
 router.delete(
   "/:noticeId",
   authMiddleware.authenticateAccessToken,
   deleteNoticeController.deleteNotice
-); // 삭제
+);
 
 export default router;

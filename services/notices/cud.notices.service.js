@@ -1,16 +1,86 @@
-import path from "path";
-import fs from "fs/promises";
 import models from "../../models/index.js";
 import {
+  InvalidInputError,
   NotExistsError,
   NotAllowedError,
-  InvalidInputError,
 } from "../../utils/errors/errors.js";
 import logger from "../../utils/logger/logger.js";
 import {
   deleteLocalFile,
   isEditInputCorrect,
 } from "../../utils/upload/uploader.object.js";
+
+// 공지사항 생성
+export const newNotice = async (userId, categoryId, noticeData) => {
+  // 게시글 제목, 게시글 내용 누락 400
+  if (!noticeData.title || !noticeData.content) {
+    logger.debug("게시글 제목 또는 내용 누락", {
+      action: "notice:create",
+      actionType: "error",
+      userId: userId,
+    });
+    throw new InvalidInputError("게시글 제목 또는 내용이 누락되었습니다.");
+  }
+
+  // 카테고리id
+  const category = await models.NoticeCategory.findOne({
+    where: { categoryId: categoryId },
+  });
+  if (!category) {
+    logger.debug("존재하지 않는 공지 카테고리", {
+      action: "notice: create",
+      actionType: "error",
+      userId: userId,
+    });
+    throw new InvalidInputError("해당 카테고리가 존재하지 않습니다.");
+  }
+
+  // 트랙잭션 시작
+  const transaction = await models.sequelize.transaction();
+
+  try {
+    // 공지 생성
+    const notice = await models.Notices.create(
+      {
+        ...noticeData,
+        authorId: userId,
+      },
+      { transaction }
+    );
+
+    // 이미지가 새로 들어온 경우에만 처리
+    if (noticeData.imagePaths.length > 0) {
+      // 새로운 이미지 추가
+      const noticeImageData = noticeData.imagePaths.map((path, index) => ({
+        noticeId: notice.noticeId,
+        imageUrl: path,
+        sequence: index + 1, // 이미지 순서 설정
+      }));
+
+      await models.NoticeImages.bulkCreate(noticeImageData, { transaction });
+    }
+
+    // 트랜잭션 커밋
+    await transaction.commit();
+
+    logger.debug("공지사항 생성 성공", {
+      action: "notice:create",
+      actionType: "success",
+      userId: userId,
+    });
+
+    return notice;
+  } catch (error) {
+    // 트랜잭션 롤백
+    await transaction.rollback();
+    logger.error("공지사항 생성 실패, Rollback 실행됨.", {
+      action: "notice:create",
+      actionType: "error",
+      userId: userId,
+    });
+    throw error;
+  }
+};
 
 // 공지 수정
 export const updateNotice = async ({ noticeId, userId, updateData }) => {
@@ -133,6 +203,50 @@ export const updateNotice = async ({ noticeId, userId, updateData }) => {
     }
 
     return { notice };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteNotice = async (noticeId, userId) => {
+  try {
+    const notice = await models.Notices.findByPk(noticeId);
+
+    // 해당 공지사항이 존재하지 않는 경우
+    if (!notice) {
+      logger.debug("존재하지 않는 공지사항 삭제", {
+        action: "notice:delete",
+        actionType: "error",
+        // authorId: notice.authorId,
+        requestedUserId: userId,
+      });
+      throw new NotExistsError("존재하지 않는 공지사항입니다.");
+    }
+
+    // 작성자가 삭제를 요청한게 아닌 경우
+    if (notice.authorId.toString() !== userId) {
+      logger.error("타인이 작성한 공지사항 삭제", {
+        action: "event:delete",
+        actionType: "error",
+        authorId: notice.authorId,
+        requestedUserId: userId,
+      });
+      throw new NotAllowedError(
+        "본인이 작성하지 않은 게시글을 삭제할 수 없습니다."
+      );
+    }
+
+    // 공지 삭제하기
+    const deleteNotice = await models.Notices.destroy({
+      where: { noticeId, authorId: userId },
+    });
+
+    // if (deleteNotice === 0) {    // 반환값이 0일 경우 404
+    // // --> 이거 그냥 존재하지 않는 공지사항입니다.로 되고 적용 안되는 것 같아요
+    //   throw new NotExistsError("이미 삭제한 공지사항입니다.");
+    // }
+
+    return true;
   } catch (error) {
     throw error;
   }
