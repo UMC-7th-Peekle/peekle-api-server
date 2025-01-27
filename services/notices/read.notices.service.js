@@ -7,21 +7,21 @@ import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Op } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
+import { paginateListBuckets } from "@aws-sdk/client-s3";
 
 /**
  * 카테고리별 공지사항 조회
  */
 export const getNoticesByCategory = async (categoryId, paginationOptions) => {
-  console.log(categoryId, paginationOptions);
   const result = await models.Notices.findAndCountAll({
     where: { categoryId },
     order: [["createdAt", "DESC"]], // 최신순 정렬
     limit: paginationOptions.limit, // 조회 개수 제한
     offset: paginationOptions.offset, // 페이지네이션 옵션
-  })
+  });
 
   return {
-    notices:result.rows,
+    notices: result.rows,
     totalCount: result.count,
   };
 };
@@ -29,11 +29,7 @@ export const getNoticesByCategory = async (categoryId, paginationOptions) => {
 /**
  * 카테고리와 검색어로 공지사항 검색
  */
-export const searchNotices = async (
-  category,
-  query,
-  { limit, offset }
-) => {
+export const searchNotices = async (category, query, paginationOptions) => {
   // 검색어가 없는 경우
   if (!category.trim() || !query.trim()) {
     logger.error("검색어가 누락되었습니다.", {
@@ -43,6 +39,35 @@ export const searchNotices = async (
     throw new InvalidQueryError("검색어가 누락되었습니다.");
   }
 
+  // 참고: findAndCountAll을 사용할 수 없는 이유:
+  // - include로 연관된 테이블을 사용할 경우, include로 연결된 테이블이 아닌 메인 테이블의 데이터를 count함
+
+  // 1. 조건에 맞는 전체 개수를 구함
+  const totalCount = await models.Notices.count({
+    include: [
+      {
+        model: models.NoticeCategory,
+        as: "category",
+        where: { name: category },
+      },
+    ],
+    where: {
+      [Op.or]: [
+        {
+          title: {
+            [Op.like]: `%${query}%`, // 제목에 검색어 포함
+          },
+        },
+        {
+          content: {
+            [Op.like]: `%${query}%`, // 내용에 검색어 포함
+          },
+        },
+      ],
+    },
+  });
+
+  // 2. 페이지네이션 적용된 데이터 가져오기
   const notices = await models.NoticeCategory.findOne({
     where: { name: category },
     include: [
@@ -62,27 +87,18 @@ export const searchNotices = async (
               },
             },
           ],
-          ...(cursor && { noticeId: { [Op.lt]: cursor } }), // 커서 조건: noticeId 기준
         },
         order: [["createdAt", "DESC"]], // 최신순 정렬
-        limit: limit + 1, // 조회 개수 제한
+        limit: paginationOptions.limit, // 조회 개수 제한
+        offset: paginationOptions.offset, // 페이지네이션 옵션
         required: false, // 검색 결과가 없는 경우에도 반환
       },
     ],
   });
 
-  // 다음 커서 설정
-  const hasNextPage = notices.length > limit; // limit + 1개를 가져왔으면 다음 페이지 있음
-  const nextCursor = hasNextPage ? notices[limit - 1].noticeId : null;
-
-  if (hasNextPage) {
-    notices.pop(); // limit + 1개를 가져왔으면 마지막 요소는 버림
-  }
-
   return {
     ...notices.dataValues,
-    nextCursor,
-    hasNextPage,
+    totalCount,
   };
 };
 

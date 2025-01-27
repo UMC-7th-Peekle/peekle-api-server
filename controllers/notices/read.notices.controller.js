@@ -53,8 +53,7 @@ export const getNoticesByCategory = async (req, res, next) => {
 // 카테고리와 검색어로 공지사항 검색
 export const searchNotices = async (req, res, next) => {
   try {
-    const { category, query } = req.query; // Query에서 category, query, limit, cursor 추출
-    const { limit, offset } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
+    const { category, query, limit, offset } = req.query; // Query에서 category, query, limit, offset 추출
 
     // 페이지네이션 기본값 설정
     const paginationOptions = {
