@@ -11,7 +11,7 @@ import {
 } from "../../utils/upload/uploader.object.js";
 
 // 공지사항 생성
-export const newNotice = async (userId, categoryId, noticeData) => {
+export const newNotice = async ({ userId, categoryId, noticeData }) => {
   // 게시글 제목, 게시글 내용 누락 400
   if (!noticeData.title || !noticeData.content) {
     logger.debug("게시글 제목 또는 내용 누락", {
@@ -208,7 +208,8 @@ export const updateNotice = async ({ noticeId, userId, updateData }) => {
   }
 };
 
-export const deleteNotice = async (noticeId, userId) => {
+// 공지 삭제
+export const deleteNotice = async ({ noticeId, userId }) => {
   try {
     const notice = await models.Notices.findByPk(noticeId);
 

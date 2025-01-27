@@ -30,11 +30,11 @@ export const createNotice = async (req, res, next) => {
       data: noticeData,
     });
 
-    const notice = await noticeService.newNotice(
+    const notice = await noticeService.newNotice({
       userId,
       categoryId,
-      noticeData
-    );
+      noticeData,
+    });
 
     if (notice) {
       // 201
@@ -83,7 +83,7 @@ export const deleteNotice = async (req, res, next) => {
       userId: userId,
     });
 
-    const notice = await noticeService.deleteNotice(noticeId, userId);
+    const notice = await noticeService.deleteNotice({ noticeId, userId });
 
     if (notice)
       return res.status(200).success({ message: "공지사항 삭제 완료" });
