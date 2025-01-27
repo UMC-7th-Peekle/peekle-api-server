@@ -96,6 +96,7 @@ const logger = winston.createLogger({
         timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // 타임스탬프 추가
         prettyPrint({ colorize: true }) // JSON 포맷을 사람이 읽기 쉬운 형태로 콘솔 출력
       ),
+      level: "debug", // DEBUG 레벨 이상 로그만 콘솔 출력
     }),
     new winston.transports.Http({
       host: SENDER_HOST,

@@ -12,10 +12,10 @@ addFormats(ajv);
  * @param {Function} schema - 스키마 검증 함수 (예: AJV에서 컴파일된 함수).
  * @returns {Function} - Express 미들웨어 함수.
  */
-export const validateRequestBody = (schema, option = false) => {
+export const validateRequestBody = (schema, isParsedFormData = false) => {
   return (req, res, next) => {
     const validator = ajv.compile(schema);
-    const data = option ? JSON.parse(req.body.data) : req.body;
+    const data = isParsedFormData ? JSON.parse(req.body.data) : req.body;
 
     // logger.silly(data);
     const isValid = validator(data);
