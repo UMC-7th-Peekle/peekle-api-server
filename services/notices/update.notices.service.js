@@ -41,7 +41,7 @@ export const updateNotice = async (noticeId, userId, updateData) => {
 
     // 공지사항 수정
     await notice.update({
-      updateData
+      updateData,
     });
 
     await notice.save();
@@ -72,8 +72,13 @@ export const updateNotice = async (noticeId, userId, updateData) => {
       });
 
       // 사용자가 보낸 이미지 순서가 이상한지 확인
-      const filteredExisting = updateData.existingImageSequence.filter((seq) => seq !== -1);
-      const combinedSequences = [...filteredExisting, ...updateData.newImageSequence];
+      const filteredExisting = updateData.existingImageSequence.filter(
+        (seq) => seq !== -1
+      );
+      const combinedSequences = [
+        ...filteredExisting,
+        ...updateData.newImageSequence,
+      ];
       const uniqueSequences = new Set(combinedSequences);
 
       if (
