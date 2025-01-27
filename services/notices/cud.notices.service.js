@@ -238,7 +238,7 @@ export const deleteNotice = async ({ noticeId, userId }) => {
     }
 
     // 공지 삭제하기
-    const deleteNotice = await models.Notices.destroy({
+    await models.Notices.destroy({
       where: { noticeId, authorId: userId },
     });
 

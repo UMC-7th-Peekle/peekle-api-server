@@ -30,14 +30,14 @@ router.patch(
     field: [{ name: "notice_images", maxCount: 5 }],
     destination: "uploads/notices",
   }),
-  updateNoticeController.updateNotice
+  noticeController.updateNotice
 );
 
 // 공지사항 삭제
 router.delete(
   "/:noticeId",
   authMiddleware.authenticateAccessToken,
-  deleteNoticeController.deleteNotice
+  noticeController.deleteNotice
 );
 
 export default router;
