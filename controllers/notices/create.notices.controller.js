@@ -11,7 +11,7 @@ export const createNotice = async (req, res, next) => {
     const { userId } = req.user;
     const { categoryId } = req.params;
     const noticeData = JSON.parse(req.body.data);
-    const uploadedFiles = req.files?.peekle_images || [];
+    const uploadedFiles = req.files?.notice_images || [];
     // 이미지 경로 추가
     noticeData.imagePaths = parseImagePaths(uploadedFiles);
 

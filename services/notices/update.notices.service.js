@@ -7,10 +7,13 @@ import {
   InvalidInputError,
 } from "../../utils/errors/errors.js";
 import logger from "../../utils/logger/logger.js";
-import { deleteLocalFile } from "../../utils/upload/uploader.object.js";
+import {
+  deleteLocalFile,
+  isEditInputCorrect,
+} from "../../utils/upload/uploader.object.js";
 
 // 공지 수정
-export const updateNotice = async (noticeId, userId, updateData) => {
+export const updateNotice = async ({ noticeId, userId, updateData }) => {
   try {
     const notice = await models.Notices.findByPk(noticeId);
 
@@ -44,7 +47,8 @@ export const updateNotice = async (noticeId, userId, updateData) => {
       updateData,
     });
 
-    await notice.save();
+    // update를 쓴 이상 사용할 필요가 없음
+    // await notice.save();
 
     logger.debug("공지사항 수정 완료", {
       action: "notice:update",
@@ -72,26 +76,12 @@ export const updateNotice = async (noticeId, userId, updateData) => {
       });
 
       // 사용자가 보낸 이미지 순서가 이상한지 확인
-      const filteredExisting = updateData.existingImageSequence.filter(
-        (seq) => seq !== -1
-      );
-      const combinedSequences = [
-        ...filteredExisting,
-        ...updateData.newImageSequence,
-      ];
-      const uniqueSequences = new Set(combinedSequences);
-
-      if (
-        updateData.existingImageSequence.length !== existingImages.length || // 존재하는 이미지 개수가 다른 경우
-        updateData.newImageSequence.length !== updateData.imagePaths.length || // 새로 추가된 이미지 개수가 다른 경우
-        uniqueSequences.size !== combinedSequences.length || // 중복된 순서가 있는 경우
-        Math.min(...combinedSequences) !== 1 || // 순서가 1부터 시작하지 않는 경우
-        Math.max(...combinedSequences) !== combinedSequences.length // 순서가 중간에 빠진 경우
-      ) {
-        throw new InvalidInputError(
-          "설명은 못하겠는데 이상한 입력 넣지 말아라 진짜"
-        );
-      }
+      isEditInputCorrect({
+        existingImageSequence: updateData.existingImageSequence,
+        newImageSequence: updateData.newImageSequence,
+        existingImagesLength: existingImages.length,
+        newImageLength: updateData.imagePaths.length,
+      });
 
       // 기존 이미지 순서 변경
       updateData.existingImageSequence.map(async (seq, idx) => {

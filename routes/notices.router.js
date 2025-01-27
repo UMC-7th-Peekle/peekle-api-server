@@ -17,7 +17,7 @@ router.post(
   authMiddleware.authenticateAccessToken,
   fileUploadMiddleware.localStorage({
     restrictions: fileUploadMiddleware.restrictions("notice"),
-    field: [{ name: "peekle_images", maxCount: 5 }],
+    field: [{ name: "notice_images", maxCount: 5 }],
     destination: "uploads/notices",
   }),
   createNoticeController.createNotice
@@ -27,7 +27,7 @@ router.patch(
   authMiddleware.authenticateAccessToken,
   fileUploadMiddleware.localStorage({
     restrictions: fileUploadMiddleware.restrictions("notice"),
-    field: [{ name: "peekle_images", maxCount: 5 }],
+    field: [{ name: "notice_images", maxCount: 5 }],
     destination: "uploads/notices",
   }),
   updateNoticeController.updateNotice
