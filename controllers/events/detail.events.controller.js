@@ -12,12 +12,7 @@ export const detailEvent = async (req, res, next) => {
 
     const detail = await detailService.detailEvent(eventId);
 
-    if (!detail)
-      return res
-        .status(204)
-        .success({ message: "해당 이벤트의 상세 정보가 비어있습니다." });
-
-    return res.status(200).success({ detail });
+    return res.status(200).success({ event: detail });
   } catch (error) {
     logError(error);
     next(error);
@@ -51,6 +46,20 @@ export const updateEvent = async (req, res, next) => {
     );
 
     return res.status(200).success({ message: "이벤트 수정 완료" });
+  } catch (error) {
+    logError(error);
+    next(error);
+  }
+};
+
+export const deleteEvent = async (req, res, next) => {
+  try {
+    await detailService.deleteEvent({
+      eventId: req.body.eventId,
+      userId: req.user.userId,
+    });
+
+    return res.status(200).success({ message: "이벤트 삭제 완료" });
   } catch (error) {
     logError(error);
     next(error);

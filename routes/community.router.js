@@ -13,7 +13,7 @@ import * as articleValidator from "../utils/validators/community/article.validat
 // 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
-import { validate } from "../middleware/validate.js";
+import { validateRequestBody } from "../middleware/validate.js";
 
 const router = Router();
 
@@ -54,7 +54,7 @@ router.post(
   }),
   // validator는 body를 검증하기에 순서에 유의
   // form-data의 경우 multer가 body에 채워주는 것임
-  validate(articleValidator.postArticleSchema, true),
+  validateRequestBody(articleValidator.postArticleSchema, true),
   articleCrudController.createArticle
 );
 
@@ -69,7 +69,7 @@ router.patch(
   }),
   // validator는 body를 검증하기에 순서에 유의
   // form-data의 경우 multer가 body에 채워주는 것임
-  validate(articleValidator.patchArticleSchema, true),
+  validateRequestBody(articleValidator.patchArticleSchema, true),
   articleCrudController.updateArticle
 );
 

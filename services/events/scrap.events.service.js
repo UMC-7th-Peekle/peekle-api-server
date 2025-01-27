@@ -14,8 +14,7 @@ export const newScrap = async (eventId, userId) => {
   } catch (error) {
     if (error instanceof Sequelize.ForeignKeyConstraintError) {
       throw new NotExistsError("존재하지 않는 이벤트입니다.");
-    } 
-    else if (error instanceof Sequelize.UniqueConstraintError) {
+    } else if (error instanceof Sequelize.UniqueConstraintError) {
       throw new AlreadyExistsError("이미 스크랩된 이벤트입니다.");
     }
     throw error;
@@ -33,11 +32,12 @@ export const deleteScrap = async (eventId, userId) => {
       where: { eventId, userId },
     });
 
-    if (deleteScrap === 0) {    // 반환값이 0일 경우 404
-      throw new NotExistsError("이미 스크랩 취소한 이벤트입니다.");
+    if (deleteScrap === 0) {
+      // 반환값이 0일 경우 404
+      throw new NotExistsError("스크랩 되어 있지 않은 이벤트입니다.");
     }
 
-    return true; 
+    return true;
   } catch (error) {
     throw error;
   }

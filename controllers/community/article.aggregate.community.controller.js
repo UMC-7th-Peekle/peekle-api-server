@@ -16,9 +16,9 @@ export const getPopularArticles = async (req, res, next) => {
 
     // 인기 게시글이 없는 경우
     if (!articles || articles.length === 0) {
-      return res.status(204).json({ message: "No popular articles found." }); // 204 응답
+      return res.status(204).end(); // 204 응답
     }
-    
+
     // 인기 게시글이 있는 경우
     return res.status(200).success({
       message: "인기 게시글 조회 성공",

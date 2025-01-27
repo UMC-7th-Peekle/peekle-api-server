@@ -6,6 +6,7 @@ export const postEventSchema = {
     price: { type: "number" },
     categoryId: { type: "number" },
     location: { type: "string" },
+    locationGroupId: { type: "number" },
     eventUrl: { type: "string", format: "uri" },
     applicationStart: { type: "string", format: "date" },
     applicationEnd: { type: "string", format: "date" },
@@ -44,11 +45,13 @@ export const postEventSchema = {
     "price",
     "categoryId",
     "location",
+    "locationGroupId",
     "eventUrl",
     "applicationStart",
     "applicationEnd",
     "schedules",
   ],
+  additionalProperties: false,
 };
 export const patchEventSchema = {
   type: "object",
@@ -93,4 +96,24 @@ export const patchEventSchema = {
     newImageSequence: { type: "array", items: { type: "number" } },
   },
   required: [],
+  additionalProperties: false,
+};
+
+export const scrapEventSchema = {
+  type: "object",
+  properties: {
+    eventId: { type: "number" },
+  },
+  required: ["eventId"],
+  additionalProperties: false,
+};
+
+export const reportEventSchema = {
+  type: "object",
+  properties: {
+    eventId: { type: "number" },
+    reason: { type: "string" },
+  },
+  required: ["eventId", "reason"],
+  additionalProperties: false,
 };

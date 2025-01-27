@@ -176,3 +176,12 @@ export class InvalidQueryError extends CustomError {
     super(reason, "INVALID_QUERY", 400, data);
   }
 }
+
+/**
+ * 기대된 Content-Type가 아닌 경우
+ */
+export class InvalidContentTypeError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "INVALID_CONTENT_TYPE", 415, data);
+  }
+}
