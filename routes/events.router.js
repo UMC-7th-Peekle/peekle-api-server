@@ -60,18 +60,29 @@ router.get("/groups/category", groupController.eventCategory); // 이벤트 카�
 router.get("/groups/location", groupController.eventLocation); // 이벤트 지역 조회
 
 // 이벤트 스크랩
+// 스크랩된 이벤트 조회
+// router.get(
+//   "/scrap",
+//   validateRequestBody(eventValidator.scrapEventSchema),
+//   authMiddleware.authenticateAccessToken,
+//   scrapEventController.listScrap
+// );
+
+// 특정 이벤트 스크랩
 router.post(
   "/scrap",
   validateRequestBody(eventValidator.scrapEventSchema),
   authMiddleware.authenticateAccessToken,
   scrapEventController.newScrap
-); // 특정 이벤트 스크랩
+);
+
+// 특정 이벤트를 스크랩 취소
 router.delete(
   "/scrap",
   validateRequestBody(eventValidator.scrapEventSchema),
   authMiddleware.authenticateAccessToken,
   scrapEventController.deleteScrap
-); // 특정 이벤트를 스크랩 취소
+);
 
 // 이벤트 신고하기
 router.post(
@@ -79,6 +90,6 @@ router.post(
   validateRequestBody(eventValidator.reportEventSchema),
   authMiddleware.authenticateAccessToken,
   reportEventController.newReport
-); // 특정 이벤트 신고
+);
 
 export default router;

@@ -14,6 +14,7 @@ export const listEvent = async (req, res, next) => {
     const paginationOptions = {
       limit: limit ? parseInt(limit, 10) : 10, // 기본 limit은 10
       cursor: cursor ? parseInt(cursor, 10) : null, // cursor가 없으면 null
+      category,
       location,
       price,
       startDate,
@@ -22,7 +23,6 @@ export const listEvent = async (req, res, next) => {
 
     // TODO : location, price, startDate, endDate에 대한 처리를 하고 있지 않음
     const { events, nextCursor, hasNextPage } = await listService.listEvent(
-      category,
       paginationOptions
     );
 
