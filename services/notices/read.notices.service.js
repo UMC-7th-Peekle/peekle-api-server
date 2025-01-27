@@ -1,5 +1,8 @@
 // Description: 공지사항 조회와 관련된 서비스 파일입니다.
-import { NotExistsError, InvalidQueryError } from "../../utils/errors/errors.js";
+import {
+  NotExistsError,
+  InvalidQueryError,
+} from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Op } from "sequelize";
@@ -8,32 +11,18 @@ import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 /**
  * 카테고리별 공지사항 조회
  */
-export const getNoticesByCategory = async (
-  categoryId,
-  { limit, cursor = null }
-) => {
-  // 공지사항 조회
-  const notices = await models.Notices.findAll({
-    where: {
-      categoryId,
-      ...(cursor && { noticeId: { [Op.lt]: cursor } }), // 커서 조건: noticeId 기준
-    },
+export const getNoticesByCategory = async (categoryId, paginationOptions) => {
+  console.log(categoryId, paginationOptions);
+  const result = await models.Notices.findAndCountAll({
+    where: { categoryId },
     order: [["createdAt", "DESC"]], // 최신순 정렬
-    limit: limit + 1,
-  });
-
-  // 다음 커서 설정
-  const hasNextPage = notices.length > limit; // limit + 1개를 가져왔으면 다음 페이지 있음
-  const nextCursor = hasNextPage ? notices[limit - 1].noticeId : null;
-
-  if (hasNextPage) {
-    notices.pop(); // limit + 1개를 가져왔으면 마지막 요소는 버림
-  }
+    limit: paginationOptions.limit, // 조회 개수 제한
+    offset: paginationOptions.offset, // 페이지네이션 옵션
+  })
 
   return {
-    notices,
-    nextCursor,
-    hasNextPage,
+    notices:result.rows,
+    totalCount: result.count,
   };
 };
 
@@ -43,7 +32,7 @@ export const getNoticesByCategory = async (
 export const searchNotices = async (
   category,
   query,
-  { limit, cursor = null }
+  { limit, offset }
 ) => {
   // 검색어가 없는 경우
   if (!category.trim() || !query.trim()) {
@@ -53,7 +42,6 @@ export const searchNotices = async (
     });
     throw new InvalidQueryError("검색어가 누락되었습니다.");
   }
-
 
   const notices = await models.NoticeCategory.findOne({
     where: { name: category },
