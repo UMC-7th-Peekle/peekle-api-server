@@ -14,9 +14,26 @@ const sequelize = new Sequelize(
     host: DATABASE.MYSQL_HOST,
     port: DATABASE.MYSQL_PORT,
     dialect: "mysql",
-    logging: (msg) => {
+    benchmark: true,
+    logging: (msg, timing) => {
       // const isTransaction = msg.startsWith("Executing (default): BEGIN;");
       // const parsedMsg = msg.replace(/^Executing \(default\):/, "").trim();
+      // ANSI escape codes:
+      const reset = "\x1b[0m"; // 리셋 (색상 및 스타일 초기화)
+
+      const green = "\x1b[32m\x1b[1m"; // 초록색, 볼드
+      const cyan = "\x1b[36m\x1b[1m"; // 청록색, 볼드
+      const magenta = "\x1b[35m\x1b[1m"; // 자홍색, 볼드
+      // const white = "\x1b[37m\x1b[1m";
+      // const yellow = "\x1b[33m\x1b[1m"; // 노란색, 볼드
+      // const blue = "\x1b[34m\x1b[1m"; // 파란색, 볼드
+      // const red = "\x1b[31m\x1b[1m"; // 빨간색, 볼드
+      // const black = "\x1b[30m\x1b[1m"; // 검정색, 볼드
+
+      // 콘솔 로그에 스타일 적용
+      console.log(
+        `${cyan}⏱️  Execution Time: ${green}${timing} ms${reset}\n${magenta}💬 Query: ${reset}${msg}${reset}`
+      );
       const parsedMsg = msg.split(":").slice(1).join(":").trim();
       let formattedMsg = msg;
       try {
@@ -33,6 +50,7 @@ const sequelize = new Sequelize(
       logger.silly(formattedMsg, {
         action: "sequelize:query",
         actionType: "log ✨",
+        queryTime: `${timing} ms`,
       });
       return;
     },

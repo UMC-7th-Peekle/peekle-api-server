@@ -1,13 +1,13 @@
 // Description: 댓글 관련 조회, 생성, 수정, 삭제와 관련된 컨트롤러 파일입니다.
 import * as commentService from "../../services/community/comment.community.service.js";
+import { InvalidQueryError } from "../../utils/errors/errors.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 // 댓글 생성
 export const createComment = async (req, res, next) => {
   try {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-    const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
-    const { content, isAnonymous } = req.body; // Request body에서 content 추출
+    const { communityId, articleId, content, isAnonymous } = req.body;
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     const comment = await commentService.createComment({
@@ -31,8 +31,8 @@ export const createComment = async (req, res, next) => {
 export const updateComment = async (req, res, next) => {
   try {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-    const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
-    const { content } = req.body; // Request body에서 content 추출
+    const { communityId, articleId, commentId, content, isAnonymous } =
+      req.body;
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     const comment = await commentService.updateComment({
@@ -41,6 +41,7 @@ export const updateComment = async (req, res, next) => {
       commentId,
       authorId,
       content,
+      isAnonymous,
     }); // 댓글 수정 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
 
     return res.status(200).success({
@@ -55,7 +56,7 @@ export const updateComment = async (req, res, next) => {
 // 댓글 삭제
 export const deleteComment = async (req, res, next) => {
   try {
-    const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
+    const { communityId, articleId, commentId } = req.body; // URL에서 communityId, articleId, commentId 추출
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     await commentService.deleteComment({
@@ -78,11 +79,11 @@ export const deleteComment = async (req, res, next) => {
 export const createCommentReply = async (req, res, next) => {
   try {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-    const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
-    const { content, isAnonymous } = req.body; // Request body에서 content 추출
+    const { communityId, articleId, commentId, content, isAnonymous } =
+      req.body;
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
-    const comment = await commentService.createCommentReply({
+    await commentService.createCommentReply({
       articleId,
       commentId,
       authorId,
@@ -102,7 +103,20 @@ export const createCommentReply = async (req, res, next) => {
 // 댓글 조회
 export const getComments = async (req, res, next) => {
   try {
-    const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
+    const { communityId, articleId } = req.query; // URL에서 communityId, articleId 추출
+
+    if (communityId === undefined || articleId === undefined) {
+      throw new InvalidQueryError(
+        "Query String은 communityId와 articleId을 포함해야 합니다."
+      );
+    }
+    const isInteger = (value) => /^\d+$/.test(value); // 정수만 허용
+    if (!isInteger(communityId)) {
+      throw new InvalidQueryError("communityId는 정수여야 합니다.");
+    }
+    if (!isInteger(articleId)) {
+      throw new InvalidQueryError("articleId는 정수여야 합니다.");
+    }
 
     const { comments } = await commentService.getComments({
       communityId,

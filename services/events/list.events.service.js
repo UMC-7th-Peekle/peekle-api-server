@@ -85,28 +85,44 @@ export const listEvent = async (category = "전체", paginationOptions) => {
   return { events: modifiedEvents, nextCursor, hasNextPage };
 };
 
-export const validateQuery = (query) => {
-  const { limit, cursor, category, location, price, startDate, endDate } =
-    query;
-  // limit 및 cursor 유효성 검증 (정수형 확인)
+export const validateEventQuery = (queries) => {
+  const {
+    limit,
+    cursor,
+    query,
+    category,
+    location,
+    price,
+    startDate,
+    endDate,
+  } = queries;
+
+  if (queries !== undefined && queries.trim().length < 2) {
+    throw new InvalidQueryError(
+      "검색어는 공백을 제외하고 2자 이상이여야 합니다."
+    );
+  }
 
   const isInteger = (value) => /^\d+$/.test(value); // 정수만 허용
-  if (
-    (limit && (!isInteger(limit) || limit === "")) ||
-    (cursor && (!isInteger(cursor) || cursor === ""))
-  ) {
-    throw new InvalidQueryError("limit, cursor는 정수여야 합니다.");
+  if (limit !== undefined && !isInteger(limit)) {
+    throw new InvalidQueryError("limit는 정수여야 합니다.");
+  }
+  if (cursor !== undefined && !isInteger(cursor)) {
+    throw new InvalidQueryError("cursor는 정수여야 합니다.");
   }
 
   // price 유효성 검증 (boolean 확인)
   const pricePool = ["true", "false"];
-  if (price && (price === "" || !pricePool.includes(price))) {
+  if (price !== undefined && (price === "" || !pricePool.includes(price))) {
     throw new InvalidQueryError("price는 true 또는 false여야 합니다.");
   }
 
   // 카테고리 검증
   const categoryPool = ["전체", "교육", "문화", "활동"];
-  if (category && (category === "" || !categoryPool.includes(category))) {
+  if (
+    category !== undefined &&
+    (category === "" || !categoryPool.includes(category))
+  ) {
     throw new InvalidQueryError(
       "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
       categoryPool
@@ -114,7 +130,6 @@ export const validateQuery = (query) => {
   }
 
   // 날짜 형식 및 유효성 검증
-  // regex로 형식 검증 후 Date 객체로 변환하여 유효성 검증
   const isValidDate = (dateString) => {
     const regex = /^\d{4}-\d{2}-\d{2}$/;
     if (!regex.test(dateString)) return false;
@@ -122,14 +137,19 @@ export const validateQuery = (query) => {
     return date instanceof Date && !isNaN(date);
   };
 
-  if (
-    (startDate && !isValidDate(startDate)) ||
-    (endDate && !isValidDate(endDate))
-  ) {
+  if (startDate !== undefined && !isValidDate(startDate)) {
     throw new InvalidQueryError("올바르지 않은 날짜 형식입니다.");
   }
-
-  if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+  if (endDate !== undefined && !isValidDate(endDate)) {
+    throw new InvalidQueryError("올바르지 않은 날짜 형식입니다.");
+  }
+  if (
+    startDate !== undefined &&
+    endDate !== undefined &&
+    new Date(startDate) > new Date(endDate)
+  ) {
     throw new InvalidQueryError("startDate가 endDate보다 미래일 수 없습니다.");
   }
+
+  return;
 };

@@ -5,7 +5,7 @@ import { logError } from "../../utils/handlers/error.logger.js";
 // 게시글 좋아요
 export const likeArticle = async (req, res, next) => {
   try {
-    const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
+    const { communityId, articleId } = req.body; // URL에서 communityId, articleId 추출
     const likedUserId = req.user.userId; // JWT에서 사용자 ID 추출
 
     const like = await articleLikeService.likeArticle({
@@ -26,7 +26,7 @@ export const likeArticle = async (req, res, next) => {
 // 게시글 좋아요 취소
 export const unlikeArticle = async (req, res, next) => {
   try {
-    const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
+    const { communityId, articleId } = req.body; // URL에서 communityId, articleId 추출
     const likedUserId = req.user.userId; // JWT에서 사용자 ID 추출
 
     await articleLikeService.unlikeArticle({

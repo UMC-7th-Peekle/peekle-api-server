@@ -77,7 +77,7 @@ export const phoneVerifySchema = {
   properties: {
     phone: { type: "string", pattern: "^[0-9]{10,11}$" },
     phoneVerificationSessionId: { type: "string" },
-    phoneVerificationCode: { type: "string", pattern: "^[0-9]{6}$" },
+    phoneVerificationCode: { type: "string", pattern: "^[0-9]{4}$" },
   },
   required: ["phone", "phoneVerificationSessionId", "phoneVerificationCode"],
   additionalProperties: false,

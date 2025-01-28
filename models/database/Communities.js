@@ -13,7 +13,8 @@ export default class Communities extends Model {
     },
     title: {
       type: DataTypes.STRING(512),
-      allowNull: false
+      allowNull: false,
+      unique: "communities_pk"
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -38,6 +39,14 @@ export default class Communities extends Model {
         using: "BTREE",
         fields: [
           { name: "community_id" },
+        ]
+      },
+      {
+        name: "communities_pk",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "title" },
         ]
       },
     ]

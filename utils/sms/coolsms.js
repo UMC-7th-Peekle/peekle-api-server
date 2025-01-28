@@ -39,10 +39,14 @@ export const axiosSendSMS = async (to, from, text) => {
 
   try {
     const response = await axios.post(url, data, { headers });
-    console.log("메시지가 성공적으로 전송되었습니다:", response.data);
+    logger.debug("메시지가 성공적으로 전송되었습니다:", {
+      data: response.data,
+    });
     return response.data;
   } catch (error) {
-    console.error("메시지 전송 중 오류가 발생했습니다:", error.response.data);
+    logger.error("메시지 전송 중 오류가 발생했습니다:", {
+      data: error.response.data,
+    });
     throw error;
   }
 };
@@ -55,7 +59,9 @@ export const sdkSendSMS = async (to, text) => {
       text,
     });
 
-    logger.debug(`메시지 전송 결과: ${JSON.stringify(result, null, 2)}`);
+    logger.debug("메세지 전송 성공", {
+      result,
+    });
     return result;
   } catch (error) {
     logError(error);
@@ -66,7 +72,9 @@ export const sdkSendSMS = async (to, text) => {
 export const sdkGetBalance = async () => {
   try {
     const result = await messageService.getBalance();
-    logger.debug(`잔액 조회 결과: ${JSON.stringify(result, null, 2)}`);
+    logger.debug("잔액 조회 성공", {
+      result,
+    });
     return result;
   } catch (error) {
     logError(error);

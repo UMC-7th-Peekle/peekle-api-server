@@ -37,7 +37,7 @@ export const kakaoCallback = async (req, res, next) => {
 
     // 2. 받아온 액세스 토큰으로 카카오 사용자 정보를 조회
     const kakaoUserInfo = await kakaoService.getKakaoUserInfo(kakaoAccessToken);
-    console.log("kakaoUserInfo", kakaoUserInfo);
+    // console.log("kakaoUserInfo", kakaoUserInfo);
 
     // 3. 조회한 사용자 정보로 우리 DB에 사용자 정보를 조회
     const peekleUser = await kakaoService.checkIfUserExists(kakaoUserInfo);

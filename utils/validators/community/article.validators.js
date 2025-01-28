@@ -5,7 +5,7 @@ export const postArticleSchema = {
     content: { type: "string" },
     isAnonymous: { type: "boolean" },
   },
-  required: ["title", "content"],
+  required: ["title", "content", "isAnonymous"],
   additionalProperties: false,
 };
 
@@ -19,5 +19,83 @@ export const patchArticleSchema = {
     newImageSequence: { type: "array", items: { type: "number" } },
   },
   required: [],
+  additionalProperties: false,
+};
+
+export const createCommunitySchema = {
+  type: "object",
+  properties: {
+    communityName: { type: "string" },
+  },
+  required: ["communityName"],
+  additionalProperties: false,
+};
+
+export const specificArticlePathSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+  },
+  required: ["communityId", "articleId"],
+  additionalProperties: false,
+};
+
+export const specificArticleCommentPathSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    commentId: { type: "number" },
+  },
+  required: ["communityId", "articleId", "commentId"],
+  additionalProperties: false,
+};
+
+export const createCommentSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    content: { type: "string" },
+    isAnonymous: { type: "boolean" },
+  },
+  required: ["communityId", "articleId", "content", "isAnonymous"],
+  additionalProperties: false,
+};
+
+export const updateOrReplyCommentSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    commentId: { type: "number" },
+    content: { type: "string" },
+    isAnonymous: { type: "boolean" },
+  },
+  required: ["communityId", "articleId", "commentId", "content", "isAnonymous"],
+  additionalProperties: false,
+};
+
+export const reportArticleSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    reason: { type: "string" },
+  },
+  required: ["communityId", "articleId", "reason"],
+  additionalProperties: false,
+};
+
+export const reportCommentSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    commentId: { type: "number" },
+    reason: { type: "string" },
+  },
+  required: ["communityId", "articleId", "commentId", "reason"],
   additionalProperties: false,
 };

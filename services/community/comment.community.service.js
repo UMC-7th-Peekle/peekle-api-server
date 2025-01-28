@@ -34,11 +34,11 @@ export const createComment = async ({
   // 댓글 생성
   try {
     comment = await models.ArticleComments.create({
-    articleId,
-    authorId,
-    content,
-    status: "active",
-    isAnonymous,
+      articleId,
+      authorId,
+      content,
+      status: "active",
+      isAnonymous,
     });
   } catch (error) {
     if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
@@ -62,6 +62,7 @@ export const updateComment = async ({
   commentId,
   authorId,
   content,
+  isAnonymous,
 }) => {
   // 댓글 조회
   const comment = await models.ArticleComments.findOne({
@@ -87,7 +88,7 @@ export const updateComment = async ({
     throw new NotAllowedError("댓글 작성자만 수정할 수 있습니다");
   }
   // 댓글 수정
-  await comment.update({ content });
+  await comment.update({ content, isAnonymous });
 
   return { comment };
 };
@@ -162,8 +163,6 @@ export const createCommentReply = async ({
     throw error;
   }
 
-
-
   return { comment };
 };
 
@@ -193,5 +192,5 @@ export const getComments = async ({ communityId, articleId }) => {
   }
 
   // 댓글만 반환
-  return { comments: articleWithComments.articleComments } ;
+  return { comments: articleWithComments.articleComments };
 };
