@@ -31,12 +31,35 @@ export const createCommunitySchema = {
   additionalProperties: false,
 };
 
-export const specifyArticleSchema = {
+export const specificArticlePathSchema = {
   type: "object",
   properties: {
     communityId: { type: "number" },
     articleId: { type: "number" },
   },
   required: ["communityId", "articleId"],
+  additionalProperties: false,
+};
+
+export const specificArticleCommentPathSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    commentId: { type: "number" },
+  },
+  required: ["communityId", "articleId", "commentId"],
+  additionalProperties: false,
+};
+
+export const crudArticleCommentSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    content: { type: "string" },
+    isAnonymous: { type: "boolean" },
+  },
+  required: ["communityId", "articleId", "content", "isAnonymous"],
   additionalProperties: false,
 };

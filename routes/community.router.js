@@ -84,7 +84,7 @@ router.patch(
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 삭제합니다
 router.delete(
   "/articles",
-  validateRequestBody(articleValidator.specifyArticleSchema),
+  validateRequestBody(articleValidator.specificArticlePathSchema),
   authenticateAccessToken,
   articleCrudController.deleteArticle
 );
@@ -96,7 +96,7 @@ router.delete(
 // article에 좋아요를 표시합니다.
 router.post(
   "/articles/like",
-  validateRequestBody(articleValidator.specifyArticleSchema),
+  validateRequestBody(articleValidator.specificArticlePathSchema),
   authenticateAccessToken,
   articleLikeController.likeArticle
 );
@@ -104,7 +104,7 @@ router.post(
 // article에 좋아요를 취소합니다.
 router.delete(
   "/articles/like",
-  validateRequestBody(articleValidator.specifyArticleSchema),
+  validateRequestBody(articleValidator.specificArticlePathSchema),
   authenticateAccessToken,
   articleLikeController.unlikeArticle
 );
@@ -115,35 +115,40 @@ router.delete(
 
 // article에 댓글을 추가합니다.
 router.post(
-  "/:communityId/articles/:articleId/comments",
+  "/articles/comments",
+  validateRequestBody(articleValidator.specificArticlePathSchema),
   authenticateAccessToken,
   commentController.createComment
 );
 
 // article에 댓글을 수정합니다.
 router.patch(
-  "/:communityId/articles/:articleId/comments/:commentId",
+  "/articles/comments",
+  validateRequestBody(articleValidator.specificArticleCommentPathSchema),
   authenticateAccessToken,
   commentController.updateComment
 );
 
 // article에 댓글을 삭제합니다.
 router.delete(
-  "/:communityId/articles/:articleId/comments/:commentId",
+  "/articles/comments",
+  validateRequestBody(articleValidator.specificArticleCommentPathSchema),
   authenticateAccessToken,
   commentController.deleteComment
 );
 
 // 댓글에 대댓글을 추가합니다.
 router.post(
-  "/:communityId/articles/:articleId/comments/:commentId/reply",
+  "/articles/comments/reply",
+  validateRequestBody(articleValidator.specificArticleCommentPathSchema),
   authenticateAccessToken,
   commentController.createCommentReply
 );
 
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글의 댓글 정보를 가져옵니다.
 router.get(
-  "/:communityId/articles/:articleId/comments",
+  "/articles/comments",
+  validateRequestBody(articleValidator.specificArticlePathSchema),
   commentController.getComments
 );
 

@@ -6,8 +6,7 @@ import { logError } from "../../utils/handlers/error.logger.js";
 export const createComment = async (req, res, next) => {
   try {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-    const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
-    const { content, isAnonymous } = req.body; // Request body에서 content 추출
+    const { communityId, articleId, content, isAnonymous } = req.body;
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     const comment = await commentService.createComment({
@@ -31,8 +30,8 @@ export const createComment = async (req, res, next) => {
 export const updateComment = async (req, res, next) => {
   try {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-    const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
-    const { content } = req.body; // Request body에서 content 추출
+    const { communityId, articleId, commentId, content, isAnonymous } =
+      req.body;
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     const comment = await commentService.updateComment({
@@ -41,6 +40,7 @@ export const updateComment = async (req, res, next) => {
       commentId,
       authorId,
       content,
+      isAnonymous,
     }); // 댓글 수정 (현재는 response에 article을 넣지 않지만, 추후에 넣을 상황이 생길 수도 있는 것을 고려해 article을 반환 받는 식으로 작성)
 
     return res.status(200).success({
@@ -55,7 +55,7 @@ export const updateComment = async (req, res, next) => {
 // 댓글 삭제
 export const deleteComment = async (req, res, next) => {
   try {
-    const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
+    const { communityId, articleId, commentId } = req.body; // URL에서 communityId, articleId, commentId 추출
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     await commentService.deleteComment({
@@ -78,11 +78,11 @@ export const deleteComment = async (req, res, next) => {
 export const createCommentReply = async (req, res, next) => {
   try {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
-    const { communityId, articleId, commentId } = req.params; // URL에서 communityId, articleId, commentId 추출
-    const { content, isAnonymous } = req.body; // Request body에서 content 추출
+    const { communityId, articleId, commentId, content, isAnonymous } =
+      req.body;
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
-    const comment = await commentService.createCommentReply({
+    await commentService.createCommentReply({
       articleId,
       commentId,
       authorId,
@@ -102,7 +102,7 @@ export const createCommentReply = async (req, res, next) => {
 // 댓글 조회
 export const getComments = async (req, res, next) => {
   try {
-    const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
+    const { communityId, articleId } = req.body; // URL에서 communityId, articleId 추출
 
     const { comments } = await commentService.getComments({
       communityId,
