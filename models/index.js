@@ -14,6 +14,7 @@ const sequelize = new Sequelize(
     host: DATABASE.MYSQL_HOST,
     port: DATABASE.MYSQL_PORT,
     dialect: "mysql",
+    benchmark: true,
     logging: (msg) => {
       // const isTransaction = msg.startsWith("Executing (default): BEGIN;");
       // const parsedMsg = msg.replace(/^Executing \(default\):/, "").trim();
