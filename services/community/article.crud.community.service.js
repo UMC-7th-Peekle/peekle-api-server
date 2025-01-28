@@ -1,6 +1,6 @@
 // Description: 게시글 관련 조회, 생성, 수정, 삭제 로직을 처리하는 파일입니다.
 import {
-  InvalidInputError,
+  AlreadyExistsError,
   NotAllowedError,
   NotExistsError,
 } from "../../utils/errors/errors.js";
@@ -14,9 +14,30 @@ import {
 
 export const createCommunity = async ({ communityName }) => {
   // 게시판 생성
-  await models.Communities.create({
-    title: communityName,
-  });
+  try {
+    await models.Communities.create({
+      title: communityName,
+    });
+  } catch (err) {
+    if (err instanceof models.Sequelize.UniqueConstraintError) {
+      // 게시판 이름이 중복되는 경우
+      logger.error({
+        layer: "service",
+        action: "community:create",
+        actionType: "error",
+        message: "중복된 게시판 이름으로 생성하려 시도했습니다.",
+        data: { title: communityName },
+      });
+      throw new AlreadyExistsError("이미 존재하는 게시판 이름입니다.");
+    }
+    logger.error("게시판 생성 실패", {
+      layer: "service",
+      action: "community:create",
+      actionType: "error",
+      data: { title: communityName },
+    });
+    throw err;
+  }
 
   logger.debug({
     layer: "service",
@@ -25,6 +46,8 @@ export const createCommunity = async ({ communityName }) => {
     message: "게시판 생성 완료",
     data: { title: communityName },
   });
+
+  return;
 };
 
 /**
