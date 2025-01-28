@@ -13,7 +13,7 @@ export const validateStatisticsQuery = (queries) => {
 
   // 날짜 형식 및 유효성 검증
   const isValidDate = (dateString) => {
-    const date = Date.parse(dateString);
+    const date = new Date(dateString);
     console.error(date);
     return date instanceof Date && !isNaN(date);
   };
