@@ -5,6 +5,20 @@ import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
 import { parseImagePaths } from "../../utils/upload/uploader.object.js";
 
+// 게시판 생성
+export const createCommunity = async (req, res, next) => {
+  try {
+    await articleCrudService.createCommunity(req.body); // 게시판 생성
+
+    return res.status(201).success({
+      message: "게시판 생성 성공",
+    });
+  } catch (error) {
+    logError(error);
+    next(error); // 에러 핸들러로 전달
+  }
+};
+
 // 게시글 조회
 export const getArticleById = async (req, res, next) => {
   try {

@@ -6,13 +6,26 @@ import {
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
-import fs from "fs/promises";
-import path from "path";
 import {
   addBaseUrl,
   deleteLocalFile,
   isEditInputCorrect,
 } from "../../utils/upload/uploader.object.js";
+
+export const createCommunity = async ({ communityName }) => {
+  // 게시판 생성
+  await models.Communities.create({
+    title: communityName,
+  });
+
+  logger.debug({
+    layer: "service",
+    action: "community:create",
+    actionType: "success",
+    message: "게시판 생성 완료",
+    data: { title: communityName },
+  });
+};
 
 /**
  * communityId와 articleId에 해당하는 게시글을 가져옵니다
