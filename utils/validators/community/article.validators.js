@@ -52,7 +52,7 @@ export const specificArticleCommentPathSchema = {
   additionalProperties: false,
 };
 
-export const crudArticleCommentSchema = {
+export const createCommentSchema = {
   type: "object",
   properties: {
     communityId: { type: "number" },
@@ -61,5 +61,18 @@ export const crudArticleCommentSchema = {
     isAnonymous: { type: "boolean" },
   },
   required: ["communityId", "articleId", "content", "isAnonymous"],
+  additionalProperties: false,
+};
+
+export const rudCommentSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    commentId: { type: "number" },
+    content: { type: "string" },
+    isAnonymous: { type: "boolean" },
+  },
+  required: ["communityId", "articleId", "commentId", "content", "isAnonymous"],
   additionalProperties: false,
 };

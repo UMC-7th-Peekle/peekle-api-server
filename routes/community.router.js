@@ -113,10 +113,17 @@ router.delete(
   게시글 댓글
 */
 
+// communityId에 해당하는 게시판의 articleId에 해당하는 게시글의 댓글 정보를 가져옵니다.
+router.get(
+  "/articles/comments",
+  validateRequestBody(articleValidator.specificArticlePathSchema),
+  commentController.getComments
+);
+
 // article에 댓글을 추가합니다.
 router.post(
   "/articles/comments",
-  validateRequestBody(articleValidator.specificArticlePathSchema),
+  validateRequestBody(articleValidator.createCommentSchema),
   authenticateAccessToken,
   commentController.createComment
 );
@@ -124,7 +131,7 @@ router.post(
 // article에 댓글을 수정합니다.
 router.patch(
   "/articles/comments",
-  validateRequestBody(articleValidator.specificArticleCommentPathSchema),
+  validateRequestBody(articleValidator.rudCommentSchema),
   authenticateAccessToken,
   commentController.updateComment
 );
@@ -140,16 +147,9 @@ router.delete(
 // 댓글에 대댓글을 추가합니다.
 router.post(
   "/articles/comments/reply",
-  validateRequestBody(articleValidator.specificArticleCommentPathSchema),
+  validateRequestBody(articleValidator.createReplySchema),
   authenticateAccessToken,
   commentController.createCommentReply
-);
-
-// communityId에 해당하는 게시판의 articleId에 해당하는 게시글의 댓글 정보를 가져옵니다.
-router.get(
-  "/articles/comments",
-  validateRequestBody(articleValidator.specificArticlePathSchema),
-  commentController.getComments
 );
 
 /*
@@ -158,14 +158,16 @@ router.get(
 
 // 댓글에 좋아요를 표시합니다.
 router.post(
-  "/:community/articles/:articleId/comments/:commentId/like",
+  "/articles/comments/like",
+  validateRequestBody(articleValidator.specificArticleCommentPathSchema),
   authenticateAccessToken,
   commentLikeController.likeComment
 );
 
 // 댓글에 좋아요를 취소합니다.
 router.delete(
-  "/:community/articles/:articleId/comments/:commentId/like",
+  "/articles/comments/like",
+  validateRequestBody(articleValidator.specificArticleCommentPathSchema),
   authenticateAccessToken,
   commentLikeController.unlikeComment
 );
