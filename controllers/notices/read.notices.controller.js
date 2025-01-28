@@ -8,7 +8,7 @@ import logger from "../../utils/logger/logger.js";
 export const getNoticesByCategory = async (req, res, next) => {
   try {
     const { categoryId } = req.params; // URL에서 categoryId 추출
-    const { limit, offset } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
+    const { limit, offset } = req.query; // 쿼리 파라미터에서 limit와 offset 추출
 
     // 페이지네이션 기본값 설정
     const paginationOptions = {
