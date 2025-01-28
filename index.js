@@ -46,7 +46,14 @@ app.use(responseHandler);
 
 app.use(cookieParser());
 app.use(cors(corsOptions));
-app.use(morgan("dev")); // morgan logger
+app.use(
+  morgan("dev", {
+    immediate: true,
+    stream: {
+      write: (message) => logger.http(message.trim()),
+    },
+  })
+); // morgan logger
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
