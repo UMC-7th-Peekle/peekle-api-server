@@ -1,5 +1,6 @@
 // Description: 공지사항 조회와 관련된 컨트롤러 파일입니다.
 import * as readNoticesService from "../../services/notices/read.notices.service.js";
+import { InvalidQueryError } from "../../utils/errors/errors.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
 
@@ -23,11 +24,12 @@ export const getNoticesByCategory = async (req, res, next) => {
 
     // 공지사항이 없는 경우
     if (notices && notices.length === 0) {
-      return res.status(204).success(); // 응답 본문 없이 204 반환
+      return res.status(204).end(); // 응답 본문 없이 204 반환
     }
 
     // 페이지 계산
-    const currentPage = Math.floor(paginationOptions.offset / paginationOptions.limit) + 1;
+    const currentPage =
+      Math.floor(paginationOptions.offset / paginationOptions.limit) + 1;
     const totalPages = Math.ceil(totalCount / paginationOptions.limit);
 
     logger.debug("공지사항 목록 조회 성공", {
@@ -55,6 +57,16 @@ export const searchNotices = async (req, res, next) => {
   try {
     const { category, query, limit, offset } = req.query; // Query에서 category, query, limit, offset 추출
 
+    if (category === "" || query === "") {
+      logger.debug("검색어 누락");
+      throw new InvalidQueryError("Query string should NOT BE EMPTY.");
+    }
+
+    if (category === "" || query === "") {
+      logger.debug("검색어 누락");
+      throw new InvalidQueryError("Query string should NOT BE EMPTY.");
+    }
+
     // 페이지네이션 기본값 설정
     const paginationOptions = {
       limit: limit ? parseInt(limit, 10) : 10, // 기본 limit은 10
@@ -73,7 +85,8 @@ export const searchNotices = async (req, res, next) => {
     }
 
     // 페이지 계산
-    const currentPage = Math.floor(paginationOptions.offset / paginationOptions.limit) + 1;
+    const currentPage =
+      Math.floor(paginationOptions.offset / paginationOptions.limit) + 1;
     const totalPages = Math.ceil(totalCount / paginationOptions.limit);
 
     logger.debug("공지사항 검색 성공", {

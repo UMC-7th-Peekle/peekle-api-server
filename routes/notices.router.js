@@ -1,16 +1,15 @@
 import { Router } from "express";
-import { notImplementedController } from "../controllers/empty.cotroller.js";
-import * as noticeReadController from "../controllers/notices/read.notices.controller.js";
+import * as readController from "../controllers/notices/read.notices.controller.js";
+import * as cudController from "../controllers/notices/cud.notices.controller.js";
 import * as authMiddleware from "../middleware/authenticate.jwt.js";
-import * as noticeController from "../controllers/notices/cud.notices.controller.js";
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
 
 const router = Router();
 
 // 공지사항 조회
-router.get("/category/:categoryId", noticeReadController.getNoticesByCategory);
-router.get("", noticeReadController.searchNotices);
-router.get("/:noticeId", noticeReadController.getNoticeById);
+router.get("/category/:categoryId", readController.getNoticesByCategory);
+router.get("/", readController.searchNotices);
+router.get("/:noticeId", readController.getNoticeById);
 
 // 공지사항 생성
 router.post(
@@ -21,7 +20,7 @@ router.post(
     field: [{ name: "notice_images", maxCount: 5 }],
     destination: "uploads/notices",
   }),
-  noticeController.createNotice
+  cudController.createNotice
 );
 
 // 공지사항 수정
@@ -33,14 +32,14 @@ router.patch(
     field: [{ name: "notice_images", maxCount: 5 }],
     destination: "uploads/notices",
   }),
-  noticeController.updateNotice
+  cudController.updateNotice
 );
 
 // 공지사항 삭제
 router.delete(
   "/:noticeId",
   authMiddleware.authenticateAccessToken,
-  noticeController.deleteNotice
+  cudController.deleteNotice
 );
 
 export default router;
