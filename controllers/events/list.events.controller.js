@@ -9,7 +9,7 @@ export const listEvent = async (req, res, next) => {
     const { limit, cursor, category, location, price, startDate, endDate } =
       req.query;
 
-    listService.validateQuery(req.query);
+    listService.validateEventQuery(req.query);
     // 페이지네이션 기본값 설정
     const paginationOptions = {
       limit: limit ? parseInt(limit, 10) : 10, // 기본 limit은 10

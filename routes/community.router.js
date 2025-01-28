@@ -31,10 +31,12 @@ router.post(
 */
 
 // communityId에 해당하는 게시판의 게시글들을 가져옵니다, 좋아요 누른 게시글만 가져올 수도 있습니다
-router.get("/:communityId", articleReadController.getArticles);
-
-// communityId에 해당하는 게시판의 게시글들을 검색합니다
-router.get("/:communityId/search", articleReadController.searchArticles);
+router.get("/", articleReadController.getArticles);
+router.get(
+  "/article/liked",
+  authenticateAccessToken,
+  articleReadController.getLikedArticles
+);
 
 /*
   게시글 CREATE, READ, UPDATE, DELETE

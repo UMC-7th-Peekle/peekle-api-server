@@ -85,16 +85,13 @@ export const listEvent = async (category = "전체", paginationOptions) => {
   return { events: modifiedEvents, nextCursor, hasNextPage };
 };
 
-export const validateQuery = (query) => {
+export const validateEventQuery = (query) => {
   const { limit, cursor, category, location, price, startDate, endDate } =
     query;
   // limit 및 cursor 유효성 검증 (정수형 확인)
 
   const isInteger = (value) => /^\d+$/.test(value); // 정수만 허용
-  if (
-    (limit && (!isInteger(limit) || limit === "")) ||
-    (cursor && (!isInteger(cursor) || cursor === ""))
-  ) {
+  if (!isInteger(limit) || !isInteger(cursor)) {
     throw new InvalidQueryError("limit, cursor는 정수여야 합니다.");
   }
 
