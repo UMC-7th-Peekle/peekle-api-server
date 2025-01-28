@@ -178,14 +178,16 @@ router.delete(
 
 // 게시글을 신고합니다.
 router.post(
-  "/:communityId/articles/:articleId/report",
+  "/articles/report",
+  validateRequestBody(articleValidator.reportArticleSchema),
   authenticateAccessToken,
   reportController.reportArticle
 );
 
 // 댓글을 신고합니다.
 router.post(
-  "/:communityId/articles/:articleId/comments/:commentId/report",
+  "/articles/comments/report",
+  validateRequestBody(articleValidator.reportCommentSchema),
   authenticateAccessToken,
   reportController.reportComment
 );

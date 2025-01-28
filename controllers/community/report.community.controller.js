@@ -5,8 +5,7 @@ import { logError } from "../../utils/handlers/error.logger.js";
 export const reportArticle = async (req, res, next) => {
   // 형식 검증은 완료된 상태로 들어온다고 가정.
   try {
-    const { communityId, articleId } = req.params;
-    const { reason } = req.body;
+    const { communityId, articleId, reason } = req.body;
     const reportedUserId = req.user.userId;
 
     const { articleReport } = await reportService.reportArticle({
@@ -28,8 +27,7 @@ export const reportArticle = async (req, res, next) => {
 
 export const reportComment = async (req, res, next) => {
   try {
-    const { communityId, articleId, commentId } = req.params;
-    const { reason } = req.body;
+    const { communityId, articleId, commentId, reason } = req.body;
     const reportedUserId = req.user.userId;
 
     const { commentReport } = await reportService.reportComment({

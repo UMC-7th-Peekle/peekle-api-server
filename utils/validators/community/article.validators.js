@@ -76,3 +76,39 @@ export const rudCommentSchema = {
   required: ["communityId", "articleId", "commentId", "content", "isAnonymous"],
   additionalProperties: false,
 };
+
+export const createReplySchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    commentId: { type: "number" },
+    content: { type: "string" },
+    isAnonymous: { type: "boolean" },
+  },
+  required: ["communityId", "articleId", "commentId", "content", "isAnonymous"],
+  additionalProperties: false,
+};
+
+export const reportArticleSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    reason: { type: "string" },
+  },
+  required: ["communityId", "articleId", "reason"],
+  additionalProperties: false,
+};
+
+export const reportCommentSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+    commentId: { type: "number" },
+    reason: { type: "string" },
+  },
+  required: ["communityId", "articleId", "commentId", "reason"],
+  additionalProperties: false,
+};
