@@ -15,9 +15,11 @@ const sequelize = new Sequelize(
     port: DATABASE.MYSQL_PORT,
     dialect: "mysql",
     benchmark: true,
-    logging: (msg) => {
+    logging: (msg, timing) => {
       // const isTransaction = msg.startsWith("Executing (default): BEGIN;");
       // const parsedMsg = msg.replace(/^Executing \(default\):/, "").trim();
+      console.log(timing);
+      console.log(msg);
       const parsedMsg = msg.split(":").slice(1).join(":").trim();
       let formattedMsg = msg;
       try {
@@ -34,6 +36,7 @@ const sequelize = new Sequelize(
       logger.silly(formattedMsg, {
         action: "sequelize:query",
         actionType: "log ✨",
+        queryTime: `${timing} ms`,
       });
       return;
     },

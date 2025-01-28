@@ -7,9 +7,8 @@ import logger from "../../utils/logger/logger.js";
 export const getArticles = async (req, res, next) => {
   // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
   try {
-    const { communityId, limit, cursor, query } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
-
     articleReadService.validateArticleQuery(req.query);
+    const { communityId, limit, cursor, query } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
 
     logger.debug("게시글 목록 조회", {
       action: "article:getArticles",
@@ -53,6 +52,8 @@ export const getArticles = async (req, res, next) => {
 export const getLikedArticles = async (req, res, next) => {
   try {
     const { userId } = req.user;
+
+    articleReadService.validateArticleQuery(req.query);
     const { limit, cursor } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
 
     // 페이지네이션 기본값 설정

@@ -25,14 +25,24 @@ const { combine, timestamp, errors, json, prettyPrint } = format;
 // });
 // await client.connect();
 
+const networkInfo =
+  Object.values(os.networkInterfaces())
+    .flat()
+    .filter((iface) => iface.family === "IPv4")
+    .map((iface) => iface.cidr)
+    .join(" | ") || undefined;
+
 const systemInfo = {
-  platform: os.platform(),
+  // platform: os.platform(),
+  // cpuModel: os.cpus()[0].model,
   // release: os.release(),
-  totalMemory: `${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
+  // totalMemory: `${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
   // freeMemory: `${(os.freemem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
-  cpuModel: os.cpus()[0].model,
-  uptime: `${Math.floor(os.uptime() / 3600)} hours ${Math.floor((os.uptime() % 3600) / 60)} minutes`,
-  hostname: os.hostname(),
+  deviceInfo: `Running on : ${os.hostname()} | ${os.userInfo().username} | ${os.cpus()[0].model} ${os.cpus().length} core | ${os.arch()} ${os.platform()} ${os.release()} | Uptime: ${Math.floor(os.uptime() / 86400)} days ${Math.floor((os.uptime() % 86400) / 3600)} hours ${Math.floor((os.uptime() % 3600) / 60)} minutes | ${networkInfo}`,
+  // memoryInfo: `${(os.freemem() / 1024 / 1024 / 1024).toFixed(2)} GB / ${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
+  // uptime: `${Math.floor(os.uptime() / 86400)} days ${Math.floor((os.uptime() % 86400) / 3600)} hours ${Math.floor((os.uptime() % 3600) / 60)} minutes`,
+  // hostname: os.hostname(),
+  // userInfo: os.userInfo(),
   // networkInterfaces: os.networkInterfaces(),
 };
 
@@ -42,7 +52,7 @@ const mongoTransportOptions = {
   level: "silly",
   collection: "peekle_logs",
   label: true,
-  storeHost: true,
+  // storeHost: true,
   tryReconnect: true,
 };
 
