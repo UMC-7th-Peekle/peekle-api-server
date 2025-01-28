@@ -64,20 +64,7 @@ export const createCommentSchema = {
   additionalProperties: false,
 };
 
-export const rudCommentSchema = {
-  type: "object",
-  properties: {
-    communityId: { type: "number" },
-    articleId: { type: "number" },
-    commentId: { type: "number" },
-    content: { type: "string" },
-    isAnonymous: { type: "boolean" },
-  },
-  required: ["communityId", "articleId", "commentId", "content", "isAnonymous"],
-  additionalProperties: false,
-};
-
-export const createReplySchema = {
+export const updateOrReplyCommentSchema = {
   type: "object",
   properties: {
     communityId: { type: "number" },

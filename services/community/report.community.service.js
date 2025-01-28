@@ -21,7 +21,7 @@ export const reportArticle = async ({
 
   // 게시글이 존재하지 않는 경우: 404
   if (!article) {
-    throw new NotExistsError("해당 게시글을 찾을 수 없습니다.");
+    throw new NotExistsError("존재하지 않는 게시글입니다.");
   }
 
   // 신고자와 게시글 작성자가 같은 경우: 403

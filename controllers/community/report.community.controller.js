@@ -1,5 +1,6 @@
 // Description: 게시글 신고와 관련된 컨트롤러 파일입니다.
 import * as reportService from "../../services/community/report.community.service.js";
+import { InvalidInputError } from "../../utils/errors/errors.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 
 export const reportArticle = async (req, res, next) => {
@@ -7,6 +8,10 @@ export const reportArticle = async (req, res, next) => {
   try {
     const { communityId, articleId, reason } = req.body;
     const reportedUserId = req.user.userId;
+
+    if (!reason) {
+      throw new InvalidInputError("신고 사유를 입력해주세요.");
+    }
 
     const { articleReport } = await reportService.reportArticle({
       communityId,
@@ -29,6 +34,10 @@ export const reportComment = async (req, res, next) => {
   try {
     const { communityId, articleId, commentId, reason } = req.body;
     const reportedUserId = req.user.userId;
+
+    if (!reason) {
+      throw new InvalidInputError("신고 사유를 입력해주세요.");
+    }
 
     const { commentReport } = await reportService.reportComment({
       communityId,

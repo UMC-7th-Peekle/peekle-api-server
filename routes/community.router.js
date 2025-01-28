@@ -40,6 +40,16 @@ router.get(
 );
 
 /*
+  인기글 집계
+*/
+
+// 특정 communityId에 startTime부터 endTime까지의 인기글을 가져옵니다.
+router.get(
+  "/:communityId/articles/popular",
+  articleAggregateController.getPopularArticles
+);
+
+/*
   게시글 CREATE, READ, UPDATE, DELETE
 */
 
@@ -114,11 +124,7 @@ router.delete(
 */
 
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글의 댓글 정보를 가져옵니다.
-router.get(
-  "/articles/comments",
-  validateRequestBody(articleValidator.specificArticlePathSchema),
-  commentController.getComments
-);
+router.get("/articles/comments", commentController.getComments);
 
 // article에 댓글을 추가합니다.
 router.post(
@@ -131,7 +137,7 @@ router.post(
 // article에 댓글을 수정합니다.
 router.patch(
   "/articles/comments",
-  validateRequestBody(articleValidator.rudCommentSchema),
+  validateRequestBody(articleValidator.updateOrReplyCommentSchema),
   authenticateAccessToken,
   commentController.updateComment
 );
@@ -147,7 +153,7 @@ router.delete(
 // 댓글에 대댓글을 추가합니다.
 router.post(
   "/articles/comments/reply",
-  validateRequestBody(articleValidator.createReplySchema),
+  validateRequestBody(articleValidator.updateOrReplyCommentSchema),
   authenticateAccessToken,
   commentController.createCommentReply
 );
@@ -190,16 +196,6 @@ router.post(
   validateRequestBody(articleValidator.reportCommentSchema),
   authenticateAccessToken,
   reportController.reportComment
-);
-
-/*
-  인기글 집계
-*/
-
-// 특정 communityId에 startTime부터 endTime까지의 인기글을 가져옵니다.
-router.get(
-  "/:communityId/popular-articles",
-  articleAggregateController.getPopularArticles
 );
 
 export default router;
