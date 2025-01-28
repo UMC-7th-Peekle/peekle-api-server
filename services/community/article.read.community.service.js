@@ -9,7 +9,7 @@ import { Op, fn, col } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
 export const validateArticleQuery = (queries) => {
-  const { communityId, limit, cursor, query } = queries; // 쿼리 파라미터에서 limit와 cursor 추출
+  const { limit, cursor, query, communityId } = queries; // 쿼리 파라미터에서 limit와 cursor 추출
 
   const isInteger = (value) => /^\d+$/.test(value); // 정수만 허용
   if (limit !== undefined && !isInteger(limit)) {
@@ -22,8 +22,10 @@ export const validateArticleQuery = (queries) => {
     throw new InvalidQueryError("communityId는 정수여야 합니다.");
   }
 
-  if (query !== undefined && query.length < 2) {
-    throw new InvalidQueryError("검색어는 2자 이상이여야 합니다.");
+  if (query !== undefined && query.trim().length < 2) {
+    throw new InvalidQueryError(
+      "검색어는 공백을 제외하고 2자 이상이여야 합니다."
+    );
   }
 
   return;
@@ -91,7 +93,7 @@ export const getArticles = async (
       },
     ],
   });
-  console.log(community);
+  // console.log(community);
 
   if (!community) {
     // 결과값이 존재하지 않는 경우

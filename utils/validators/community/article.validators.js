@@ -5,7 +5,7 @@ export const postArticleSchema = {
     content: { type: "string" },
     isAnonymous: { type: "boolean" },
   },
-  required: ["title", "content"],
+  required: ["title", "content", "isAnonymous"],
   additionalProperties: false,
 };
 
@@ -19,5 +19,24 @@ export const patchArticleSchema = {
     newImageSequence: { type: "array", items: { type: "number" } },
   },
   required: [],
+  additionalProperties: false,
+};
+
+export const createCommunitySchema = {
+  type: "object",
+  properties: {
+    communityName: { type: "string" },
+  },
+  required: ["communityName"],
+  additionalProperties: false,
+};
+
+export const specifyArticleSchema = {
+  type: "object",
+  properties: {
+    communityId: { type: "number" },
+    articleId: { type: "number" },
+  },
+  required: ["communityId", "articleId"],
   additionalProperties: false,
 };

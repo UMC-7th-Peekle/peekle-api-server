@@ -3,7 +3,6 @@ import {
   MulterError,
   UnknownError,
 } from "../utils/errors/errors.js";
-import { logError } from "../utils/handlers/error.logger.js";
 import logger from "../utils/logger/logger.js";
 import * as uploadService from "../utils/upload/uploader.object.js";
 import multer from "multer";

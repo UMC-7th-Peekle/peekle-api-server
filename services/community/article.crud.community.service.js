@@ -91,12 +91,10 @@ export const getArticleById = async ({ communityId, articleId }) => {
     sequence: image.sequence,
   }));
 
+  const ret = { ...data.dataValues, articleImages: transformedImages };
+
   // 결과 반환
-  return {
-    articleData: data, // 게시글 데이터
-    articleImages: transformedImages, // URL이 수정된 이미지 데이터
-    articleComments: data.articleComments, // 댓글 데이터
-  };
+  return ret;
 };
 
 /**

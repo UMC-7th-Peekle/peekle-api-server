@@ -96,15 +96,6 @@ export const updateArticle = async (req, res, next) => {
     // 업로드된 파일 정보 추출
     const uploadedFiles = req.files?.article_images || [];
 
-    // 업로드된 파일이 없는 경우 고려
-    let imagePaths = [];
-    if (uploadedFiles.length > 0) {
-      imagePaths = uploadedFiles.map((file) => {
-        console.log(file);
-        return file.path.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
-      });
-    }
-
     const article = await articleCrudService.updateArticle({
       communityId,
       articleId,
@@ -114,7 +105,7 @@ export const updateArticle = async (req, res, next) => {
       isAnonymous,
       existingImageSequence,
       newImageSequence,
-      imagePaths,
+      imagePaths: parseImagePaths(uploadedFiles),
     });
     // 게시글 수정
     // 현재는 response에 article을 넣지 않지만,
@@ -134,7 +125,7 @@ export const updateArticle = async (req, res, next) => {
 export const deleteArticle = async (req, res, next) => {
   // 사용자 인증 검증 필요
   try {
-    const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
+    const { communityId, articleId } = req.body; // URL에서 communityId, articleId 추출
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     await articleCrudService.deleteArticle({

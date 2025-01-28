@@ -85,9 +85,23 @@ export const listEvent = async (category = "전체", paginationOptions) => {
   return { events: modifiedEvents, nextCursor, hasNextPage };
 };
 
-export const validateEventQuery = (query) => {
-  const { limit, cursor, category, location, price, startDate, endDate } =
-    query;
+export const validateEventQuery = (queries) => {
+  const {
+    limit,
+    cursor,
+    query,
+    category,
+    location,
+    price,
+    startDate,
+    endDate,
+  } = queries;
+
+  if (queries !== undefined && queries.trim().length < 2) {
+    throw new InvalidQueryError(
+      "검색어는 공백을 제외하고 2자 이상이여야 합니다."
+    );
+  }
 
   const isInteger = (value) => /^\d+$/.test(value); // 정수만 허용
   if (limit !== undefined && !isInteger(limit)) {
@@ -136,4 +150,6 @@ export const validateEventQuery = (query) => {
   ) {
     throw new InvalidQueryError("startDate가 endDate보다 미래일 수 없습니다.");
   }
+
+  return;
 };

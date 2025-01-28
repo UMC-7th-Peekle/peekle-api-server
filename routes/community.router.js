@@ -22,6 +22,7 @@ const router = Router();
 
 router.post(
   "/",
+  validateRequestBody(articleValidator.createCommunitySchema),
   authenticateAccessToken,
   articleCrudController.createCommunity
 );
@@ -33,7 +34,7 @@ router.post(
 // communityId에 해당하는 게시판의 게시글들을 가져옵니다, 좋아요 누른 게시글만 가져올 수도 있습니다
 router.get("/", articleReadController.getArticles);
 router.get(
-  "/article/liked",
+  "/article/like",
   authenticateAccessToken,
   articleReadController.getLikedArticles
 );
@@ -82,7 +83,8 @@ router.patch(
 
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 삭제합니다
 router.delete(
-  "/:communityId/articles/:articleId",
+  "/articles",
+  validateRequestBody(articleValidator.specifyArticleSchema),
   authenticateAccessToken,
   articleCrudController.deleteArticle
 );
@@ -93,14 +95,16 @@ router.delete(
 
 // article에 좋아요를 표시합니다.
 router.post(
-  "/:communityId/articles/:articleId/like",
+  "/articles/like",
+  validateRequestBody(articleValidator.specifyArticleSchema),
   authenticateAccessToken,
   articleLikeController.likeArticle
 );
 
 // article에 좋아요를 취소합니다.
 router.delete(
-  "/:communityId/articles/:articleId/like",
+  "/articles/like",
+  validateRequestBody(articleValidator.specifyArticleSchema),
   authenticateAccessToken,
   articleLikeController.unlikeArticle
 );
