@@ -33,7 +33,7 @@ const sequelize = new Sequelize(
       // 콘솔 로그에 스타일 적용
       if (config.SERVER.ENV === "development") {
         console.log(
-          `${cyan}⏱️  Execution Time: ${green}${timing} ms${reset}\n${magenta}💬 Query: ${reset}${msg}${reset}`
+          `${cyan}⏱️  Execution Time: ${green}${timing} ms${reset}\n${magenta}💬 Query: ${reset}${msg.length > 100 ? msg.substring(0, 100) + "..." : msg}${reset}`
         );
       }
 
@@ -50,11 +50,11 @@ const sequelize = new Sequelize(
       } catch (err) {
         console.error(err);
       }
-      logger.silly(formattedMsg, {
-        action: "sequelize:query",
-        actionType: "log ✨",
-        queryTime: `${timing} ms`,
-      });
+      // logger.silly(formattedMsg, {
+      //   action: "sequelize:query",
+      //   actionType: "log ✨",
+      //   queryTime: `${timing} ms`,
+      // });
       return;
     },
     // timezone: "+09:00",
