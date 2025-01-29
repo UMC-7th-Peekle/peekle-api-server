@@ -6,13 +6,18 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import { v4 as uuidv4 } from "uuid";
 import http from "http";
 // import https from "https"; // https를 사용해야 하는 경우 사용하면 됩니다.
 // import { Server } from "socket.io"; // socket을 사용하려면 주석 해제
 
 // 로컬 module import, 기능별로 구분해주세요.
 import logger from "./utils/logger/logger.js";
-import { corsOptions /*, sslOptions */ } from "./utils/options/options.js";
+import {
+  corsOptions /*, sslOptions */,
+  morganFormat,
+  morgranOptions,
+} from "./utils/options/options.js";
 
 import config from "./config.json" with { type: "json" };
 const PORT = config.SERVER.PORT;
@@ -43,17 +48,14 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(responseHandler);
-
 app.use(cookieParser());
 app.use(cors(corsOptions));
-app.use(
-  morgan("dev", {
-    immediate: true,
-    stream: {
-      write: (message) => logger.http(message.trim()),
-    },
-  })
-); // morgan logger
+
+app.use((req, res, next) => {
+  req.transactionId = uuidv4(); // 고유한 트랜잭션 ID 생성
+  next();
+});
+app.use(morgan(morganFormat, morgranOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
