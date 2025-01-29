@@ -76,9 +76,8 @@ app.use(errorHandler);
 const server = http.createServer(app);
 
 server.listen(PORT, "0.0.0.0", () => {
-  logger.info(`Server is running on PORT ${PORT}`, {
+  logger.info(`SEVER LISTENING TO PORT ${PORT}`, {
     action: "server:start",
-    actionType: "log ✨",
   });
 });
 
