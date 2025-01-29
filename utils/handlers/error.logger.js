@@ -9,14 +9,10 @@ export const logError = (err) => {
   //   STACK: ${err.stack}
   //   =====================
   // `);
-  console.error(err);
+  // console.error(err);
 
-  logger.error({
+  logger.error("통합 에러 로그", {
     action: "handler:logError",
-    actionType: "error",
-    name: err.name,
-    reason: err.reason,
-    message: err.message,
-    stack: err.stack,
+    errorDetails: { ...err },
   });
 };

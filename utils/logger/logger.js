@@ -72,7 +72,6 @@ const logger = winston.createLogger({
   ),
   defaultMeta: {
     action: undefined,
-    layer: undefined,
     ...systemInfo,
   }, // 기본 메타데이터
   transports: [

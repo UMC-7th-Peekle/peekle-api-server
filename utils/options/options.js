@@ -2,6 +2,7 @@
 import config from "../../config.json" with { type: "json" };
 import logger from "../logger/logger.js";
 const { SERVER_DOMAIN } = config.SERVER;
+const { ENV } = config.SERVER;
 
 export const corsOptions = {
   origin: ["http://localhost:5173", "http://192.168.0.24:5173"], // CORS domain 설정
@@ -44,6 +45,17 @@ export const refreshTokenCookieOptions = {
 // };
 
 export const morganFormat = (tokens, req, res) => {
+  let requestData = null;
+  if (ENV === "development") {
+    requestData = {
+      cookies: req.cookies,
+      body: req.body,
+      contentType: req.headers["content-type"],
+      headers: req.headers,
+      params: req.params,
+      query: req.query,
+    };
+  }
   return JSON.stringify({
     clientInfo: {
       ip: tokens["remote-addr"](req, res),
@@ -60,6 +72,7 @@ export const morganFormat = (tokens, req, res) => {
       contentLength: Number(tokens.res(req, res, "content-length")) || 0, // 기본값 처리
       httpVersion: tokens["http-version"](req, res),
       transactionId: req.transactionId,
+      requestData,
     },
   });
 };
