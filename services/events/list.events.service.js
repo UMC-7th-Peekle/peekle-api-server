@@ -70,20 +70,20 @@ export const listEvent = async (paginationOptions) => {
       ...dateWhereClause, // 날짜 기준 조건 추가
     },
     limit: limit + 1, // 다음 페이지 존재 여부 확인을 위해 하나 더 조회
-    order: [["eventId", "DESC"]],
+    order: ["eventId", "DESC"],
 
     attributes: { exclude: ["categoryId", "createdUserId"] },
     include: [
       {
         model: models.EventCategory,
         as: "category",
-        where: categoryWhereClause,
+        // where: categoryWhereClause,
         attributes: ["name", "description"],
       },
       {
         model: models.EventImages,
         as: "eventImages",
-        attributes: ["imageUrl", "sequence", "createdAt", "updatedAt"],
+        attributes: ["imageUrl", "sequence"],
       },
       {
         model: models.EventSchedules,

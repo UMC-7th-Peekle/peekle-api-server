@@ -61,12 +61,12 @@ router.get("/groups/location", groupController.eventLocation); // 이벤트 지�
 
 // 이벤트 스크랩
 // 스크랩된 이벤트 조회
-// router.get(
-//   "/scrap",
-//   validateRequestBody(eventValidator.scrapEventSchema),
-//   authMiddleware.authenticateAccessToken,
-//   scrapEventController.listScrap
-// );
+router.get(
+  "/scrap",
+  validateRequestBody(eventValidator.scrapEventSchema),
+  authMiddleware.authenticateAccessToken,
+  scrapEventController.listScrap
+);
 
 // 특정 이벤트 스크랩
 router.post(
