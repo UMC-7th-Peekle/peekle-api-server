@@ -164,7 +164,7 @@ export const sendTokenToPhone = async ({ phone }) => {
 /**
  * 인증 세션 ID, 전화번호, 토큰값을 받아서 인증을 처리합니다
  */
-export const verifyToken = async ({ id, token, phone }) => {
+export const verifyToken = async ({ id, phone, token }) => {
   // 1. DB에 존재하는 인증 세션인지 조회
   const decryptedId = decrypt62(id);
   // logger.debug(`[verifyToken] decryptedId: ${decryptedId}`);

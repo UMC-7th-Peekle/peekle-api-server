@@ -5,6 +5,13 @@ import {
   NotAllowedError,
   NotExistsError,
 } from "../../utils/errors/errors.js";
+import logger from "../../utils/logger/logger.js";
+import {
+  addBaseUrl,
+  deleteLocalFile,
+} from "../../utils/upload/uploader.object.js";
+
+import config from "../../config.json" with { type: "json" };
 
 export const getProfile = async ({ userId }) => {
   const user = await models.Users.findByPk(userId, {
@@ -15,16 +22,19 @@ export const getProfile = async ({ userId }) => {
     throw new NotExistsError("존재하지 않는 사용자 입니다.");
   }
 
-  return user;
+  return {
+    ...user.dataValues,
+    profileImage: addBaseUrl(user.profileImage),
+  };
 };
 
 export const getUserTerms = async ({ userId }) => {
   const terms = await models.UserTerms.findAll({
-    where: { userId },
-    attributes: { exclude: ["userTermId"] },
+    where: { userId, termId: { [models.Sequelize.Op.ne]: null } },
+    attributes: { exclude: ["userTermsId"] },
   });
 
-  if (!terms) {
+  if (terms.length === 0) {
     throw new NotExistsError("약관 동의 정보가 존재하지 않습니다.");
   }
 
@@ -33,8 +43,10 @@ export const getUserTerms = async ({ userId }) => {
 
 export const changeNickname = async ({ userId, nickname }) => {
   const user = await models.Users.findByPk(userId, {
-    attributes: ["lastNicknameChangeDate"],
+    attributes: ["userId", "nickname", "lastNicknameChangeDate"],
   });
+
+  console.log(user);
 
   if (!user) {
     throw new NotExistsError("존재하지 않는 사용자 입니다.");
@@ -47,21 +59,57 @@ export const changeNickname = async ({ userId, nickname }) => {
     const diffDays = diff / (1000 * 60 * 60 * 24);
 
     if (diffDays < 30) {
+      logger.warn("기한 이전 닉네임 변경 시도", {
+        data: {
+          userId,
+          nickname,
+          lastNicknameChangeDate,
+          diffDays,
+        },
+      });
       throw new NotAllowedError("닉네임은 30일에 한 번만 변경할 수 있습니다.");
     }
   }
 
-  await user.update({ nickname });
+  logger.debug("닉네임 변경 가능", {
+    data: {
+      userId,
+      nickname: {
+        before: user.nickname,
+        after: nickname,
+      },
+    },
+  });
+
+  await user.update({
+    nickname,
+    lastNicknameChangeDate: new Date().toISOString(),
+  });
 };
 
-export const changeProfileImage = async ({ userId, profileImage }) => {
-  const data = await models.Users.update(
-    { profileImage },
-    { where: { userId } }
-  );
+export const changeProfileImage = async ({
+  userId,
+  profileImage = config.PEEKLE.DEFAULT_PROFILE_IMAGE,
+}) => {
+  const data = await models.Users.findOne({
+    where: { userId },
+    attributes: ["userId", "profileImage"],
+  });
+
   if (!data) {
     throw new InvalidInputError("존재하지 않는 사용자입니다.");
   }
+
+  // DB에 저장된 이미지가 기본값이 아닌 경우 삭제
+  if (data.profileImage !== config.PEEKLE.DEFAULT_PROFILE_IMAGE) {
+    await deleteLocalFile(data.profileImage);
+  } else {
+    // DB에 저장된 이미지가 기본값인데 변경을 요청한게 기본값인 경우 에러
+    if (profileImage === config.PEEKLE.DEFAULT_PROFILE_IMAGE) {
+      throw new AlreadyExistsError("이미 기본 프로필 이미지 입니다.");
+    }
+  }
+  await data.update({ profileImage });
 };
 
 export const changePhone = async ({ userId, phone }) => {
@@ -73,6 +121,13 @@ export const changePhone = async ({ userId, phone }) => {
 
 export const changeAccountStatus = async ({ userId, status }) => {
   const data = await models.Users.update({ status }, { where: { userId } });
+  if (!data) {
+    throw new InvalidInputError("존재하지 않는 사용자입니다.");
+  }
+};
+
+export const deleteAccount = async ({ userId }) => {
+  const data = await models.Users.destroy({ where: { userId } });
   if (!data) {
     throw new InvalidInputError("존재하지 않는 사용자입니다.");
   }

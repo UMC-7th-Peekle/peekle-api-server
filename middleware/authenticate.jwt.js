@@ -26,9 +26,8 @@ export const authenticateAccessToken = (req, res, next) => {
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
       if (err) {
-        logger.debug({
+        logger.debug("JWT 토큰 검증 실패", {
           action: "token:authenticate",
-          actionType: "fail",
           message: err.message,
         });
 
@@ -46,7 +45,7 @@ export const authenticateAccessToken = (req, res, next) => {
 
       // payload 안의 user_id를 암호화하여 전달했을 경우 복호화
       // user_id = parseInt(decrypt62(user_id));
-      logger.debug({
+      logger.debug("JWT 토큰 검증 성공", {
         action: "token:authenticate",
         actionType: "success",
         userId: user.userId,

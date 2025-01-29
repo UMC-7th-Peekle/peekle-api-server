@@ -5,8 +5,6 @@ import { InvalidInputError } from "../../utils/errors/errors.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 import { parseImagePaths } from "../../utils/upload/uploader.object.js";
 
-import config from "../../config.json" with { type: "json" };
-
 export const getProfile = async (req, res, next) => {
   try {
     const user = await profileService.getProfile({ userId: req.user.userId });
@@ -78,7 +76,6 @@ export const deleteProfileImage = async (req, res, next) => {
   try {
     await profileService.changeProfileImage({
       userId: req.user.userId,
-      profileImage: config.PEEKLE.DEFAULT_PROFILE_IMAGE,
     });
 
     return res.status(200).success({
@@ -92,13 +89,13 @@ export const deleteProfileImage = async (req, res, next) => {
 
 export const changePhone = async (req, res, next) => {
   try {
-    const { phoneVerificationSessionId, phoneVerificationCode, phone } =
+    const { phoneVerificationSessionId, phone, phoneVerificationCode } =
       req.body;
 
     await phoneService.verifyToken({
       id: phoneVerificationSessionId,
       phone: phone,
-      code: phoneVerificationCode,
+      token: phoneVerificationCode,
     });
 
     await profileService.changePhone({
@@ -140,6 +137,24 @@ export const terminateUser = async (req, res, next) => {
 
     return res.status(200).success({
       message: "계정을 탈퇴 처리합니다.",
+    });
+  } catch (err) {
+    logError(err);
+    next(err);
+  }
+};
+
+export const terminateUserImmediately = async (req, res, next) => {
+  try {
+    await profileService.deleteAccount({
+      userId: req.user.userId,
+    });
+
+    return res.status(200).success({
+      message:
+        "그동한 감사했습니다. 귀하의 계정은 즉시 삭제되었습니다. 다음에 또 만나요.",
+      additionalMessage:
+        "Your personal data has been immediately deleted, and you will NOT BE ABLE to recover it.",
     });
   } catch (err) {
     logError(err);
