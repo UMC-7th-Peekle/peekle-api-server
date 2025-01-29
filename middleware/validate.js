@@ -22,7 +22,7 @@ export const validateRequestBody = (schema, isParsedFormData = false) => {
 
     if (!isValid) {
       const errorDetails = formatErrors(validator.errors);
-      return next(new AjvError("입력 형식이 잘못되었습니다.", errorDetails));
+      return next(new AjvError("올바르지 않은 요청 형식입니다.", errorDetails));
     }
 
     next();

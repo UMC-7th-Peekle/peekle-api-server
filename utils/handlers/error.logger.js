@@ -9,6 +9,7 @@ export const logError = (err) => {
   //   STACK: ${err.stack}
   //   =====================
   // `);
+  console.error(err);
 
   logger.error({
     action: "handler:logError",

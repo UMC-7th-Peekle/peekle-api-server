@@ -4,8 +4,7 @@ import * as articleReadController from "../controllers/community/article.read.co
 import * as commentController from "../controllers/community/comment.community.controller.js";
 import * as articleLikeController from "../controllers/community/article.like.community.controller.js";
 import * as commentLikeController from "../controllers/community/comment.like.community.controller.js";
-import * as articleReportController from "../controllers/community/article.report.community.controller.js";
-import * as commentReportController from "../controllers/community/comment.report.community.controller.js";
+import * as reportController from "../controllers/community/report.community.controller.js";
 import * as articleAggregateController from "../controllers/community/article.aggregate.community.controller.js";
 // 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
 import * as articleValidator from "../utils/validators/community/article.validators.js";
@@ -21,15 +20,34 @@ const router = Router();
   관리자 메뉴 : 게시판 생성
 */
 
+router.post(
+  "/",
+  validateRequestBody(articleValidator.createCommunitySchema),
+  authenticateAccessToken,
+  articleCrudController.createCommunity
+);
+
 /*
   게시판 조회
 */
 
 // communityId에 해당하는 게시판의 게시글들을 가져옵니다, 좋아요 누른 게시글만 가져올 수도 있습니다
-router.get("/:communityId", articleReadController.getArticles);
+router.get("/", articleReadController.getArticles);
+router.get(
+  "/article/like",
+  authenticateAccessToken,
+  articleReadController.getLikedArticles
+);
 
-// communityId에 해당하는 게시판의 게시글들을 검색합니다
-router.get("/:communityId/search", articleReadController.searchArticles);
+/*
+  인기글 집계
+*/
+
+// 특정 communityId에 startTime부터 endTime까지의 인기글을 가져옵니다.
+router.get(
+  "/:communityId/articles/popular",
+  articleAggregateController.getPopularArticles
+);
 
 /*
   게시글 CREATE, READ, UPDATE, DELETE
@@ -75,7 +93,8 @@ router.patch(
 
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 삭제합니다
 router.delete(
-  "/:communityId/articles/:articleId",
+  "/articles",
+  validateRequestBody(articleValidator.specificArticlePathSchema),
   authenticateAccessToken,
   articleCrudController.deleteArticle
 );
@@ -86,14 +105,16 @@ router.delete(
 
 // article에 좋아요를 표시합니다.
 router.post(
-  "/:communityId/articles/:articleId/like",
+  "/articles/like",
+  validateRequestBody(articleValidator.specificArticlePathSchema),
   authenticateAccessToken,
   articleLikeController.likeArticle
 );
 
 // article에 좋아요를 취소합니다.
 router.delete(
-  "/:communityId/articles/:articleId/like",
+  "/articles/like",
+  validateRequestBody(articleValidator.specificArticlePathSchema),
   authenticateAccessToken,
   articleLikeController.unlikeArticle
 );
@@ -102,38 +123,39 @@ router.delete(
   게시글 댓글
 */
 
+// communityId에 해당하는 게시판의 articleId에 해당하는 게시글의 댓글 정보를 가져옵니다.
+router.get("/articles/comments", commentController.getComments);
+
 // article에 댓글을 추가합니다.
 router.post(
-  "/:communityId/articles/:articleId/comments",
+  "/articles/comments",
+  validateRequestBody(articleValidator.createCommentSchema),
   authenticateAccessToken,
   commentController.createComment
 );
 
 // article에 댓글을 수정합니다.
 router.patch(
-  "/:communityId/articles/:articleId/comments/:commentId",
+  "/articles/comments",
+  validateRequestBody(articleValidator.updateOrReplyCommentSchema),
   authenticateAccessToken,
   commentController.updateComment
 );
 
 // article에 댓글을 삭제합니다.
 router.delete(
-  "/:communityId/articles/:articleId/comments/:commentId",
+  "/articles/comments",
+  validateRequestBody(articleValidator.specificArticleCommentPathSchema),
   authenticateAccessToken,
   commentController.deleteComment
 );
 
 // 댓글에 대댓글을 추가합니다.
 router.post(
-  "/:communityId/articles/:articleId/comments/:commentId/reply",
+  "/articles/comments/reply",
+  validateRequestBody(articleValidator.updateOrReplyCommentSchema),
   authenticateAccessToken,
   commentController.createCommentReply
-);
-
-// communityId에 해당하는 게시판의 articleId에 해당하는 게시글의 댓글 정보를 가져옵니다.
-router.get(
-  "/:communityId/articles/:articleId/comments",
-  commentController.getComments
 );
 
 /*
@@ -142,14 +164,16 @@ router.get(
 
 // 댓글에 좋아요를 표시합니다.
 router.post(
-  "/:community/articles/:articleId/comments/:commentId/like",
+  "/articles/comments/like",
+  validateRequestBody(articleValidator.specificArticleCommentPathSchema),
   authenticateAccessToken,
   commentLikeController.likeComment
 );
 
 // 댓글에 좋아요를 취소합니다.
 router.delete(
-  "/:community/articles/:articleId/comments/:commentId/like",
+  "/articles/comments/like",
+  validateRequestBody(articleValidator.specificArticleCommentPathSchema),
   authenticateAccessToken,
   commentLikeController.unlikeComment
 );
@@ -160,26 +184,18 @@ router.delete(
 
 // 게시글을 신고합니다.
 router.post(
-  "/:communityId/articles/:articleId/report",
+  "/articles/report",
+  validateRequestBody(articleValidator.reportArticleSchema),
   authenticateAccessToken,
-  articleReportController.reportArticle
+  reportController.reportArticle
 );
 
 // 댓글을 신고합니다.
 router.post(
-  "/:communityId/articles/:articleId/comments/:commentId/report",
+  "/articles/comments/report",
+  validateRequestBody(articleValidator.reportCommentSchema),
   authenticateAccessToken,
-  commentReportController.reportComment
-);
-
-/*
-  인기글 집계
-*/
-
-// 특정 communityId에 startTime부터 endTime까지의 인기글을 가져옵니다.
-router.get(
-  "/:communityId/popular-articles",
-  articleAggregateController.getPopularArticles
+  reportController.reportComment
 );
 
 export default router;

@@ -1,18 +1,54 @@
 // Description: 게시글 관련 조회, 생성, 수정, 삭제 로직을 처리하는 파일입니다.
 import {
-  InvalidInputError,
+  AlreadyExistsError,
   NotAllowedError,
   NotExistsError,
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
-import fs from "fs/promises";
-import path from "path";
 import {
   addBaseUrl,
   deleteLocalFile,
   isEditInputCorrect,
 } from "../../utils/upload/uploader.object.js";
+
+export const createCommunity = async ({ communityName }) => {
+  // 게시판 생성
+  try {
+    await models.Communities.create({
+      title: communityName,
+    });
+  } catch (err) {
+    if (err instanceof models.Sequelize.UniqueConstraintError) {
+      // 게시판 이름이 중복되는 경우
+      logger.error({
+        layer: "service",
+        action: "community:create",
+        actionType: "error",
+        message: "중복된 게시판 이름으로 생성하려 시도했습니다.",
+        data: { title: communityName },
+      });
+      throw new AlreadyExistsError("이미 존재하는 게시판 이름입니다.");
+    }
+    logger.error("게시판 생성 실패", {
+      layer: "service",
+      action: "community:create",
+      actionType: "error",
+      data: { title: communityName },
+    });
+    throw err;
+  }
+
+  logger.debug({
+    layer: "service",
+    action: "community:create",
+    actionType: "success",
+    message: "게시판 생성 완료",
+    data: { title: communityName },
+  });
+
+  return;
+};
 
 /**
  * communityId와 articleId에 해당하는 게시글을 가져옵니다
@@ -55,12 +91,10 @@ export const getArticleById = async ({ communityId, articleId }) => {
     sequence: image.sequence,
   }));
 
+  const ret = { ...data.dataValues, articleImages: transformedImages };
+
   // 결과 반환
-  return {
-    articleData: data, // 게시글 데이터
-    articleImages: transformedImages, // URL이 수정된 이미지 데이터
-    articleComments: data.articleComments, // 댓글 데이터
-  };
+  return ret;
 };
 
 /**

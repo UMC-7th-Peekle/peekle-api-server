@@ -1,7 +1,7 @@
 import {
   decrypt62,
   encrypt62,
-  generate6DigitToken,
+  generate4DigitToken,
 } from "../../utils/cipher/encrypt.js";
 
 import {
@@ -134,7 +134,7 @@ export const checkAccountStatus = async ({ phone }) => {
 export const sendTokenToPhone = async ({ phone }) => {
   // 토큰을 생성하고, db에 저장하고, 사용자에게 전송
 
-  const token = generate6DigitToken();
+  const token = generate4DigitToken();
   const record = await models.VerificationCode.create({
     identifierType: "phone",
     identifierValue: phone,

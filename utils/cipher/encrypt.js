@@ -129,6 +129,6 @@ export const comparePassword = async (password, hashedPassword) => {
   }
 };
 
-export const generate6DigitToken = () => {
-  return crypto.randomInt(100000, 1000000).toString();
+export const generate4DigitToken = () => {
+  return crypto.randomInt(1000, 10000).toString();
 };
