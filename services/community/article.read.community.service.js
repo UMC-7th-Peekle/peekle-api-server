@@ -46,6 +46,7 @@ export const getArticles = async (
       {
         model: models.Articles,
         as: "articles",
+        attributes: { exclude: ["authorId"] }, // 모든 필드 가져오기
         where: {
           ...(query && {
             [Op.or]: [
@@ -74,12 +75,14 @@ export const getArticles = async (
             attributes: ["commentId"], // 댓글 개수만 가져오기 위해 commentId만 추출
             where: { status: { [Op.ne]: "deleted" } }, // 삭제되지 않은 댓글만 가져오기
             required: false, // 댓글이 없는 경우에도 커뮤니티는 반환
+            separate: true,
           },
           {
             model: models.ArticleLikes,
             as: "articleLikes",
             attributes: ["likedUserId"], // 좋아요 개수만 가져오기 위해 userId만 추출
             required: false, // 좋아요가 없는 경우에도 커뮤니티는 반환
+            separate: true,
           },
           {
             model: models.ArticleImages,
@@ -88,11 +91,21 @@ export const getArticles = async (
             where: { sequence: 1 }, // 대표 이미지만 가져오기
             limit: 1,
             required: false, // 이미지가 없는 경우에도 커뮤니티는 반환
+            separate: true,
+          },
+          {
+            model: models.Users,
+            as: "author",
+            attributes: ["userId", "nickname", "profileImage"], // 필요한 필드만 가져오기
+            required: true,
           },
         ],
       },
     ],
   });
+  // console.log(
+  //   `communityId: ${communityId}, query: ${query}, limit: ${limit}, cursor: ${cursor}`
+  // );
   // console.log(community);
 
   if (!community) {
@@ -120,6 +133,18 @@ export const getArticles = async (
     }
     article.thumbnail = article.articleImages;
     delete article.articleImages;
+
+    // 작성자 정보
+    article.author = article.author.dataValues;
+    article.author.profileImage = addBaseUrl(article.author.profileImage);
+
+    // author.userId를 authorId로 변경
+    article.author.authorId = article.author.userId;
+    delete article.author.userId;
+
+    // author를 authorInfo로 변경
+    article.authorInfo = article.author;
+    delete article.author;
   });
 
   // 다음 커서 설정
