@@ -14,7 +14,7 @@ const swaggerDoc = {
     description: "API 명세서 입니다", // 문서 설명
     termsOfService: "http://swagger.io/terms/",
     contact: {
-      email: "apiteam@swagger.io",
+      email: "saveearth1@cau.ac.kr",
     },
     license: {
       name: "Apache 2.0",
