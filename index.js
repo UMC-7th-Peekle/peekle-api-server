@@ -28,10 +28,10 @@ import {
 } from "./utils/handlers/response.handlers.js";
 
 import swaggerUi from "swagger-ui-express";
-import { specs } from "./utils/swagger/swagger.js";
 
 // Router import , /routes/index.js에서 Router들을 1차적으로 모아서 export 합니다.
 import routers from "./routes/index.js";
+import swaggerOptions from "./routes/swagger.index.js";
 import path from "path";
 
 // __dirname을 사용하기 위한 설정
@@ -63,7 +63,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Swagger 설정
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerOptions));
 
 // Router 연결
 app.use("/", routers);

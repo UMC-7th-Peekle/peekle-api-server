@@ -10,12 +10,12 @@ export const logError = (err) => {
   //   =====================
   // `);
   // console.error(err);
-  // const errorDetails = Object.getOwnPropertyNames(err).reduce((acc, key) => {
-  //   acc[key] = err[key];
-  //   return acc;
-  // }, {});
-  // logger.error("통합 에러 로그", {
-  //   action: "handler:logError",
-  //   errorDetails,
-  // });
+  const errorDetails = Object.getOwnPropertyNames(err).reduce((acc, key) => {
+    acc[key] = err[key];
+    return acc;
+  }, {});
+  logger.error("통합 에러 로그", {
+    action: "handler:logError",
+    errorDetails,
+  });
 };
