@@ -80,4 +80,32 @@ router.post(
   phoneController.verifyToken
 );
 
+export const authSwagger = {
+  "/phone/verify": {
+    post: {
+      tags: ["Auth"],
+      summary: "휴대폰 인증",
+      description: "휴대폰 인증을 진행합니다.",
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/PhoneVerify",
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+};
+
 export default router;

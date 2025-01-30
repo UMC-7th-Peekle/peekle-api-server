@@ -1,9 +1,9 @@
 config.json
 *.pem
-uploads/
-.idea
 
-test.test.js
+uploads/
+
+.idea
 
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,linux,node,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,node,dotenv

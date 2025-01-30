@@ -33,12 +33,12 @@ const networkInfo =
     .join(" | ") || undefined;
 
 const systemInfo = {
+  deviceInfo: `Running on : ${os.hostname()} | ${os.userInfo().username} | ${os.cpus()[0].model} ${os.cpus().length} core | ${os.arch()} ${os.platform()} ${os.release()} | Uptime: ${Math.floor(os.uptime() / 86400)} days ${Math.floor((os.uptime() % 86400) / 3600)} hours ${Math.floor((os.uptime() % 3600) / 60)} minutes | ${networkInfo}`,
   // platform: os.platform(),
   // cpuModel: os.cpus()[0].model,
   // release: os.release(),
   // totalMemory: `${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
   // freeMemory: `${(os.freemem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
-  deviceInfo: `Running on : ${os.hostname()} | ${os.userInfo().username} | ${os.cpus()[0].model} ${os.cpus().length} core | ${os.arch()} ${os.platform()} ${os.release()} | Uptime: ${Math.floor(os.uptime() / 86400)} days ${Math.floor((os.uptime() % 86400) / 3600)} hours ${Math.floor((os.uptime() % 3600) / 60)} minutes | ${networkInfo}`,
   // memoryInfo: `${(os.freemem() / 1024 / 1024 / 1024).toFixed(2)} GB / ${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
   // uptime: `${Math.floor(os.uptime() / 86400)} days ${Math.floor((os.uptime() % 86400) / 3600)} hours ${Math.floor((os.uptime() % 3600) / 60)} minutes`,
   // hostname: os.hostname(),
@@ -52,7 +52,7 @@ const mongoTransportOptions = {
   level: "silly",
   collection: "peekle_logs",
   label: true,
-  // storeHost: true,
+  storeHost: true,
   tryReconnect: true,
 };
 
@@ -71,31 +71,29 @@ const logger = winston.createLogger({
     json() // JSON 포맷으로 기록
   ),
   defaultMeta: {
-    action: "undefined",
-    actionType: "log ✨",
-    service: "peekle",
+    action: undefined,
     ...systemInfo,
   }, // 기본 메타데이터
   transports: [
     // MongoDB로 로그 전송
     new winston.transports.MongoDB(mongoTransportOptions),
     // 각 로그 레벨별로 JSON 파일 저장
-    new winston.transports.File({
-      filename: path.join(logDirectory, "error.log"),
-      level: "error", // ERROR 레벨 로그만 기록
-    }),
-    new winston.transports.File({
-      filename: path.join(logDirectory, "warn.log"),
-      level: "warn", // WARN 레벨 로그만 기록
-    }),
-    new winston.transports.File({
-      filename: path.join(logDirectory, "info.log"),
-      level: "info", // INFO 레벨 로그만 기록
-    }),
-    new winston.transports.File({
-      filename: path.join(logDirectory, "debug.log"),
-      level: "debug", // DEBUG 레벨 로그만 기록
-    }),
+    // new winston.transports.File({
+    //   filename: path.join(logDirectory, "error.log"),
+    //   level: "error", // ERROR 레벨 로그만 기록
+    // }),
+    // new winston.transports.File({
+    //   filename: path.join(logDirectory, "warn.log"),
+    //   level: "warn", // WARN 레벨 로그만 기록
+    // }),
+    // new winston.transports.File({
+    //   filename: path.join(logDirectory, "info.log"),
+    //   level: "info", // INFO 레벨 로그만 기록
+    // }),
+    // new winston.transports.File({
+    //   filename: path.join(logDirectory, "debug.log"),
+    //   level: "debug", // DEBUG 레벨 로그만 기록
+    // }),
     // 모든 로그를 기록하는 파일
     new winston.transports.File({
       filename: path.join(logDirectory, "combined.log"),

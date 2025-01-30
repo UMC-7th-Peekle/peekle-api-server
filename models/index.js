@@ -30,10 +30,6 @@ const sequelize = new Sequelize(
       // const red = "\x1b[31m\x1b[1m"; // 빨간색, 볼드
       // const black = "\x1b[30m\x1b[1m"; // 검정색, 볼드
 
-      // 콘솔 로그에 스타일 적용
-      console.log(
-        `${cyan}⏱️  Execution Time: ${green}${timing} ms${reset}\n${magenta}💬 Query: ${reset}${msg}${reset}`
-      );
       const parsedMsg = msg.split(":").slice(1).join(":").trim();
       let formattedMsg = msg;
       try {
@@ -52,6 +48,17 @@ const sequelize = new Sequelize(
         actionType: "log ✨",
         queryTime: `${timing} ms`,
       });
+
+      // 콘솔 로그에 스타일 적용
+      if (config.SERVER.ENV === "development") {
+        const slicedMsg =
+          formattedMsg.length > 100
+            ? formattedMsg.substring(0, 100) + "..."
+            : formattedMsg;
+        console.log(
+          `${cyan}⏱️  Execution Time: ${green}${timing} ms${reset}\n${magenta}💬 Query: ${reset}${formattedMsg}${reset}`
+        );
+      }
       return;
     },
     // timezone: "+09:00",
