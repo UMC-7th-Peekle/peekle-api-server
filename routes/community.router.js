@@ -201,10 +201,34 @@ router.post(
 
 export const communitySwagger = {
   "/community": {
+    post: {
+      tags: ["Community - 관리자: 게시판 생성"],
+      summary: "게시판 생성",
+      description: "게시판을 생성합니다.",
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.createCommunitySchema,
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: "성공",
+        },
+        409: {
+          description: "이미 존재하는 게시판 이름입니다.",
+        },
+      },
+    },
     get: {
-      tags: ["Community"],
+      tags: ["Community - 게시글 조회"],
       summary: "커뮤니티 게시글 목록 조회",
-      description: "커뮤니티 ID를 통해 해당 커뮤니티의 게시글 목록을 조회합니다.",
+      description:
+        "커뮤니티 ID를 통해 해당 커뮤니티의 게시글 목록을 조회합니다.",
       parameters: [
         {
           name: "limit",
@@ -243,12 +267,13 @@ export const communitySwagger = {
           },
         },
       ],
-      requestBody: { // TODO: 마지막에 상세 정보 추가
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.postArticleSchema // getArticle에 대한 스키마 지정이 필요한가?
+              $ref: aritcleSchema.postArticleSchema, // getArticle에 대한 스키마 지정이 필요한가?
             },
           },
         },
@@ -256,6 +281,9 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+        },
+        204: {
+          description: "게시글이 존재하지 않음",
         },
         400: {
           description: "실패",
@@ -268,7 +296,7 @@ export const communitySwagger = {
   },
   "/community/article/like": {
     get: {
-      tags: ["Community"],
+      tags: ["Community - 게시글 조회"],
       summary: "좋아요 누른 게시글 목록 조회",
       description: "사용자가 좋아요를 누른 게시글 목록을 조회합니다.",
       parameters: [
@@ -303,7 +331,7 @@ export const communitySwagger = {
   },
   "/community/:communityId/articles/:articleId": {
     get: {
-      tags: ["Community"],
+      tags: ["Community - 게시글 CRUD"],
       summary: "게시글 조회",
       description: "게시글 ID를 통해 해당 게시글을 조회합니다.",
       parameters: [
@@ -330,6 +358,9 @@ export const communitySwagger = {
         200: {
           description: "성공",
         },
+        204: {
+          description: "좋아요한 게시글이 존재하지 않음",
+        },
         400: {
           description: "실패",
         },
@@ -338,49 +369,8 @@ export const communitySwagger = {
         },
       },
     },
-  },
-  "/community/:communityId/articles": {
-    post: {
-      tags: ["Community"],
-      summary: "게시글 작성",
-      description: "커뮤니티 ID에 해당하는 게시판에 게시글을 작성합니다.",
-      parameters: [
-        {
-          name: "communityId",
-          in: "path",
-          required: true,
-          description: "커뮤니티 ID",
-          schema: {
-            type: "integer",
-          },
-        },
-      ],
-      requestBody: { // TODO: 마지막에 상세 정보 추가
-        required: true,
-        content: {
-          "multipart/form-data": {
-            schema: {
-              $ref: aritcleSchema.postArticleSchema,
-            },
-          },
-        },
-      },
-      responses: {
-        201: {
-          description: "성공",
-        },
-        401: {
-          description: "사용자 인증 정보가 제공되지 않은 경우",
-        },
-        404: {
-          description: "커뮤니티 ID에 해당하는 게시판이 존재하지 않습니다.",
-        },
-      },
-    },
-  },
-  "/community/:communityId/articles/:articleId": {
     patch: {
-      tags: ["Community"],
+      tags: ["Community - 게시글 CRUD"],
       summary: "게시글 수정",
       description: "게시글 ID에 해당하는 게시글을 수정합니다.",
       parameters: [
@@ -403,7 +393,8 @@ export const communitySwagger = {
           },
         },
       ],
-      requestBody: { // TODO: 마지막에 상세 정보 추가
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "multipart/form-data": {
@@ -429,12 +420,53 @@ export const communitySwagger = {
       },
     },
   },
+  "/community/:communityId/articles": {
+    post: {
+      tags: ["Community - 게시글 CRUD"],
+      summary: "게시글 작성",
+      description: "커뮤니티 ID에 해당하는 게시판에 게시글을 작성합니다.",
+      parameters: [
+        {
+          name: "communityId",
+          in: "path",
+          required: true,
+          description: "커뮤니티 ID",
+          schema: {
+            type: "integer",
+          },
+        },
+      ],
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "multipart/form-data": {
+            schema: {
+              $ref: aritcleSchema.postArticleSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        404: {
+          description: "커뮤니티 ID에 해당하는 게시판이 존재하지 않습니다.",
+        },
+      },
+    },
+  },
   "/community/articles": {
     delete: {
-      tags: ["Community"],
+      tags: ["Community - 게시글 CRUD"],
       summary: "게시글 삭제",
       description: "게시글 ID에 해당하는 게시글을 삭제합니다.",
-      requestBody: { // TODO: 마지막에 상세 정보 추가
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
@@ -457,7 +489,407 @@ export const communitySwagger = {
       },
     },
   },
+  "/community/articles/like": {
+    post: {
+      tags: ["Community - 게시글 및 댓글 좋아요"],
+      summary: "게시글 좋아요",
+      description: "게시글에 좋아요를 누릅니다.",
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.specificArticlePathSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        404: {
+          description: "게시글 ID에 해당하는 게시글이 존재하지 않음",
+        },
+        409: {
+          description: "이미 좋아요를 누른 경우",
+        },
+      },
+    },
+    delete: {
+      tags: ["Community - 게시글 및 댓글 좋아요"],
+      summary: "게시글 좋아요 취소",
+      description: "게시글에 좋아요를 취소합니다.",
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.specificArticlePathSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        404: {
+          description: "게시글 ID에 해당하는 게시글이 존재하지 않음",
+        },
+        409: {
+          description: "이미 좋아요를 취소한 경우",
+        },
+      },
+    },
+  },
+  "/community/articles/comments/like": {
+    post: {
+      tags: ["Community - 게시글 및 댓글 좋아요"],
+      summary: "댓글 좋아요",
+      description: "댓글에 좋아요를 누릅니다.",
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.specificArticleCommentPathSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        404: {
+          description: "댓글 ID에 해당하는 댓글이 존재하지 않음",
+        },
+        409: {
+          description: "이미 좋아요를 누른 경우",
+        },
+      },
+    },
+    delete: {
+      tags: ["Community - 게시글 및 댓글 좋아요"],
+      summary: "댓글 좋아요 취소",
+      description: "댓글에 좋아요를 취소합니다.",
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.specificArticleCommentPathSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        404: {
+          description: "댓글 ID에 해당하는 댓글이 존재하지 않음",
+        },
+        409: {
+          description: "이미 좋아요를 취소한 경우",
+        },
+      },
+    },
+  },
+  "/community/articles/comments": {
+    get: {
+      tags: ["Community - 댓글"],
+      summary: "댓글 조회",
+      description: "게시글 ID에 해당하는 게시글의 댓글을 조회합니다.",
+      parameters: [
+        {
+          name: "communityId",
+          in: "query",
+          required: true,
+          description: "커뮤니티 ID",
+          schema: {
+            type: "integer",
+          },
+        },
+        {
+          name: "articleId",
+          in: "query",
+          required: true,
+          description: "게시글 ID",
+          schema: {
+            type: "integer",
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: "성공",
+        },
+        204: {
+          description: "댓글이 존재하지 않음",
+        },
+        404: {
+          description: "댓글 ID에 해당하는 댓글이 존재하지 않음",
+        },
+      },
+    },
+    post: {
+      tags: ["Community - 댓글"],
+      summary: "댓글 작성",
+      description: "게시글 ID에 해당하는 게시글에 댓글을 작성합니다.",
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.createCommentSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        404: {
+          description: "게시글 ID에 해당하는 게시글이 존재하지 않음",
+        },
+      },
+    },
+    patch: {
+      tags: ["Community - 댓글"],
+      summary: "댓글 수정",
+      description: "댓글 ID에 해당하는 댓글을 수정합니다.",
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.updateOrReplyCommentSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        403: {
+          description: "댓글 작성자가 아닌 경우",
+        },
+        404: {
+          description: "댓글 ID에 해당하는 댓글이 존재하지 않음",
+        },
+      },
+    },
+    delete: {
+      tags: ["Community - 댓글"],
+      summary: "댓글 삭제",
+      description: "댓글 ID에 해당하는 댓글을 삭제합니다.",
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.specificArticleCommentPathSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        403: {
+          description: "댓글 작성자가 아닌 경우",
+        },
+        404: {
+          description: "댓글 ID에 해당하는 댓글이 존재하지 않음",
+        },
+      },
+    },
+  },
+  "/community/articles/comments/reply": {
+    post: {
+      tags: ["Community - 댓글"],
+      summary: "대댓글 작성",
+      description: "댓글 ID에 해당하는 댓글에 대댓글을 작성합니다.",
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.updateOrReplyCommentSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        404: {
+          description: "댓글 ID에 해당하는 댓글이 존재하지 않음",
+        },
+      },
+    },
+  },
+  "/community/articles/report": {
+    post: {
+      tags: ["Community - 게시글 및 댓글 신고"],
+      summary: "게시글 신고",
+      description: "게시글을 신고합니다.",
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.reportArticleSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: "성공",
+        },
+        400: {
+          description: "신고 사유가 누락된 경우",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        403: {
+          description: "게시글 작성자가 신고자인 경우",
+        },
+        404: {
+          description: "게시글 ID에 해당하는 게시글이 존재하지 않음",
+        },
+        409: {
+          description: "이미 신고 처리가 된 경우",
+        },
+      },
+    },
+  },
+  "/community/articles/comments/report": {
+    post: {
+      tags: ["Community - 게시글 및 댓글 신고"],
+      summary: "댓글 신고",
+      description: "댓글을 신고합니다.",
+      requestBody: {
+        // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.reportCommentSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: "성공",
+        },
+        400: {
+          description: "신고 사유가 누락된 경우",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        403: {
+          description: "댓글 작성자가 신고자인 경우",
+        },
+        404: {
+          description: "댓글 ID에 해당하는 댓글이 존재하지 않음",
+        },
+        409: {
+          description: "이미 신고 처리가 된 경우",
+        },
+      },
+    },
+  },
+  "/community/:communityId/articles/popular": {
+    get: {
+      tags: ["Community - 인기 게시글 집계"],
+      summary: "인기글 조회",
+      description: "커뮤니티 ID에 해당하는 게시판의 인기글을 조회합니다.",
+      parameters: [
+        {
+          name: "communityId",
+          in: "path",
+          required: true,
+          description: "커뮤니티 ID",
+          schema: {
+            type: "integer",
+          },
+        },
+        {
+          name: "startTime",
+          in: "query",
+          required: true,
+          description: "조회 시작 시간",
+          schema: {
+            type: "string",
+          },
+        },
+        {
+          name: "endTime",
+          in: "query",
+          required: true,
+          description: "조회 종료 시간",
+          schema: {
+            type: "string",
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: "성공",
+        },
+        204: {
+          description: "해당 시간대에 인기글이 존재하지 않음",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
 };
 
 export default router;
-
