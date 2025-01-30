@@ -65,7 +65,7 @@ export const listScrap = async (paginationOptions, userId) => {
   // 스크랩 조건 설정
   let scrapWhereClause = {};
   if (scrap === "true") {
-    scrapWhereClause = {}; // 스크랩된 튜플 모두 반환 (EventScraps 테이블에 있는 거 다다)
+    scrapWhereClause = {}; // 스크랩된 튜플 모두 반환 (EventScraps 테이블에 있는 거 다)
   } else {
     throw new InvalidQueryError(
       "올바르지 않은 입력입니다. scrap 값은 'true'만 가능합니다."
@@ -141,7 +141,7 @@ export const listScrap = async (paginationOptions, userId) => {
     : null;
 
   const modifiedEvents = events.map((event) => {
-    // event.eventImages에서 eventImages 가져오기
+    // event.eventImages에서 eventImages 가져오기 (EventScraps에서 Events, Events에서 EventImage)
     const transformedImages = event.event.eventImages.map((image) => ({
       imageUrl: addBaseUrl(image.imageUrl),
       sequence: image.sequence,

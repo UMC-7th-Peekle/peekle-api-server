@@ -6,8 +6,16 @@ import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
 // 이벤트 목록 조회
 export const listEvent = async (paginationOptions) => {
-  const { limit, cursor, category, location, price, startDate, endDate } =
-    paginationOptions;
+  const {
+    limit,
+    cursor,
+    query,
+    category,
+    location,
+    price,
+    startDate,
+    endDate,
+  } = paginationOptions;
 
   // 커서 기준 조건 설정
   let cursorWhereClause = {};
@@ -25,12 +33,26 @@ export const listEvent = async (paginationOptions) => {
 
   // TODO : category Id로 filtering 해도 되지 않을까 하는 생각
 
+  // 검색어 조건 설정
+  let queryWhereClause = {};
+  if (query) {
+    queryWhereClause = {
+      [Op.or]: [
+        {
+          title: { [Op.like]: `%${query}%` }, // 제목에 검색어 포함
+        },
+        {
+          content: { [Op.like]: `%${query}%` }, // 내용에 검색어 포함
+        },
+      ],
+    };
+  }
+
   // 지역 조건 설정
   let locationWhereClause = {};
   if (location !== "전체") {
     // 지역그룹Id로 필터링
     const locationGroup = await models.EventLocationGroups.findAll({
-      // findAll로 하면 복수 선택 처리가 되나..?
       where: { groupId: location },
       attributes: ["groupId"],
     });
@@ -49,9 +71,6 @@ export const listEvent = async (paginationOptions) => {
 
   // 날짜 조건 설정
   let dateWhereClause = {};
-  // if (startDate) dateWhereClause.startDate = { applicationStart: { [Op.gte]: startDate } };   // 2025-01-28 같은 형식
-  // if (endDate) dateWhereClause.endDate = { applicationEnd: { [Op.lte]: endDate } };
-  // 받아오는 application날짜는 시간까지 같이 받아와서 에러가 생긴다. application 날짜에서 시간을 빼고 비교하는게 필요함
   if (startDate)
     dateWhereClause.applicationStart = { [Op.gte]: startDate.split("T")[0] }; // 2025-01-28 같은 형식
   if (endDate)
@@ -63,6 +82,7 @@ export const listEvent = async (paginationOptions) => {
       ...priceWhereClause, // 금액 기준 조건 추가
       ...locationWhereClause, // 위치 기준 조건 추가
       ...dateWhereClause, // 날짜 기준 조건 추가
+      ...queryWhereClause, // 검색어 기준 조건 추가
     },
     limit: limit + 1, // 다음 페이지 존재 여부 확인을 위해 하나 더 조회
     order: [["eventId", "DESC"]],
@@ -72,7 +92,7 @@ export const listEvent = async (paginationOptions) => {
       {
         model: models.EventCategory,
         as: "category",
-        // where: categoryWhereClause,
+        where: categoryWhereClause,
         attributes: ["name", "description"],
       },
       {
@@ -120,9 +140,14 @@ export const listEvent = async (paginationOptions) => {
     };
   });
 
+  logger.debug("이벤트 조회 완료", {
+    action: "events:getEvents",
+    actionType: "success",
+  });
+
   return { events: modifiedEvents, nextCursor, hasNextPage };
 };
-
+// --------------------------------------------------------------------------------------------------
 export const validateEventQuery = (queries) => {
   const {
     limit,
@@ -135,7 +160,7 @@ export const validateEventQuery = (queries) => {
     endDate,
   } = queries;
 
-  if (queries !== undefined && queries.trim().length < 2) {
+  if (query !== undefined && query.trim().length < 2) {
     throw new InvalidQueryError(
       "검색어는 공백을 제외하고 2자 이상이여야 합니다."
     );
@@ -149,11 +174,7 @@ export const validateEventQuery = (queries) => {
     throw new InvalidQueryError("cursor는 정수여야 합니다.");
   }
 
-  // price 유효성 검증 (boolean 확인)
-  // const pricePool = ["true", "false"];
-  // if (price && (price === "" || !pricePool.includes(price))) {
-  //   throw new InvalidQueryError("price는 true 또는 false여야 합니다.");
-  // }
+  // price 유효성 검증
   const pricePool = ["전체", "무료", "유료"];
   if (price !== undefined && (price === "" || !pricePool.includes(price))) {
     throw new InvalidQueryError(
