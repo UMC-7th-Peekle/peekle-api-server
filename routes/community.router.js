@@ -243,7 +243,7 @@ export const communitySwagger = {
           },
         },
       ],
-      requestBody: {
+      requestBody: { // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
@@ -301,8 +301,162 @@ export const communitySwagger = {
       },
     },
   },
-  
-
+  "/community/:communityId/articles/:articleId": {
+    get: {
+      tags: ["Community"],
+      summary: "게시글 조회",
+      description: "게시글 ID를 통해 해당 게시글을 조회합니다.",
+      parameters: [
+        {
+          name: "communityId",
+          in: "path",
+          required: true,
+          description: "커뮤니티 ID",
+          schema: {
+            type: "integer",
+          },
+        },
+        {
+          name: "articleId",
+          in: "path",
+          required: true,
+          description: "게시글 ID",
+          schema: {
+            type: "integer",
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+        404: {
+          description: "게시글 ID에 해당하는 게시글이 존재하지 않습니다.",
+        },
+      },
+    },
+  },
+  "/community/:communityId/articles": {
+    post: {
+      tags: ["Community"],
+      summary: "게시글 작성",
+      description: "커뮤니티 ID에 해당하는 게시판에 게시글을 작성합니다.",
+      parameters: [
+        {
+          name: "communityId",
+          in: "path",
+          required: true,
+          description: "커뮤니티 ID",
+          schema: {
+            type: "integer",
+          },
+        },
+      ],
+      requestBody: { // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "multipart/form-data": {
+            schema: {
+              $ref: aritcleSchema.postArticleSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        404: {
+          description: "커뮤니티 ID에 해당하는 게시판이 존재하지 않습니다.",
+        },
+      },
+    },
+  },
+  "/community/:communityId/articles/:articleId": {
+    patch: {
+      tags: ["Community"],
+      summary: "게시글 수정",
+      description: "게시글 ID에 해당하는 게시글을 수정합니다.",
+      parameters: [
+        {
+          name: "communityId",
+          in: "path",
+          required: true,
+          description: "커뮤니티 ID",
+          schema: {
+            type: "integer",
+          },
+        },
+        {
+          name: "articleId",
+          in: "path",
+          required: true,
+          description: "게시글 ID",
+          schema: {
+            type: "integer",
+          },
+        },
+      ],
+      requestBody: { // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "multipart/form-data": {
+            schema: {
+              $ref: aritcleSchema.patchArticleSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "게시글 제목이나 내용이 누락된 경우",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        403: {
+          description: "게시글 작성자가 아닌 경우.",
+        },
+      },
+    },
+  },
+  "/community/articles": {
+    delete: {
+      tags: ["Community"],
+      summary: "게시글 삭제",
+      description: "게시글 ID에 해당하는 게시글을 삭제합니다.",
+      requestBody: { // TODO: 마지막에 상세 정보 추가
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.specificArticlePathSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        401: {
+          description: "사용자 인증 정보가 제공되지 않은 경우",
+        },
+        403: {
+          description: "게시글 작성자가 아닌 경우.",
+        },
+      },
+    },
+  },
 };
 
 export default router;
