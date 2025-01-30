@@ -18,6 +18,7 @@ const router = Router();
 
 // 이벤트 조회
 router.get("/", listEventController.listEvent);
+
 // 이벤트 삭제
 router.delete(
   "/",
@@ -25,8 +26,16 @@ router.delete(
   detailEventController.deleteEvent
 );
 
+// 스크랩된 이벤트 조회
+router.get(
+  "/scrap",
+  authMiddleware.authenticateAccessToken,
+  scrapEventController.listScrap
+);
+
 // 이벤트 상세정보 조회
 router.get("/:eventId", detailEventController.detailEvent);
+
 // 이벤트 수정
 router.patch(
   "/:eventId",
@@ -58,15 +67,6 @@ router.post(
 // 이벤트 카테고리 조회
 router.get("/groups/category", groupController.eventCategory); // 이벤트 카테고리 조회
 router.get("/groups/location", groupController.eventLocation); // 이벤트 지역 조회
-
-// 이벤트 스크랩
-// 스크랩된 이벤트 조회
-router.get(
-  "/scrap",
-  validateRequestBody(eventValidator.scrapEventSchema),
-  authMiddleware.authenticateAccessToken,
-  scrapEventController.listScrap
-);
 
 // 특정 이벤트 스크랩
 router.post(

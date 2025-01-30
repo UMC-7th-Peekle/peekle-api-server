@@ -6,15 +6,8 @@ import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
 // 이벤트 목록 조회
 export const listEvent = async (paginationOptions) => {
-  const { 
-    limit, 
-    cursor, 
-    category,
-    location,
-    price,
-    startDate,
-    endDate, 
-  } = paginationOptions;
+  const { limit, cursor, category, location, price, startDate, endDate } =
+    paginationOptions;
 
   // 커서 기준 조건 설정
   let cursorWhereClause = {};
@@ -36,7 +29,8 @@ export const listEvent = async (paginationOptions) => {
   let locationWhereClause = {};
   if (location !== "전체") {
     // 지역그룹Id로 필터링
-    const locationGroup = await models.EventLocationGroups.findAll({   // findAll로 하면 복수 선택 처리가 되나..?
+    const locationGroup = await models.EventLocationGroups.findAll({
+      // findAll로 하면 복수 선택 처리가 되나..?
       where: { groupId: location },
       attributes: ["groupId"],
     });
@@ -49,9 +43,8 @@ export const listEvent = async (paginationOptions) => {
   let priceWhereClause = {};
   if (price === "무료") {
     priceWhereClause = { price: 0 };
-  }
-  else if (price === "유료") {
-    priceWhereClause = { price: { [Op.gt]: 0 } };   // price가 0보다 큰 값들
+  } else if (price === "유료") {
+    priceWhereClause = { price: { [Op.gt]: 0 } }; // price가 0보다 큰 값들
   }
 
   // 날짜 조건 설정
@@ -59,18 +52,20 @@ export const listEvent = async (paginationOptions) => {
   // if (startDate) dateWhereClause.startDate = { applicationStart: { [Op.gte]: startDate } };   // 2025-01-28 같은 형식
   // if (endDate) dateWhereClause.endDate = { applicationEnd: { [Op.lte]: endDate } };
   // 받아오는 application날짜는 시간까지 같이 받아와서 에러가 생긴다. application 날짜에서 시간을 빼고 비교하는게 필요함
-  if (startDate) dateWhereClause.applicationStart = { [Op.gte]: startDate.split("T")[0] };   // 2025-01-28 같은 형식
-  if (endDate) dateWhereClause.applicationEnd = { [Op.lte]: endDate.split("T")[0] };
+  if (startDate)
+    dateWhereClause.applicationStart = { [Op.gte]: startDate.split("T")[0] }; // 2025-01-28 같은 형식
+  if (endDate)
+    dateWhereClause.applicationEnd = { [Op.lte]: endDate.split("T")[0] };
 
   const events = await models.Events.findAll({
-    where: { 
+    where: {
       ...cursorWhereClause, // 커서 기준 조건 추가
-      ...priceWhereClause,   // 금액 기준 조건 추가
+      ...priceWhereClause, // 금액 기준 조건 추가
       ...locationWhereClause, // 위치 기준 조건 추가
       ...dateWhereClause, // 날짜 기준 조건 추가
     },
     limit: limit + 1, // 다음 페이지 존재 여부 확인을 위해 하나 더 조회
-    order: ["eventId", "DESC"],
+    order: [["eventId", "DESC"]],
 
     attributes: { exclude: ["categoryId", "createdUserId"] },
     include: [
@@ -160,7 +155,7 @@ export const validateEventQuery = (queries) => {
   //   throw new InvalidQueryError("price는 true 또는 false여야 합니다.");
   // }
   const pricePool = ["전체", "무료", "유료"];
-  if (price && (price === "" || !pricePool.includes(price))) {
+  if (price !== undefined && (price === "" || !pricePool.includes(price))) {
     throw new InvalidQueryError(
       "올바르지 않은 가격입니다. 허용되는 값은 다음과 같습니다.",
       pricePool
@@ -190,7 +185,7 @@ export const validateEventQuery = (queries) => {
 
   // 날짜 형식 및 유효성 검증
   const isValidDate = (dateString) => {
-    const regex = /^\d{4}-\d{2}-\d{2}$/;      // 2024-12-31
+    const regex = /^\d{4}-\d{2}-\d{2}$/; // 2024-12-31
     if (!regex.test(dateString)) return false;
     const date = new Date(dateString);
     return date instanceof Date && !isNaN(date);

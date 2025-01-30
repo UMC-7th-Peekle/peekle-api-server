@@ -1,6 +1,7 @@
 import {
   AlreadyExistsError,
   NotExistsError,
+  InvalidQueryError,
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import { Sequelize } from "sequelize";
@@ -47,12 +48,8 @@ export const deleteScrap = async (eventId, userId) => {
 /**
  * 스크랩한 이벤트 목록을 조회합니다.
  */
-export const listScrap = async(paginationOptions, userId) => {
-  const { 
-    limit, 
-    cursor, 
-    scrap
-  } = paginationOptions;
+export const listScrap = async (paginationOptions, userId) => {
+  const { limit, cursor, scrap } = paginationOptions;
 
   // 커서 기준 조건 설정
   let cursorWhereClause = {};
@@ -68,7 +65,11 @@ export const listScrap = async(paginationOptions, userId) => {
   // 스크랩 조건 설정
   let scrapWhereClause = {};
   if (scrap === "true") {
-    scrapWhereClause = {}; // 모든 튜플을 반환할 조건 (필터링 없음)
+    scrapWhereClause = {}; // 스크랩된 튜플 모두 반환 (EventScraps 테이블에 있는 거 다다)
+  } else {
+    throw new InvalidQueryError(
+      "올바르지 않은 입력입니다. scrap 값은 'true'만 가능합니다."
+    );
   }
 
   // 이벤트 불러오기
@@ -79,53 +80,55 @@ export const listScrap = async(paginationOptions, userId) => {
       ...scrapWhereClause,
     },
     limit: limit + 1,
-    order: ["eventScrapId", "DESC"],
+    order: [["eventScrapId", "DESC"]],
 
     attributes: { exclude: ["userId", "createdAt", "updateAt"] },
     include: [
       {
         model: models.Events,
-        as: "events",
+        as: "event",
         attributes: [
-          "title", 
-          "content", 
-          "price", 
-          "location", 
+          "title",
+          "content",
+          "price",
+          "location",
           "locationGroupId",
-          "eventUrl", 
+          "eventUrl",
           "applicationStart",
           "applicationEnd",
-        ]
-      },
-      {
-        model: models.EventCategory,
-        as: "category",
-        attributes: ["name", "description"],
-      },
-      {
-        model: models.EventImages,
-        as: "eventImages",
-        attributes: ["imageUrl", "sequence"],
-      },
-      {
-        model: models.EventSchedules,
-        as: "eventSchedules",
-        attributes: [
-          "repeatType",
-          "repeatEndDate",
-          "isAllDay",
-          "customText",
-          "startDate",
-          "endDate",
-          "startTime",
-          "endTime",
+        ],
+        include: [
+          {
+            model: models.EventCategory,
+            as: "category",
+            attributes: ["name", "description"],
+          },
+          {
+            model: models.EventImages,
+            as: "eventImages",
+            attributes: ["imageUrl", "sequence"],
+          },
+          {
+            model: models.EventSchedules,
+            as: "eventSchedules",
+            attributes: [
+              "repeatType",
+              "repeatEndDate",
+              "isAllDay",
+              "customText",
+              "startDate",
+              "endDate",
+              "startTime",
+              "endTime",
+            ],
+          },
         ],
       },
-    ]
+    ],
   });
 
   let hasNextPage = false;
-  
+
   // limit+1로 조회했을 때 초과된 데이터가 있으면, 다음 페이지가 있다는 뜻
   if (events.length > limit) {
     hasNextPage = true;
@@ -133,21 +136,25 @@ export const listScrap = async(paginationOptions, userId) => {
   }
 
   // 더 과거의 이벤트가 있으면 nextCursor를 설정
-  const nextCursor = hasNextPage ? events[events.length - 1].eventScrapId : null;
+  const nextCursor = hasNextPage
+    ? events[events.length - 1].eventScrapId
+    : null;
 
   const modifiedEvents = events.map((event) => {
-    const transformedImages = event.eventImages.map((image) => ({
+    // event.eventImages에서 eventImages 가져오기
+    const transformedImages = event.event.eventImages.map((image) => ({
       imageUrl: addBaseUrl(image.imageUrl),
       sequence: image.sequence,
     }));
 
     return {
-      ...event.dataValues,
-      eventImages: transformedImages,
+      ...event.dataValues, // 스크랩 관련 데이터 가져오기
+      event: {
+        ...event.event.dataValues, // 이벤트 관련 데이터
+        eventImages: transformedImages, // event 안에 eventImage 포함해서 가져오기
+      },
     };
   });
 
   return { events: modifiedEvents, nextCursor, hasNextPage };
-
-  // 쿼리 유효성 검증 부분
 };

@@ -46,18 +46,16 @@ export const deleteScrap = async (req, res, next) => {
  * 스크랩한 이벤트 목록을 조회합니다.
  * scrap 쿼리로 가져와서 확인합니다. scrap = true..? --> /events/scrap?scrap=true
  */
-export const listScrap = async(req, res, next) => {
+export const listScrap = async (req, res, next) => {
   try {
     const { scrap, limit, cursor } = req.query;
     const { userId } = req.user;
-
-    // scrapService.validateQuery(req.query);
 
     // 페이지네이션 기본값 설정
     const paginationOptions = {
       limit: limit ? parseInt(limit, 10) : 10, // 기본 limit은 10
       cursor: cursor ? parseInt(cursor, 10) : null, // cursor가 없으면 null
-      scrap
+      scrap,
     };
 
     const { events, nextCursor, hasNextPage } = await scrapService.listScrap(
