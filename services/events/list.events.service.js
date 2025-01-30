@@ -27,8 +27,15 @@ export const listEvent = async (paginationOptions) => {
 
   // 카테고리 조건 설정
   let categoryWhereClause = {};
-  if (category !== "전체") {
-    categoryWhereClause = { name: category }; // 카테고리 이름으로 필터링
+  // if (category !== "전체") {
+  //   categoryWhereClause = { name: category }; // 카테고리 이름으로 필터링
+  // }
+  if (category.length > 0 && category[0] !== "전체") {
+    categoryWhereClause = {
+      name: {
+        [Op.in]: category, // 배열인 카테고리로
+      },
+    };
   }
 
   // TODO : category Id로 filtering 해도 되지 않을까 하는 생각
@@ -50,15 +57,22 @@ export const listEvent = async (paginationOptions) => {
 
   // 지역 조건 설정
   let locationWhereClause = {};
-  if (location !== "전체") {
-    // 지역그룹Id로 필터링
-    const locationGroup = await models.EventLocationGroups.findAll({
-      where: { groupId: location },
-      attributes: ["groupId"],
-    });
-    if (locationGroup) {
-      locationWhereClause = { locationGroupId: location };
-    }
+  // if (location !== "전체") {
+  //   // 지역그룹Id로 필터링
+  //   const locationGroup = await models.EventLocationGroups.findAll({
+  //     where: { groupId: location },
+  //     attributes: ["groupId"],
+  //   });
+  //   if (locationGroup) {
+  //     locationWhereClause = { locationGroupId: location };
+  //   }
+  // }
+  if (location.length > 0 && location[0] !== "전체") {
+    locationWhereClause = {
+      locationGroupId: {
+        [Op.in]: location, // 배열인 location
+      },
+    };
   }
 
   // 금액 조건 설정
@@ -185,10 +199,27 @@ export const validateEventQuery = (queries) => {
 
   // 카테고리 검증
   const categoryPool = ["전체", "교육", "문화", "활동"];
-  if (
-    category !== undefined &&
-    (category === "" || !categoryPool.includes(category))
-  ) {
+  // if (
+  //   category !== undefined &&
+  //   (category === "" || !categoryPool.includes(category))
+  // ) {
+  //   throw new InvalidQueryError(
+  //     "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
+  //     categoryPool
+  //   );
+  // }
+
+  // 중복인 경우와 중복이 아닌 경우 나누기
+  if (Array.isArray(category)) {
+    category.forEach((cate) => {
+      if (cate !== "전체" && !categoryPool.includes(cate)) {
+        throw new InvalidQueryError(
+          "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
+          categoryPool
+        );
+      }
+    });
+  } else if (category === "" || !categoryPool.includes(category)) {
     throw new InvalidQueryError(
       "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
       categoryPool
@@ -197,7 +228,24 @@ export const validateEventQuery = (queries) => {
 
   // 위치 검증
   const locationPool = ["전체", "1", "2", "3", "4", "5", "6", "7", "8"];
-  if (location && (location === "" || !locationPool.includes(location))) {
+  // if (location && (location === "" || !locationPool.includes(location))) {
+  //   throw new InvalidQueryError(
+  //     "올바르지 않은 위치입니다. 허용되는 값은 다음과 같습니다.",
+  //     locationPool
+  //   );
+  // }
+
+  // 중복인 경우와 중복이 아닌 경우 나누기
+  if (Array.isArray(location)) {
+    location.forEach((locate) => {
+      if (locate === "" || !locationPool.includes(locate)) {
+        throw new InvalidQueryError(
+          "올바르지 않은 위치입니다. 허용되는 값은 다음과 같습니다.",
+          locationPool
+        );
+      }
+    });
+  } else if (location === "" || !locationPool.includes(location)) {
     throw new InvalidQueryError(
       "올바르지 않은 위치입니다. 허용되는 값은 다음과 같습니다.",
       locationPool

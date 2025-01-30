@@ -19,14 +19,26 @@ export const listEvent = async (req, res, next) => {
       endDate,
     } = req.query;
 
+    // 중복 선택 받아오는 배열로
+    const categories = Array.isArray(category)
+      ? category
+      : category
+        ? [category]
+        : [];
+    const locations = Array.isArray(location)
+      ? location
+      : location
+        ? [location]
+        : [];
+
     logger.debug("이벤트 목록 조회", {
       action: "events:getEvents",
       actionType: "request",
       limit,
       cursor,
       query,
-      category,
-      location,
+      category: categories,
+      location: locations,
       price,
       startDate,
       endDate,
@@ -37,8 +49,8 @@ export const listEvent = async (req, res, next) => {
       limit: limit ? parseInt(limit, 10) : 10, // 기본 limit은 10
       cursor: cursor ? parseInt(cursor, 10) : null, // cursor가 없으면 null
       query,
-      category,
-      location,
+      category: categories,
+      location: locations,
       price,
       startDate,
       endDate,
