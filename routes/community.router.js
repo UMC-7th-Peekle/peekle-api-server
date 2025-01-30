@@ -13,6 +13,7 @@ import * as articleValidator from "../utils/validators/community/article.validat
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
 import { validateRequestBody } from "../middleware/validate.js";
+import * as aritcleSchema from "../utils/validators/community/article.validators.js";
 
 const router = Router();
 
@@ -198,4 +199,111 @@ router.post(
   reportController.reportComment
 );
 
+export const communitySwagger = {
+  "/community": {
+    get: {
+      tags: ["Community"],
+      summary: "커뮤니티 게시글 목록 조회",
+      description: "커뮤니티 ID를 통해 해당 커뮤니티의 게시글 목록을 조회합니다.",
+      parameters: [
+        {
+          name: "limit",
+          in: "query",
+          required: false,
+          description: "한 번에 가져올 게시글 수",
+          schema: {
+            type: "integer",
+          },
+        },
+        {
+          name: "cursor",
+          in: "query",
+          required: false,
+          description: "페이지네이션을 위한 커서",
+          schema: {
+            type: "string",
+          },
+        },
+        {
+          name: "query",
+          in: "query",
+          required: false,
+          description: "검색어",
+          schema: {
+            type: "string",
+          },
+        },
+        {
+          name: "communityId",
+          in: "query",
+          required: true,
+          description: "커뮤니티 ID",
+          schema: {
+            type: "integer",
+          },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: aritcleSchema.postArticleSchema // getArticle에 대한 스키마 지정이 필요한가?
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+        404: {
+          description: "커뮤니티 ID에 해당하는 게시판이 존재하지 않습니다.",
+        },
+      },
+    },
+  },
+  "/community/article/like": {
+    get: {
+      tags: ["Community"],
+      summary: "좋아요 누른 게시글 목록 조회",
+      description: "사용자가 좋아요를 누른 게시글 목록을 조회합니다.",
+      parameters: [
+        {
+          name: "limit",
+          in: "query",
+          required: false,
+          description: "한 번에 가져올 게시글 수",
+          schema: {
+            type: "integer",
+          },
+        },
+        {
+          name: "cursor",
+          in: "query",
+          required: false,
+          description: "페이지네이션을 위한 커서",
+          schema: {
+            type: "string",
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  
+
+};
+
 export default router;
+

@@ -5,6 +5,7 @@ yaml ... 어차피
 */
 
 import { authSwagger } from "./auth.router.js";
+import { communitySwagger } from "./community.router.js";
 
 const swaggerDoc = {
   openapi: "3.1.0", // OpenAPI 버전을 3.1.0으로 업데이트
@@ -84,6 +85,7 @@ const swaggerDoc = {
       },
     },
     ...authSwagger,
+    ...communitySwagger,
   },
 };
 
