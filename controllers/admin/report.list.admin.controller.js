@@ -27,7 +27,7 @@ export const getReports = async (req, res, next) => {
 
     // 신고가 있는 경우
     logger.debug("신고 목록 조회", {
-      action: "report: getReports",
+      action: "report:getReports",
       actionType: "success",
       reportsCount: reports.length,
       nextCursor,

@@ -145,11 +145,18 @@ export const sendTokenToPhone = async ({ phone }) => {
   // 입력값으로 들어오는 전화번호는 10으로 시작하고 공백이 존재하지 않아야 합니다.
   // const southKoreaPhone = "+82" + phone.slice(1);
   const message = `[Peekle, 피클] 인증번호는 ${token} 입니다.\n절대 타인에게 노출하지 마세요.`;
-  logger.debug(`[sendTokenToPhone]\n핸드폰번호: ${phone}\n메세지: ${message}`);
 
   // COOLSMS 사용
   const result = await coolSMS.sdkSendSMS(phone, message);
   logger.debug(`[sendTokenToPhone] result: ${JSON.stringify(result, null, 2)}`);
+  logger.debug("전화번호 인증 요청", {
+    action: "verifyPhone:send",
+    data: {
+      phone,
+      message,
+      result,
+    },
+  });
 
   return encrypt62(record.sessionId);
 };
@@ -157,10 +164,10 @@ export const sendTokenToPhone = async ({ phone }) => {
 /**
  * 인증 세션 ID, 전화번호, 토큰값을 받아서 인증을 처리합니다
  */
-export const verifyToken = async ({ id, token, phone }) => {
+export const verifyToken = async ({ id, phone, token }) => {
   // 1. DB에 존재하는 인증 세션인지 조회
   const decryptedId = decrypt62(id);
-  logger.debug(`[verifyToken] decryptedId: ${decryptedId}`);
+  // logger.debug(`[verifyToken] decryptedId: ${decryptedId}`);
 
   const record = await models.VerificationCode.findOne({
     attributes: [
@@ -175,9 +182,26 @@ export const verifyToken = async ({ id, token, phone }) => {
       isVerified: false,
     },
   });
-  logger.debug(`[verifyToken] record: ${JSON.stringify(record, null, 2)}`);
+
+  logger.debug("SMS 전화번호 인증 확인 요청", {
+    action: "verifyPhone:verify",
+    data: {
+      id,
+      token,
+      phone,
+    },
+  });
   // 1-1. 존재하지 않는 세션인 경우 에러 리턴
   if (!record) {
+    logger.error("존재하지 않는 인증 세션에 대한 인증 요청", {
+      action: "verifyPhone:verify",
+      actionType: "request",
+      data: {
+        id,
+        token,
+        phone,
+      },
+    });
     throw new NotExistsError(
       "이미 인증되었거나, 존재하지 않는 인증 세션입니다."
     );
@@ -186,7 +210,16 @@ export const verifyToken = async ({ id, token, phone }) => {
   // 1-2. 인증하려는 전화번호가 일치하는지 확인
   if (record.identifierValue !== phone) {
     logger.error(
-      `[verifyToken] 인증 세션과 다른 전화번호로 인증을 시도하였습니다. sessionId: ${decryptedId}, phone: ${phone}, identifierValue: ${record.identifierValue}`
+      "인증을 요청하며 전송한 전화번호가 인증 세션에 기록된 정보와 일치하지 않습니다.",
+      {
+        action: "verifyPhone:verify",
+        actionType: "request",
+        data: {
+          id,
+          token,
+          phone,
+        },
+      }
     );
     throw new InvalidInputError("인증하려는 전화번호가 아닙니다.");
   }
@@ -198,6 +231,15 @@ export const verifyToken = async ({ id, token, phone }) => {
   if (now - createdAt > VERIFICATION_TIME_LIMIT) {
     // 2-1. 만료된 인증세션인 경우 에러 리턴 및 해당 세션 삭제
     await record.destroy();
+    logger.error("인증 시간이 만료된 인증 세션에 대한 인증 요청", {
+      action: "verifyPhone:verify",
+      actionType: "request",
+      data: {
+        id,
+        token,
+        phone,
+      },
+    });
     throw new TimeOutError("인증 시간이 만료되었습니다.");
   }
 

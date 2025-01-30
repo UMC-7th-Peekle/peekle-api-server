@@ -12,15 +12,37 @@ import {
 } from "../middleware/validate.js";
 import { oauthRegisterSchema } from "../utils/validators/auth/auth.validators.js";
 import logger from "../utils/logger/logger.js";
-import { eventLocationGroup } from "../models/seed/location.group.js";
+import {
+  seedCommunity,
+  seedEventLocationGroup,
+  seedTerms,
+} from "../models/seed/seeder.js";
+import { logError } from "../utils/handlers/error.logger.js";
 
 const router = Router();
 
-router.get("/seed/:type", async (req, res) => {
+router.get("/seed/:type", authenticateAccessToken, async (req, res, next) => {
   const { type } = req.params;
-  if (type === "event-location") {
-    await eventLocationGroup();
+
+  try {
+    switch (type) {
+      case "eventLocation":
+        await seedEventLocationGroup();
+        break;
+      case "terms":
+        await seedTerms();
+        break;
+      case "community":
+        await seedCommunity();
+        break;
+      default:
+        break;
+    }
+  } catch (err) {
+    logError(err);
+    return next(err);
   }
+
   res.status(201).success({
     message: "Seed 작업이 완료되었습니다.",
   });

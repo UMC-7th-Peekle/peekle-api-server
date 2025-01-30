@@ -97,7 +97,7 @@ export const getArticles = async (
 
   if (!community) {
     // 결과값이 존재하지 않는 경우
-    logger.error("존재하지 않은 게시판입니다.", {
+    logger.error("존재하지 않는 게시판입니다.", {
       action: "community:getArticles",
       actionType: "error",
       communityId: communityId,
