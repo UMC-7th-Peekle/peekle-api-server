@@ -6,6 +6,7 @@ yaml ... 어차피
 
 import { authSwagger } from "./auth.router.js";
 import { communitySwagger } from "./community.router.js";
+import * as articleValidator from "../utils/validators/community/article.validators.js";
 
 const swaggerDoc = {
   openapi: "3.1.0", // OpenAPI 버전을 3.1.0으로 업데이트
@@ -60,6 +61,15 @@ const swaggerDoc = {
     schemas: {
       // schema 파일에서 export 한 것을 구조분해할당으로 몰아두기.
       // ...yourSchema,
+      postArticle: articleValidator.postArticleSchema,
+      patchArticle: articleValidator.patchArticleSchema,
+      createCommunity: articleValidator.createCommunitySchema,
+      specificArticlePath: articleValidator.specificArticlePathSchema,
+      specificArticleCommentPath: articleValidator.specificArticleCommentPathSchema,
+      createComment: articleValidator.createCommentSchema,
+      updateOrReplyComment: articleValidator.updateOrReplyCommentSchema,
+      reportArticle: articleValidator.reportArticleSchema,
+      reportComment: articleValidator.reportCommentSchema,
     },
   },
   security: [

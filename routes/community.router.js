@@ -210,7 +210,7 @@ export const communitySwagger = {
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.createCommunitySchema,
+              $ref: "#/components/schemas/createCommunity",
             },
           },
         },
@@ -267,17 +267,6 @@ export const communitySwagger = {
           },
         },
       ],
-      requestBody: {
-        // TODO: 마지막에 상세 정보 추가
-        required: true,
-        content: {
-          "application/json": {
-            schema: {
-              $ref: aritcleSchema.postArticleSchema, // getArticle에 대한 스키마 지정이 필요한가?
-            },
-          },
-        },
-      },
       responses: {
         200: {
           description: "성공",
@@ -323,13 +312,16 @@ export const communitySwagger = {
         200: {
           description: "성공",
         },
+        204: {
+          description: "좋아요한 게시글이 존재하지 않음",
+        },
         400: {
           description: "실패",
         },
       },
     },
   },
-  "/community/:communityId/articles/:articleId": {
+  "/community/{communityId}/articles/{articleId}": {
     get: {
       tags: ["Community - 게시글 CRUD"],
       summary: "게시글 조회",
@@ -357,9 +349,6 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
-        },
-        204: {
-          description: "좋아요한 게시글이 존재하지 않음",
         },
         400: {
           description: "실패",
@@ -394,12 +383,11 @@ export const communitySwagger = {
         },
       ],
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "multipart/form-data": {
             schema: {
-              $ref: aritcleSchema.patchArticleSchema,
+              $ref: "#/components/schemas/patchArticle",
             },
           },
         },
@@ -420,7 +408,7 @@ export const communitySwagger = {
       },
     },
   },
-  "/community/:communityId/articles": {
+  "/community/{communityId}/articles": {
     post: {
       tags: ["Community - 게시글 CRUD"],
       summary: "게시글 작성",
@@ -437,12 +425,11 @@ export const communitySwagger = {
         },
       ],
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "multipart/form-data": {
             schema: {
-              $ref: aritcleSchema.postArticleSchema,
+              $ref: "#/components/schemas/postArticle",
             },
           },
         },
@@ -466,12 +453,11 @@ export const communitySwagger = {
       summary: "게시글 삭제",
       description: "게시글 ID에 해당하는 게시글을 삭제합니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.specificArticlePathSchema,
+              $ref: "#/components/schemas/specificArticlePath",
             },
           },
         },
@@ -495,12 +481,11 @@ export const communitySwagger = {
       summary: "게시글 좋아요",
       description: "게시글에 좋아요를 누릅니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.specificArticlePathSchema,
+              $ref: "#/components/schemas/specificArticlePath",
             },
           },
         },
@@ -525,12 +510,11 @@ export const communitySwagger = {
       summary: "게시글 좋아요 취소",
       description: "게시글에 좋아요를 취소합니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.specificArticlePathSchema,
+              $ref: "#/components/schemas/specificArticlePath",
             },
           },
         },
@@ -557,12 +541,11 @@ export const communitySwagger = {
       summary: "댓글 좋아요",
       description: "댓글에 좋아요를 누릅니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.specificArticleCommentPathSchema,
+              $ref: "#/components/schemas/specificArticleCommentPath",
             },
           },
         },
@@ -587,12 +570,11 @@ export const communitySwagger = {
       summary: "댓글 좋아요 취소",
       description: "댓글에 좋아요를 취소합니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.specificArticleCommentPathSchema,
+              $ref: "#/components/schemas/specificArticleCommentPath",
             },
           },
         },
@@ -655,12 +637,11 @@ export const communitySwagger = {
       summary: "댓글 작성",
       description: "게시글 ID에 해당하는 게시글에 댓글을 작성합니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.createCommentSchema,
+              $ref: "#/components/schemas/createComment", 
             },
           },
         },
@@ -682,12 +663,11 @@ export const communitySwagger = {
       summary: "댓글 수정",
       description: "댓글 ID에 해당하는 댓글을 수정합니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.updateOrReplyCommentSchema,
+              $ref: "#/components/schemas/updateOrReplyComment",
             },
           },
         },
@@ -712,12 +692,11 @@ export const communitySwagger = {
       summary: "댓글 삭제",
       description: "댓글 ID에 해당하는 댓글을 삭제합니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.specificArticleCommentPathSchema,
+              $ref: "#/components/schemas/specificArticleCommentPath",
             },
           },
         },
@@ -744,12 +723,11 @@ export const communitySwagger = {
       summary: "대댓글 작성",
       description: "댓글 ID에 해당하는 댓글에 대댓글을 작성합니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.updateOrReplyCommentSchema,
+              $ref: "#/components/schemas/updateOrReplyComment",
             },
           },
         },
@@ -773,12 +751,11 @@ export const communitySwagger = {
       summary: "게시글 신고",
       description: "게시글을 신고합니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.reportArticleSchema,
+              $ref: "#/components/schemas/reportArticle",
             },
           },
         },
@@ -811,12 +788,11 @@ export const communitySwagger = {
       summary: "댓글 신고",
       description: "댓글을 신고합니다.",
       requestBody: {
-        // TODO: 마지막에 상세 정보 추가
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref: aritcleSchema.reportCommentSchema,
+              $ref: "#/components/schemas/reportComment",
             },
           },
         },
@@ -843,7 +819,7 @@ export const communitySwagger = {
       },
     },
   },
-  "/community/:communityId/articles/popular": {
+  "/community/{communityId}/articles/popular": {
     get: {
       tags: ["Community - 인기 게시글 집계"],
       summary: "인기글 조회",
