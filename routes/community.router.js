@@ -199,6 +199,20 @@ router.post(
   reportController.reportComment
 );
 
+export const communitySwaggerSchema = {
+  postArticle: articleValidator.postArticleSchema,
+  patchArticle: articleValidator.patchArticleSchema,
+  getArticle: articleValidator.getArticleSchema,
+  createCommunity: articleValidator.createCommunitySchema,
+  specificArticlePath: articleValidator.specificArticlePathSchema,
+  specificArticleCommentPath: articleValidator.specificArticleCommentPathSchema,
+  createComment: articleValidator.createCommentSchema,
+  updateOrReplyComment: articleValidator.updateOrReplyCommentSchema,
+  getComment: articleValidator.getCommentSchema,
+  reportArticle: articleValidator.reportArticleSchema,
+  reportComment: articleValidator.reportCommentSchema,
+};
+
 export const communitySwagger = {
   "/community": {
     post: {
@@ -306,7 +320,7 @@ export const communitySwagger = {
                     example: "SUCCESS",
                   },
                   error: {
-                    type: [ "string", "null" ],
+                    type: ["string", "null"],
                     example: null,
                   },
                   success: {
@@ -360,7 +374,7 @@ export const communitySwagger = {
                               example: 1,
                             },
                             thumbnail: {
-                              type: [ "string", "null" ],
+                              type: ["string", "null"],
                               example: null,
                             },
                             authorInfo: {
@@ -373,7 +387,8 @@ export const communitySwagger = {
                                 profileImage: {
                                   type: "string",
                                   format: "uri",
-                                  example: "http://localhost:7777/uploads/default/peekle_default_profile_image.png",
+                                  example:
+                                    "http://localhost:7777/uploads/default/peekle_default_profile_image.png",
                                 },
                                 authorId: {
                                   type: "number",
@@ -431,7 +446,7 @@ export const communitySwagger = {
                   },
                 },
               },
-            },  
+            },
           },
         },
       },
@@ -475,7 +490,7 @@ export const communitySwagger = {
                     example: "SUCCESS",
                   },
                   error: {
-                    type: [ "string", "null" ],
+                    type: ["string", "null"],
                     example: null,
                   },
                   success: {
@@ -533,7 +548,7 @@ export const communitySwagger = {
                               example: 1,
                             },
                             thumbnail: {
-                              type: [ "string", "null" ],
+                              type: ["string", "null"],
                               example: null,
                             },
                           },
@@ -1335,7 +1350,7 @@ export const communitySwagger = {
                     example: "SUCCESS",
                   },
                   error: {
-                    type: [ "string", "null" ],
+                    type: ["string", "null"],
                     example: null,
                   },
                   success: {

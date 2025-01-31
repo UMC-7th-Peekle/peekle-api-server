@@ -5,7 +5,7 @@ yaml ... 어차피
 */
 
 import { authSwagger } from "./auth.router.js";
-import { communitySwagger } from "./community.router.js";
+import { communitySwagger, communitySwaggerSchema } from "./community.router.js";
 import * as articleValidator from "../utils/validators/community/article.validators.js";
 
 const swaggerDoc = {
@@ -61,17 +61,7 @@ const swaggerDoc = {
     schemas: {
       // schema 파일에서 export 한 것을 구조분해할당으로 몰아두기.
       // ...yourSchema,
-      postArticle: articleValidator.postArticleSchema,
-      patchArticle: articleValidator.patchArticleSchema,
-      getArticle: articleValidator.getArticleSchema,
-      createCommunity: articleValidator.createCommunitySchema,
-      specificArticlePath: articleValidator.specificArticlePathSchema,
-      specificArticleCommentPath: articleValidator.specificArticleCommentPathSchema,
-      createComment: articleValidator.createCommentSchema,
-      updateOrReplyComment: articleValidator.updateOrReplyCommentSchema,
-      getComment: articleValidator.getCommentSchema,
-      reportArticle: articleValidator.reportArticleSchema,
-      reportComment: articleValidator.reportCommentSchema,
+      ...communitySwaggerSchema,
     },
   },
   security: [
