@@ -218,9 +218,35 @@ export const communitySwagger = {
       responses: {
         201: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "게시판 생성 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         409: {
-          description: "이미 존재하는 게시판 이름입니다.",
+          description: "게시판 이름이 중복된 경우",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "이미 존재하는 게시판 이름입니다.",
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -270,15 +296,143 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  resultType: {
+                    type: "string",
+                    example: "SUCCESS",
+                  },
+                  error: {
+                    type: [ "string", "null" ],
+                    example: null,
+                  },
+                  success: {
+                    type: "object",
+                    properties: {
+                      message: {
+                        type: "string",
+                        example: "게시글 목록 조회 성공",
+                      },
+                      articles: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            articleId: {
+                              type: "number",
+                              example: 769,
+                            },
+                            title: {
+                              type: "string",
+                              example: "1-769 제목",
+                            },
+                            content: {
+                              type: "string",
+                              example: "1-769 내용 | 피클이 최고!",
+                            },
+                            isAnonymous: {
+                              type: "boolean",
+                              example: true,
+                            },
+                            communityId: {
+                              type: "number",
+                              example: 1,
+                            },
+                            createdAt: {
+                              type: "string",
+                              format: "date-time",
+                              example: "2025-01-29T20:02:18.677Z",
+                            },
+                            updatedAt: {
+                              type: "string",
+                              format: "date-time",
+                              example: "2025-01-29T20:02:18.677Z",
+                            },
+                            articleComments: {
+                              type: "number",
+                              example: 49,
+                            },
+                            articleLikes: {
+                              type: "number",
+                              example: 1,
+                            },
+                            thumbnail: {
+                              type: [ "string", "null" ],
+                              example: null,
+                            },
+                            authorInfo: {
+                              type: "object",
+                              properties: {
+                                nickname: {
+                                  type: "string",
+                                  example: "레일",
+                                },
+                                profileImage: {
+                                  type: "string",
+                                  format: "uri",
+                                  example: "http://localhost:7777/uploads/default/peekle_default_profile_image.png",
+                                },
+                                authorId: {
+                                  type: "number",
+                                  example: 4,
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      nextCursor: {
+                        type: "number",
+                        example: 747,
+                      },
+                      hasNextPage: {
+                        type: "boolean",
+                        example: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         204: {
-          description: "게시글이 존재하지 않음",
+          description: "게시글이 존재하지 않는 경우",
         },
         400: {
-          description: "실패",
+          description: "형식에 맞지 않는 입력이 들어온 경우",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "검색어는 공백을 제외하고 2자 이상이여야 합니다.",
+                  },
+                },
+              },
+            },
+          },
         },
         404: {
-          description: "커뮤니티 ID에 해당하는 게시판이 존재하지 않습니다.",
+          description: "커뮤니티 ID에 해당하는 게시판이 존재하지 않는 경우",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "존재하지 않는 게시판입니다.",
+                  },
+                },
+              },
+            },  
+          },
         },
       },
     },
@@ -311,6 +465,94 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  resultType: {
+                    type: "string",
+                    example: "SUCCESS",
+                  },
+                  error: {
+                    type: [ "string", "null" ],
+                    example: null,
+                  },
+                  success: {
+                    type: "object",
+                    properties: {
+                      message: {
+                        type: "string",
+                        example: "좋아요한 게시글 목록 조회 성공",
+                      },
+                      articles: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            articleId: {
+                              type: "number",
+                              example: 35,
+                            },
+                            title: {
+                              type: "string",
+                              example: "2-35 제목",
+                            },
+                            content: {
+                              type: "string",
+                              example: "2-35 내용 | 피클이 최고!",
+                            },
+                            authorId: {
+                              type: "number",
+                              example: 4,
+                            },
+                            isAnonymous: {
+                              type: "boolean",
+                              example: true,
+                            },
+                            communityId: {
+                              type: "number",
+                              example: 2,
+                            },
+                            createdAt: {
+                              type: "string",
+                              format: "date-time",
+                              example: "2025-01-29T20:02:18.677Z",
+                            },
+                            updatedAt: {
+                              type: "string",
+                              format: "date-time",
+                              example: "2025-01-29T20:02:18.677Z",
+                            },
+                            articleComments: {
+                              type: "number",
+                              example: 52,
+                            },
+                            articleLikes: {
+                              type: "number",
+                              example: 1,
+                            },
+                            thumbnail: {
+                              type: [ "string", "null" ],
+                              example: null,
+                            },
+                          },
+                        },
+                      },
+                      nextCursor: {
+                        type: "number",
+                        example: 30,
+                      },
+                      hasNextPage: {
+                        type: "boolean",
+                        example: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         204: {
           description: "좋아요한 게시글이 존재하지 않음",
@@ -349,6 +591,17 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                message: {
+                  type: "string",
+                  example: "게시글 조회 성공",
+                },
+                $ref: "#/components/schemas/getArticle",
+              },
+            },
+          },
         },
         400: {
           description: "실패",
@@ -395,6 +648,18 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "게시글 수정 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         400: {
           description: "게시글 제목이나 내용이 누락된 경우",
@@ -437,6 +702,18 @@ export const communitySwagger = {
       responses: {
         201: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "게시글 작성 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           description: "사용자 인증 정보가 제공되지 않은 경우",
@@ -465,6 +742,18 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "게시글 삭제 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           description: "사용자 인증 정보가 제공되지 않은 경우",
@@ -493,6 +782,18 @@ export const communitySwagger = {
       responses: {
         201: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "게시글 좋아요 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           description: "사용자 인증 정보가 제공되지 않은 경우",
@@ -522,6 +823,18 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "게시글 좋아요 취소 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           description: "사용자 인증 정보가 제공되지 않은 경우",
@@ -553,6 +866,18 @@ export const communitySwagger = {
       responses: {
         201: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "댓글 좋아요 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           description: "사용자 인증 정보가 제공되지 않은 경우",
@@ -582,6 +907,18 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "댓글 좋아요 취소 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           description: "사용자 인증 정보가 제공되지 않은 경우",
@@ -623,6 +960,24 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "댓글 조회 성공",
+                  },
+                  comments: {
+                    type: "array",
+                    items: {
+                      $ref: "#/components/schemas/getComment",
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         204: {
           description: "댓글이 존재하지 않음",
@@ -641,7 +996,7 @@ export const communitySwagger = {
         content: {
           "application/json": {
             schema: {
-              $ref: "#/components/schemas/createComment", 
+              $ref: "#/components/schemas/createComment",
             },
           },
         },
@@ -649,6 +1004,18 @@ export const communitySwagger = {
       responses: {
         201: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "댓글 작성 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           description: "사용자 인증 정보가 제공되지 않은 경우",
@@ -675,6 +1042,18 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "댓글 수정 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           description: "사용자 인증 정보가 제공되지 않은 경우",
@@ -704,6 +1083,18 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "댓글 삭제 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           description: "사용자 인증 정보가 제공되지 않은 경우",
@@ -735,6 +1126,18 @@ export const communitySwagger = {
       responses: {
         201: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "대댓글 작성 성공",
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           description: "사용자 인증 정보가 제공되지 않은 경우",
@@ -763,6 +1166,39 @@ export const communitySwagger = {
       responses: {
         201: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "게시글 신고 성공",
+                  },
+                  articleReport: {
+                    type: "object",
+                    properties: {
+                      targetId: {
+                        type: "integer",
+                        example: 1,
+                      },
+                      reportedUserId: {
+                        type: "integer",
+                        example: 2,
+                      },
+                      reason: {
+                        type: "string",
+                        example: "욕설",
+                      },
+                      type: {
+                        type: "string",
+                        example: "article",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         400: {
           description: "신고 사유가 누락된 경우",
@@ -800,6 +1236,39 @@ export const communitySwagger = {
       responses: {
         201: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "댓글 신고 성공",
+                  },
+                  articleReport: {
+                    type: "object",
+                    properties: {
+                      targetId: {
+                        type: "integer",
+                        example: 1,
+                      },
+                      reportedUserId: {
+                        type: "integer",
+                        example: 2,
+                      },
+                      reason: {
+                        type: "string",
+                        example: "욕설",
+                      },
+                      type: {
+                        type: "string",
+                        example: "comment",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         400: {
           description: "신고 사유가 누락된 경우",
@@ -856,6 +1325,82 @@ export const communitySwagger = {
       responses: {
         200: {
           description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  resultType: {
+                    type: "string",
+                    example: "SUCCESS",
+                  },
+                  error: {
+                    type: [ "string", "null" ],
+                    example: null,
+                  },
+                  success: {
+                    type: "object",
+                    properties: {
+                      message: {
+                        type: "string",
+                        example: "인기 게시글 조회 성공",
+                      },
+                      articles: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            articleId: {
+                              type: "number",
+                              example: 683,
+                            },
+                            title: {
+                              type: "string",
+                              example: "1-683 제목",
+                            },
+                            content: {
+                              type: "string",
+                              example: "1-683 내용 | 댓글도 맛있어라 얍",
+                            },
+                            authorId: {
+                              type: "number",
+                              example: 1,
+                            },
+                            isAnonymous: {
+                              type: "boolean",
+                              example: true,
+                            },
+                            communityId: {
+                              type: "number",
+                              example: 1,
+                            },
+                            createdAt: {
+                              type: "string",
+                              format: "date-time",
+                              example: "2025-01-29T20:02:18.677Z",
+                            },
+                            updatedAt: {
+                              type: "string",
+                              format: "date-time",
+                              example: "2025-01-29T20:02:18.677Z",
+                            },
+                            likeCount: {
+                              type: "number",
+                              example: 1,
+                            },
+                            commentCount: {
+                              type: "number",
+                              example: 100,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         204: {
           description: "해당 시간대에 인기글이 존재하지 않음",

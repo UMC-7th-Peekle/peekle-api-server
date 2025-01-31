@@ -48,6 +48,104 @@ export const patchArticleSchema = {
   additionalProperties: false,
 };
 
+export const getArticleSchema = {
+  type: "object",
+  properties: {
+    article: {
+      type: "object",
+      properties: {
+        articleId: {
+          type: "number",
+          example: 1,
+        },
+        title: {
+          type: "string",
+          example: "게시글 제목",
+        },
+        content: {
+          type: "string",
+          example: "게시글 내용입니다.",
+        },
+        authorId: {
+          type: "number",
+          example: 3,
+        },
+        isAnonymous: {
+          type: "boolean",
+          example: true,
+        },
+        communityId: {
+          type: "number",
+          example: 4,
+        },
+        createdAt: {
+          type: "string",
+          format: "date-time",
+          example: "2025-01-29T20:02:18.677Z",
+        },
+        updatedAt: {
+          type: "string",
+          format: "date-time",
+          example: "2025-01-29T20:02:18.677Z",
+        },
+        articleComments: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              commentId: {
+                type: "number",
+                example: 1,
+              },
+              articleId: {
+                type: "number",
+                example: 1,
+              },
+              parentCommentId: {
+                type: ["number", "null"],
+                example: null,
+              },
+              status: {
+                type: "string",
+                example: "active",
+              },
+              authorId: {
+                type: "number",
+                example: 4,
+              },
+              isAnonymous: {
+                type: "boolean",
+                example: true,
+              },
+              content: {
+                type: "string",
+                example: "댓글 내용입니다.",
+              },
+              createdAt: {
+                type: "string",
+                format: "date-time",
+                example: "2025-01-29T20:02:19.203Z",
+              },
+              updatedAt: {
+                type: "string",
+                format: "date-time",
+                example: "2025-01-29T20:02:19.203Z",
+              },
+            },
+          },
+        },
+        articleImages: {
+          type: "array",
+          items: {
+            type: "string",
+            example: "http://localhost:3000/uploads/1.jpg",
+          },
+        },
+      },
+    },
+  },
+};
+
 export const createCommunitySchema = {
   type: "object",
   properties: {
@@ -148,6 +246,55 @@ export const updateOrReplyCommentSchema = {
   additionalProperties: false,
 };
 
+export const getCommentSchema = {
+  type: "object",
+  properties: {
+    comment: {
+      type: "object",
+      properties: {
+        commentId: {
+          type: "number",
+          example: 1,
+        },
+        articleId: {
+          type: "number",
+          example: 1,
+        },
+        parentCommentId: {
+          type: ["number", "null"],
+          example: null,
+        },
+        status: {
+          type: "string",
+          example: "active",
+        },
+        authorId: {
+          type: "number",
+          example: 4,
+        },
+        isAnonymous: {
+          type: "boolean",
+          example: true,
+        },
+        content: {
+          type: "string",
+          example: "댓글 내용입니다.",
+        },
+        createdAt: {
+          type: "string",
+          format: "date-time",
+          example: "2025-01-29T20:02:19.203Z",
+        },
+        updatedAt: {
+          type: "string",
+          format: "date-time",
+          example: "2025-01-29T20:02:19.203Z",
+        },
+      },
+    },
+  },
+};
+
 export const reportArticleSchema = {
   type: "object",
   properties: {
@@ -171,19 +318,19 @@ export const reportArticleSchema = {
 export const reportCommentSchema = {
   type: "object",
   properties: {
-    communityId: { 
+    communityId: {
       type: "number",
       example: 1,
     },
-    articleId: { 
+    articleId: {
       type: "number",
       example: 123,
     },
-    commentId: { 
+    commentId: {
       type: "number",
       example: 456,
     },
-    reason: { 
+    reason: {
       type: "string",
       example: "부적절한 댓글입니다.",
     },
