@@ -8,6 +8,7 @@ import { authenticateRefreshToken } from "../middleware/authenticate.jwt.js";
 
 import * as authSchema from "../utils/validators/auth/auth.validators.js";
 import { validateRequestBody } from "../middleware/validate.js";
+import { deprecate } from "util";
 
 const router = Router();
 
@@ -80,12 +81,30 @@ router.post(
   phoneController.verifyToken
 );
 
+export const authSwaggerSchema = {
+  PhoneVerify: {
+    type: "object",
+    properties: {
+      phoneNumber: {
+        type: "string",
+        example: "01012345678",
+      },
+      token: {
+        type: "string",
+        example: "123456",
+      },
+    },
+    required: ["phoneNumber", "token"],
+  },
+};
+
 export const authSwagger = {
   "/phone/verify": {
     post: {
       tags: ["Auth"],
       summary: "휴대폰 인증",
       description: "휴대폰 인증을 진행합니다.",
+      deprecated: false, // 사용하지 않는 API일 경우 true로 변경
       requestBody: {
         required: true,
         content: {
@@ -107,5 +126,7 @@ export const authSwagger = {
     },
   },
 };
+
+// Yaml 형식으로 작성한 JSDoc을 swagger방식으로 변환
 
 export default router;
