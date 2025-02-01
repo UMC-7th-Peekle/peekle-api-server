@@ -7,7 +7,7 @@ import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { v4 as uuidv4 } from "uuid";
-import http from "http";
+// import http from "http";
 import https from "https"; // https를 사용해야 하는 경우 사용하면 됩니다.
 // import { Server } from "socket.io"; // socket을 사용하려면 주석 해제
 
@@ -56,6 +56,8 @@ app.use((req, res, next) => {
 
 app.use(cookieParser());
 app.use(cors(corsOptions));
+// Preflight 요청 수동 처리 (필요한 경우)
+// app.options("*", cors(corsOptions));
 
 app.use(morgan(morganFormat, morgranOptions));
 
