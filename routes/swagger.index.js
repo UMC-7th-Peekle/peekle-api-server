@@ -6,65 +6,71 @@ yaml ... 어차피
 
 import { authSwagger, authSwaggerSchema } from "./auth.router.js";
 
+const tags = [
+  {
+    name: "Admin",
+    description: "관리자 전용입니다.",
+  },
+  {
+    name: "Auth",
+    description: "",
+  },
+  {
+    name: "Community",
+    description: "테스트 API",
+  },
+  {
+    name: "Notices",
+    description: "테스트 API",
+  },
+  {
+    name: "Tickets",
+    description: "테스트 API",
+  },
+  {
+    name: "Users",
+    description: "테스트 API",
+  },
+  {
+    name: "Tests",
+    description: "테스트 API",
+  },
+];
+
+const info = {
+  title: "Peekle : 피클", // 문서 제목
+  version: "1.0.0", // 문서 버전
+  description: "API 명세서 입니다", // 문서 설명
+  termsOfService: "http://swagger.io/terms/",
+  contact: {
+    email: "saveearth1@cau.ac.kr",
+  },
+  license: {
+    name: "Apache 2.0",
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html",
+  },
+};
+
+const servers = [
+  {
+    url: "https://localhost:7777", // API 서버 URL
+    description: "Local Server",
+  },
+  {
+    url: "https://test.shop:41021", // API 서버 URL
+    description: "Remote Server (경운)",
+  },
+];
+
 const swaggerDoc = {
   openapi: "3.1.0", // OpenAPI 3.1.0
-  info: {
-    title: "Peekle : 피클", // 문서 제목
-    version: "1.0.0", // 문서 버전
-    description: "API 명세서 입니다", // 문서 설명
-    termsOfService: "http://swagger.io/terms/",
-    contact: {
-      email: "saveearth1@cau.ac.kr",
-    },
-    license: {
-      name: "Apache 2.0",
-      url: "http://www.apache.org/licenses/LICENSE-2.0.html",
-    },
-  },
+  info: info,
   externalDocs: {
-    description: "Find out more about Swagger",
-    url: "http://swagger.io",
+    description: "더 자세한 정보는 Backend Team Notion을 참고해주세요.",
+    url: "https://www.notion.so/API-0abd444acbf44291a14204991c8cf4ac?pvs=4",
   },
-  servers: [
-    {
-      url: "http://localhost:7777", // API 서버 URL
-      description: "Local Server",
-    },
-    {
-      url: "https://maybe.aws", // API 서버 URL
-      description: "AWS Server",
-    },
-  ],
-  tags: [
-    {
-      name: "Admin",
-      description: "관리자 전용입니다.",
-    },
-    {
-      name: "Auth",
-      description: "",
-    },
-    {
-      name: "Community",
-      description: "테스트 API",
-    },
-    {
-      name: "Notices",
-      description: "테스트 API",
-    },
-    {
-      name: "Tickets",
-      description: "테스트 API",
-    },
-    {
-      name: "Users",
-      description: "테스트 API",
-    },
-    {
-      name: "Tests",
-      description: "테스트 API",
-    },
-  ],
+  servers: servers,
+  tags: tags,
   security: [
     {
       AccessToken_Bearer: [],

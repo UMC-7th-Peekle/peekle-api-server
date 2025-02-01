@@ -49,13 +49,14 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(responseHandler);
-app.use(cookieParser());
-app.use(cors(corsOptions));
-
 app.use((req, res, next) => {
   req.transactionId = uuidv4(); // 고유한 트랜잭션 ID 생성
   next();
 });
+
+app.use(cookieParser());
+app.use(cors(corsOptions));
+
 app.use(morgan(morganFormat, morgranOptions));
 
 app.use(express.json());
@@ -64,7 +65,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Swagger 설정
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerOptions));
+// app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerOptions));
+app.use(
+  "/docs2",
+  (req, res, next) => {
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    res.setHeader("Surrogate-Control", "no-store");
+    next();
+  },
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerOptions)
+);
 
 // Router 연결
 app.use("/", routers);

@@ -80,27 +80,138 @@ router.post(
   phoneController.verifyToken
 );
 
+// export const authSwaggerSchema = { ...authSchema };
+
 export const authSwaggerSchema = {
-  PhoneVerify: {
+  localRegisterSchema: {
     type: "object",
     properties: {
-      phoneNumber: {
+      name: { type: "string", example: "김철수" },
+      nickname: { type: "string", example: "철수야" },
+      birthdate: { type: "string", format: "date", example: "1995-05-15" },
+      gender: { type: "string", enum: ["male", "female"], example: "male" },
+      email: { type: "string", format: "email", example: "user@example.com" },
+      phone: {
         type: "string",
+        pattern: "^[0-9]{10,11}$",
         example: "01012345678",
       },
-      token: {
-        type: "string",
-        example: "123456",
+      phoneVerificationSessionId: { type: "string", example: "session_5678" },
+      terms: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            termId: { type: "integer", example: 1 },
+            isAgreed: { type: "boolean", example: true },
+          },
+          required: ["termId", "isAgreed"],
+        },
+        example: [
+          { termId: 1, isAgreed: true },
+          { termId: 2, isAgreed: false },
+        ],
       },
     },
-    required: ["phoneNumber", "token"],
+    required: [
+      "name",
+      "nickname",
+      "birthdate",
+      "gender",
+      "email",
+      "phone",
+      "phoneVerificationSessionId",
+      "terms",
+    ],
+    additionalProperties: false,
+  },
+
+  oauthRegisterSchema: {
+    type: "object",
+    properties: {
+      oauthId: { type: "integer", example: 12345 },
+      oauthType: {
+        type: "string",
+        enum: ["kakao", "google", "facebook"],
+        example: "kakao",
+      },
+      name: { type: "string", example: "이영희" },
+      nickname: { type: "string", example: "영희양" },
+      birthdate: { type: "string", format: "date", example: "2000-12-25" },
+      gender: { type: "string", enum: ["male", "female"], example: "female" },
+      email: { type: "string", format: "email", example: "user@social.com" },
+      phone: {
+        type: "string",
+        pattern: "^[0-9]{10,11}$",
+        example: "01087654321",
+      },
+      phoneVerificationSessionId: { type: "string", example: "session_abcd" },
+      terms: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            termId: { type: "integer", example: 1 },
+            isAgreed: { type: "boolean", example: true },
+          },
+          required: ["termId", "isAgreed"],
+        },
+        example: [
+          { termId: 3, isAgreed: true },
+          { termId: 4, isAgreed: true },
+        ],
+      },
+    },
+    required: [
+      "oauthId",
+      "oauthType",
+      "name",
+      "nickname",
+      "birthdate",
+      "gender",
+      "email",
+      "phone",
+      "phoneVerificationSessionId",
+      "terms",
+    ],
+    additionalProperties: false,
+  },
+  phoneVerifySchema: {
+    type: "object",
+    properties: {
+      phone: {
+        type: "string",
+        pattern: "^[0-9]{10,11}$",
+        example: "01011223344",
+      },
+      phoneVerificationSessionId: { type: "string", example: "session_efgh" },
+      phoneVerificationCode: {
+        type: "string",
+        pattern: "^[0-9]{4}$",
+        example: "9876",
+      },
+    },
+    required: ["phone", "phoneVerificationSessionId", "phoneVerificationCode"],
+    additionalProperties: false,
+  },
+  sendTokenToPhoneSchema: {
+    type: "object",
+    properties: {
+      phone: {
+        type: "string",
+        pattern: "^[0-9]{10,11}$",
+        example: "01055667788",
+      },
+    },
+    required: ["phone"],
+    additionalProperties: false,
   },
 };
 
 export const authSwagger = {
   "/phone/verify": {
     post: {
-      tags: ["Auth"],
+      tags: ["회원가입"],
       summary: "휴대폰 인증",
       description: "휴대폰 인증을 진행합니다.",
       deprecated: false, // 사용하지 않는 API일 경우 true로 변경
@@ -109,7 +220,7 @@ export const authSwagger = {
         content: {
           "application/json": {
             schema: {
-              $ref: "#/components/schemas/PhoneVerify",
+              $ref: "#/components/schemas/localRegisterSchema",
             },
           },
         },
