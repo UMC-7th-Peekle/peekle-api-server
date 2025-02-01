@@ -35,6 +35,8 @@ export const newNotice = async ({ userId, categoryId, noticeData }) => {
     throw new InvalidInputError("해당 카테고리가 존재하지 않습니다.");
   }
 
+  // 사용자 권한 403
+
   logger.debug("공지사항 생성", {
     action: "notice:create",
     actionType: "log",

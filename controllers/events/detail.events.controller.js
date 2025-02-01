@@ -39,11 +39,7 @@ export const updateEvent = async (req, res, next) => {
       data: updateData,
     });
 
-    const updateEvent = await detailService.updateEvent(
-      eventId,
-      userId,
-      updateData
-    );
+    await detailService.updateEvent(eventId, userId, updateData);
 
     return res.status(200).success({ message: "이벤트 수정 완료" });
   } catch (error) {

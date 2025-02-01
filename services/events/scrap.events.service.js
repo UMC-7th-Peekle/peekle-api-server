@@ -82,7 +82,7 @@ export const listScrap = async (paginationOptions, userId) => {
     limit: limit + 1,
     order: [["eventScrapId", "DESC"]],
 
-    attributes: { exclude: ["userId", "createdAt", "updateAt"] },
+    attributes: { exclude: ["userId", "createdAt", "updatedAt"] },
     include: [
       {
         model: models.Events,
