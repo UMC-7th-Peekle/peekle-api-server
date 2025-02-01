@@ -5,6 +5,8 @@ yaml ... 어차피
 */
 
 import { authSwagger, authSwaggerSchema } from "./auth.router.js";
+import { communitySwagger, communitySwaggerSchema } from "./community.router.js";
+import * as articleValidator from "../utils/validators/community/article.validators.js";
 
 const swaggerDoc = {
   openapi: "3.1.0", // OpenAPI 3.1.0
@@ -88,7 +90,9 @@ const swaggerDoc = {
     },
     schemas: {
       // schema 파일에서 export 한 것을 구조분해할당으로 몰아두기.
+      // ...yourSchema,
       ...authSwaggerSchema,
+      ...communitySwaggerSchema,
     },
     requestBodies: {},
     responses: {},
@@ -114,6 +118,7 @@ const swaggerDoc = {
       },
     },
     ...authSwagger,
+    ...communitySwagger,
   },
   webhooks: {},
 };
