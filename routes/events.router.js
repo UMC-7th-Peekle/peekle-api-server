@@ -663,6 +663,141 @@ export const eventSwaggerSchema = {
     },
     required: ["eventId", "reason"],
   },
+
+  // 400 에러
+  InvalidInputError: {
+    type: "object",
+    properties: {
+      resultType: {
+        type: "string",
+        example: "FAIL",
+      },
+      error: {
+        type: "object",
+        properties: {
+          errorCode: {
+            type: "string",
+            example: "INVALID_INPUT",
+          },
+          reason: {
+            type: "string",
+            enum: [
+              "게시글 제목 또는 내용이 누락되었습니다.",
+              "쿼리문이 올바르지 않습니다.",
+              "신고 사유가 누락되었습니다.",
+            ],
+          },
+          data: {
+            type: "object",
+            example: null,
+          },
+        },
+      },
+      success: {
+        type: "object",
+        example: null,
+      },
+    },
+  },
+
+  // 404 에러
+  NotExistsError: {
+    type: "object",
+    properties: {
+      resultType: {
+        type: "string",
+        example: "FAIL",
+      },
+      error: {
+        type: "object",
+        properties: {
+          errorCode: {
+            type: "string",
+            example: "NOT_EXISTS",
+          },
+          reason: {
+            type: "string",
+            example: "존재하지 않는 이벤트입니다.",
+          },
+          data: {
+            type: "object",
+            example: null,
+          },
+        },
+      },
+      success: {
+        type: "object",
+        example: null,
+      },
+    },
+  },
+
+  // 403 에러
+  NotAllowedError: {
+    type: "object",
+    properties: {
+      resultType: {
+        type: "string",
+        example: "FAIL",
+      },
+      error: {
+        type: "object",
+        properties: {
+          errorCode: {
+            type: "string",
+            example: "NOT_ALLOWED",
+          },
+          reason: {
+            type: "string",
+            example: "해당 권한이 없습니다.",
+          },
+          data: {
+            type: "object",
+            example: null,
+          },
+        },
+      },
+      success: {
+        type: "object",
+        example: null,
+      },
+    },
+  },
+
+  // 409
+  NotExistsError: {
+    type: "object",
+    properties: {
+      resultType: {
+        type: "string",
+        example: "FAIL",
+      },
+      error: {
+        type: "object",
+        properties: {
+          errorCode: {
+            type: "string",
+            example: "ALREADY_EXISTS",
+          },
+          reason: {
+            type: "string",
+            enum: [
+              "이미 존재하는 이벤트입니다.",
+              "이미 스크랩된 이벤트입니다.",
+            ],
+          },
+          data: {
+            type: "object",
+            example: null,
+          },
+        },
+      },
+      success: {
+        type: "object",
+        example: null,
+      },
+    },
+  },
 };
 // ----------------------------------------------------------------------
 export const eventSwagger = {
@@ -775,6 +910,13 @@ export const eventSwagger = {
         },
         400: {
           description: "쿼리문이 올바르지 않습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/InvalidInputError",
+              },
+            },
+          },
         },
       },
     },
@@ -811,9 +953,23 @@ export const eventSwagger = {
         },
         404: {
           description: "이벤트가 존재하지 않습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotExistsError",
+              },
+            },
+          },
         },
         403: {
           description: "해당 이벤트를 삭제할 권한이 없습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotAllowedError",
+              },
+            },
+          },
         },
       },
     },
@@ -849,6 +1005,13 @@ export const eventSwagger = {
         },
         400: {
           description: "게시글 제목 또는 내용이 누락되었습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/InvalidInputError",
+              },
+            },
+          },
         },
       },
     },
@@ -906,6 +1069,13 @@ export const eventSwagger = {
         },
         400: {
           description: "쿼리문이 올바르지 않습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/InvalidInputError",
+              },
+            },
+          },
         },
       },
     },
@@ -941,9 +1111,23 @@ export const eventSwagger = {
         },
         404: {
           description: "존재하지 않는 이벤트입니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotExistsError",
+              },
+            },
+          },
         },
         409: {
           description: "이미 스크랩된 이벤트입니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotExistsError",
+              },
+            },
+          },
         },
       },
     },
@@ -1030,6 +1214,13 @@ export const eventSwagger = {
         },
         404: {
           description: "이벤트가 존재하지 않습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotExistsError",
+              },
+            },
+          },
         },
       },
     },
@@ -1076,9 +1267,23 @@ export const eventSwagger = {
         },
         404: {
           description: "이벤트가 존재하지 않습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotExistsError",
+              },
+            },
+          },
         },
         403: {
           description: "본인이 작성하지 않은 게시글을 수정할 수 없습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotAllowedError",
+              },
+            },
+          },
         },
       },
     },
@@ -1166,6 +1371,33 @@ export const eventSwagger = {
         },
         400: {
           description: "신고 사유가 누락되었습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/InvalidInputError",
+              },
+            },
+          },
+        },
+        403: {
+          description: "본인이 작성한 게시글을 신고할 수 없습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotAllowedError",
+              },
+            },
+          },
+        },
+        409: {
+          description: "이미 신고한 이벤트입니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotExistsError",
+              },
+            },
+          },
         },
       },
     },

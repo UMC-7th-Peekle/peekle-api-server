@@ -4,6 +4,8 @@ yaml ... 어차피
 
 */
 
+import { authSwagger } from "./auth.router.js";
+import { eventSwagger, eventSwaggerSchema } from "./events.router.js";
 import { authSwagger, authSwaggerSchema } from "./auth.router.js";
 import { eventSwagger, eventSwaggerSchema } from "./events.router.js";
 import { noticesSwaggerSchema, noticesSwagger } from "./notices.router.js";
