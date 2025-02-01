@@ -106,6 +106,36 @@ export const noticesSwaggerSchema = {
     },
   },
   // TODO: 403 Forbidden 에러 스키마 추가
+  forbiddenError: {
+    type: "object",
+    properties: {
+      resultType: {
+        type: "string",
+        example: "FAIL",
+      },
+      error: {
+        type: "object",
+        properties: {
+          errorCode: {
+            type: "string",
+            example: "NOT_ALLOWED",
+          },
+          reason: {
+            type: "string",
+            example: "해당 권한이 없습니다.",
+          },
+          data: {
+            type: "object",
+            example: null,
+          },
+        },
+      },
+      success: {
+        type: "object",
+        example: null,
+      },
+    },
+  },
   getNoticesByCategory: {
     type: "object",
     properties: {
@@ -404,7 +434,7 @@ export const noticesSwaggerSchema = {
     },
   },
 };
-
+// ------------------------------------------------------------------------------------------------
 export const noticesSwagger = {
   "/notices/category/{categoryId}": {
     get: {
@@ -534,13 +564,7 @@ export const noticesSwagger = {
           content: {
             "application/json": {
               schema: {
-                type: "object",
-                properties: {
-                  message: {
-                    type: "string",
-                    example: "권한이 없습니다.",
-                  },
-                },
+                $ref: "#/components/schemas/forbiddenError",
               },
             },
           },
@@ -752,13 +776,7 @@ export const noticesSwagger = {
           content: {
             "application/json": {
               schema: {
-                type: "object",
-                properties: {
-                  message: {
-                    type: "string",
-                    example: "권한이 없습니다.",
-                  },
-                },
+                $ref: "#/components/schemas/forbiddenError",
               },
             },
           },
@@ -833,13 +851,7 @@ export const noticesSwagger = {
           content: {
             "application/json": {
               schema: {
-                type: "object",
-                properties: {
-                  message: {
-                    type: "string",
-                    example: "권한이 없습니다.",
-                  },
-                },
+                $ref: "#/components/schemas/forbiddenError",
               },
             },
           },
