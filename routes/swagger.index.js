@@ -4,12 +4,12 @@ yaml ... 어차피
 
 */
 
-import { authSwagger } from "./auth.router.js";
+import { authSwagger, authSwaggerSchema } from "./auth.router.js";
 import { eventSwagger, eventSwaggerSchema } from "./events.router.js";
 import { noticesSwaggerSchema, noticesSwagger } from "./notices.router.js";
 
 const swaggerDoc = {
-  openapi: "3.1.0", // OpenAPI 버전을 3.1.0으로 업데이트
+  openapi: "3.1.0", // OpenAPI 3.1.0
   info: {
     title: "Peekle : 피클", // 문서 제목
     version: "1.0.0", // 문서 버전
@@ -39,8 +39,38 @@ const swaggerDoc = {
   ],
   tags: [
     {
-      name: "Test",
+      name: "Admin",
+      description: "관리자 전용입니다.",
+    },
+    {
+      name: "Auth",
+      description: "",
+    },
+    {
+      name: "Community",
       description: "테스트 API",
+    },
+    {
+      name: "Notices",
+      description: "테스트 API",
+    },
+    {
+      name: "Tickets",
+      description: "테스트 API",
+    },
+    {
+      name: "Users",
+      description: "테스트 API",
+    },
+    {
+      name: "Tests",
+      description: "테스트 API",
+    },
+  ],
+  security: [
+    {
+      AccessToken_Bearer: [],
+      RefreshToken_Cookie: [],
     },
   ],
   components: {
@@ -63,14 +93,15 @@ const swaggerDoc = {
       // ...yourSchema,
       ...eventSwaggerSchema,
       ...noticesSwaggerSchema,
+      ...authSwaggerSchema,
     },
+    requestBodies: {},
+    responses: {},
+    parameters: {},
+    examples: {},
+    headers: {},
+    links: {},
   },
-  security: [
-    {
-      AccessToken_Bearer: [],
-      RefreshToken_Cookie: [],
-    },
-  ],
   paths: {
     "/test": {
       get: {
@@ -91,6 +122,7 @@ const swaggerDoc = {
     ...eventSwagger,
     ...noticesSwagger,
   },
+  webhooks: {},
 };
 
 export default swaggerDoc;
