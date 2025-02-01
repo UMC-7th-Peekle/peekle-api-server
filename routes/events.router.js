@@ -665,9 +665,40 @@ export const eventSwaggerSchema = {
   },
 
   // 400 에러
-  // 게시글 제목 또는 내용이 누락되었습니다.
-  // 쿼리문이 올바르지 않습니다.
-  // 신고 사유가 누락되었습니다.
+  InvalidInputError: {
+    type: "object",
+    properties: {
+      resultType: {
+        type: "string",
+        example: "FAIL",
+      },
+      error: {
+        type: "object",
+        properties: {
+          errorCode: {
+            type: "string",
+            example: "INVALID_INPUT",
+          },
+          reason: {
+            type: "string",
+            enum: [
+              "게시글 제목 또는 내용이 누락되었습니다.",
+              "쿼리문이 올바르지 않습니다.",
+              "신고 사유가 누락되었습니다.",
+            ],
+          },
+          data: {
+            type: "object",
+            example: null,
+          },
+        },
+      },
+      success: {
+        type: "object",
+        example: null,
+      },
+    },
+  },
 
   // 404 에러
   NotExistsError: {
@@ -882,13 +913,7 @@ export const eventSwagger = {
           content: {
             "application/json": {
               schema: {
-                type: "object",
-                properties: {
-                  message: {
-                    type: "string",
-                    example: "쿼리문이 올바르지 않습니다.",
-                  },
-                },
+                $ref: "#/components/schemas/InvalidInputError",
               },
             },
           },
@@ -980,6 +1005,13 @@ export const eventSwagger = {
         },
         400: {
           description: "게시글 제목 또는 내용이 누락되었습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/InvalidInputError",
+              },
+            },
+          },
         },
       },
     },
@@ -1037,6 +1069,13 @@ export const eventSwagger = {
         },
         400: {
           description: "쿼리문이 올바르지 않습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/InvalidInputError",
+              },
+            },
+          },
         },
       },
     },
@@ -1332,6 +1371,13 @@ export const eventSwagger = {
         },
         400: {
           description: "신고 사유가 누락되었습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/InvalidInputError",
+              },
+            },
+          },
         },
         403: {
           description: "본인이 작성한 게시글을 신고할 수 없습니다.",
