@@ -5,7 +5,7 @@ yaml ... 어차피
 */
 
 import { authSwagger } from "./auth.router.js";
-import { eventSwagger } from "./events.router.js";
+import { eventSwagger, eventSwaggerSchema } from "./events.router.js";
 
 const swaggerDoc = {
   openapi: "3.1.0", // OpenAPI 버전을 3.1.0으로 업데이트
@@ -60,6 +60,7 @@ const swaggerDoc = {
     schemas: {
       // schema 파일에서 export 한 것을 구조분해할당으로 몰아두기.
       // ...yourSchema,
+      ...eventSwaggerSchema,
     },
   },
   security: [

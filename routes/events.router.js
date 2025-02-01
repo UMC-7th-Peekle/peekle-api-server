@@ -92,8 +92,579 @@ router.post(
   reportEventController.newReport
 );
 
-export const eventSchema = {};
+export const eventSwaggerSchema = {
+  // GetEvents, DeleteEvents, CreateEvents, GetScrapEvents, ScrapEvents, DeleteScrapEvents,
+  // GetDetailEvents, GetEventCategory, GetEventLocation, EventReport
+  GetEvents: {
+    type: "object",
+    properties: {
+      events: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            eventId: { type: "integer" },
+            title: { type: "string" },
+            content: { type: "string" },
+            price: { type: "integer" },
+            location: { type: "string" },
+            locationGroupId: { type: "integer" },
+            eventUrl: { type: "string" },
+            applicationStart: {
+              type: "string",
+              format: "date-time",
+              example: "2025-01-30T00:00:00.000Z",
+            },
+            applicationEnd: {
+              type: "string",
+              format: "date-time",
+              example: "2025-01-30T00:00:00.000Z",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-01-30T00:00:00.000Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-01-30T00:00:00.000Z",
+            },
+            category: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                description: { type: "string" },
+              },
+            },
+            eventImages: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  imageUrl: {
+                    type: "string",
+                    example: "https://peekle.com/image.jpg",
+                  },
+                  sequence: { type: "integer" },
+                },
+              },
+            },
+            eventSchedules: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  repeatType: {
+                    type: "string",
+                    enum: [
+                      "none",
+                      "daily",
+                      "weekly",
+                      "monthly",
+                      "yearly",
+                      "custom",
+                    ],
+                  },
+                  repeatEndDate: {
+                    type: "string",
+                    format: "date",
+                    example: "2025-12-31",
+                  },
+                  isAllDay: {
+                    type: "boolean",
+                  },
+                  customText: {
+                    type: "string",
+                    example: "매주 화요일마다 반복",
+                  },
+                  startDate: {
+                    type: "string",
+                    format: "date",
+                    example: "2025-12-31",
+                  },
+                  endDate: {
+                    type: "string",
+                    format: "date",
+                    example: "2025-12-31",
+                  },
+                  startTime: {
+                    type: "string",
+                    format: "time",
+                    example: "10:45:46",
+                  },
+                  endTime: {
+                    type: "string",
+                    format: "time",
+                    example: "10:45:46",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      nextCursor: { type: "integer", nullable: true },
+      hasNextPage: { type: "boolean", example: true },
+    },
+  },
 
+  DeleteEvents: {
+    type: "object",
+    properties: {
+      message: {
+        type: "string",
+        example: "이벤트 삭제 완료",
+      },
+      eventId: { type: "integer" },
+    },
+  },
+
+  CreateEvents: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      content: { type: "string" },
+      price: { type: "integer" },
+      categoryId: { type: "integer" },
+      location: { type: "string" },
+      eventUrl: {
+        type: "string",
+        example: "https://peekle.com/",
+      },
+      applicationStart: {
+        type: "string",
+        format: "date-time",
+        example: "2025-01-10T00:00:00Z",
+      },
+      applicationEnd: {
+        type: "string",
+        format: "date-time",
+        example: "2025-01-20T00:00:00Z",
+      },
+      schedules: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            repeatType: {
+              type: "string",
+              enum: ["none", "daily", "weekly", "monthly", "yearly", "custom"],
+            },
+            repeatEndDate: {
+              type: "string",
+              format: "date",
+              example: "2025-12-31",
+            },
+            isAllDay: {
+              type: "boolean",
+            },
+            customText: {
+              type: "string",
+              example: "매일",
+            },
+            startDate: {
+              type: "string",
+              format: "date",
+              example: "2025-12-31",
+            },
+            endDate: {
+              type: "string",
+              format: "date",
+              example: "2025-12-31",
+            },
+            startTime: {
+              type: "string",
+              format: "time",
+              example: "10:45:46",
+            },
+            endTime: {
+              type: "string",
+              format: "time",
+              example: "10:45:46",
+            },
+          },
+        },
+      },
+      imagePaths: {
+        type: "array",
+        items: {
+          type: "string",
+          example: "https://peekle.com/image.jpg",
+        },
+      },
+    },
+    required: [
+      // 이것들은 반드시 요청에 포함하기
+      "title",
+      "content",
+      "categoryId",
+      "location",
+      "applicationStart",
+      "applicationEnd",
+    ],
+  },
+
+  GetScrapEvents: {
+    type: "object",
+    properties: {
+      events: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            eventScrapId: { type: "integer" },
+            eventId: { type: "integer" },
+            title: { type: "string" },
+            content: { type: "string" },
+            price: { type: "integer" },
+            location: { type: "string" },
+            locationGroupId: { type: "integer" },
+            eventUrl: {
+              type: "string",
+              example: "https://peekle.com/",
+            },
+            applicationStart: {
+              type: "string",
+              format: "date-time",
+              example: "2025-01-10T00:00:00Z",
+            },
+            applicationEnd: {
+              type: "string",
+              format: "date-time",
+              example: "2025-01-20T00:00:00Z",
+            },
+            category: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                description: { type: "string" },
+              },
+            },
+            eventImages: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  imageUrl: {
+                    type: "string",
+                    example: "https://peekle.com/image.jpg",
+                  },
+                  sequence: { type: "integer" },
+                },
+              },
+            },
+            eventSchedules: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  repeatType: {
+                    type: "string",
+                    enum: [
+                      "none",
+                      "daily",
+                      "weekly",
+                      "monthly",
+                      "yearly",
+                      "custom",
+                    ],
+                  },
+                  repeatEndDate: {
+                    type: "string",
+                    format: "date",
+                    example: "2025-12-31",
+                  },
+                  isAllDay: {
+                    type: "boolean",
+                  },
+                  customText: {
+                    type: "string",
+                    example: "매주 화요일마다 반복",
+                  },
+                  startDate: {
+                    type: "string",
+                    format: "date",
+                    example: "2025-12-31",
+                  },
+                  endDate: {
+                    type: "string",
+                    format: "date",
+                    example: "2025-12-31",
+                  },
+                  startTime: {
+                    type: "string",
+                    format: "time",
+                    example: "10:45:46",
+                  },
+                  endTime: {
+                    type: "string",
+                    format: "time",
+                    example: "10:45:46",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      nextCursor: { type: "integer", nullable: true },
+      hasNextPage: { type: "boolean", example: true },
+    },
+  },
+
+  ScrapEvents: {
+    type: "object",
+    properties: {
+      eventId: { type: "integer" },
+      message: {
+        type: "string",
+        example: "이벤트 스크랩 성공",
+      },
+    },
+    required: ["eventId"],
+  },
+
+  DeleteScrapEvents: {
+    type: "object",
+    properties: {
+      eventId: { type: "integer" },
+      message: {
+        type: "string",
+        example: "이벤트 스크랩 취소 성공",
+      },
+    },
+    required: ["eventId"],
+  },
+
+  GetDetailEvents: {
+    type: "object",
+    properties: {
+      event: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            eventId: { type: "integer" },
+            title: { type: "string" },
+            content: { type: "string" },
+            price: { type: "integer" },
+            location: { type: "string" },
+            locationGroupId: { type: "integer" },
+            eventUrl: { type: "string" },
+            applicationStart: {
+              type: "string",
+              format: "date-time",
+              example: "2025-01-30T00:00:00.000Z",
+            },
+            applicationEnd: {
+              type: "string",
+              format: "date-time",
+              example: "2025-01-30T00:00:00.000Z",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-01-30T00:00:00.000Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-01-30T00:00:00.000Z",
+            },
+            category: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                description: { type: "string" },
+              },
+            },
+            eventImages: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  imageUrl: {
+                    type: "string",
+                    example: "https://peekle.com/image.jpg",
+                  },
+                  sequence: { type: "integer" },
+                },
+              },
+            },
+            eventSchedules: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  repeatType: {
+                    type: "string",
+                    enum: [
+                      "none",
+                      "daily",
+                      "weekly",
+                      "monthly",
+                      "yearly",
+                      "custom",
+                    ],
+                  },
+                  repeatEndDate: {
+                    type: "string",
+                    format: "date",
+                    example: "2025-12-31",
+                  },
+                  isAllDay: {
+                    type: "boolean",
+                  },
+                  customText: {
+                    type: "string",
+                    example: "매주 화요일마다 반복",
+                  },
+                  startDate: {
+                    type: "string",
+                    format: "date",
+                    example: "2025-12-31",
+                  },
+                  endDate: {
+                    type: "string",
+                    format: "date",
+                    example: "2025-12-31",
+                  },
+                  startTime: {
+                    type: "string",
+                    format: "time",
+                    example: "10:45:46",
+                  },
+                  endTime: {
+                    type: "string",
+                    format: "time",
+                    example: "10:45:46",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+
+  UpdateDetailEvents: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      content: { type: "string" },
+      price: { type: "integer" },
+      location: { type: "string" },
+      locationGroupId: { type: "integer" },
+      eventUrl: { type: "string" },
+      applicationStart: {
+        type: "string",
+        format: "date-time",
+        example: "2025-01-30T00:00:00.000Z",
+      },
+      applicationEnd: {
+        type: "string",
+        format: "date-time",
+        example: "2025-01-30T00:00:00.000Z",
+      },
+      createdAt: {
+        type: "string",
+        format: "date-time",
+        example: "2025-01-30T00:00:00.000Z",
+      },
+      updatedAt: {
+        type: "string",
+        format: "date-time",
+        example: "2025-01-30T00:00:00.000Z",
+      },
+      category: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          description: { type: "string" },
+        },
+      },
+      imagePaths: {
+        type: "array",
+        items: {
+          type: "string",
+          example: "https://peekle.com/image.jpg",
+        },
+      },
+      existingImageSequence: {
+        type: "array",
+        items: { type: "integer" },
+        example: [1, -1, 2],
+        description: "기존 이미지 순서 (삭제는 -1)",
+      },
+      newImageSequence: {
+        type: "array",
+        items: { type: "integer" },
+        example: [3, 4],
+        description: "새로 추가된 이미지 순서",
+      },
+      message: {
+        type: "string",
+        example: "이벤트 수정 완료",
+      },
+    },
+    required: [
+      "title",
+      "content",
+      "category",
+      "locationGroupId",
+      "startDate",
+      "endDate",
+    ],
+  },
+
+  GetEventCategory: {
+    type: "object",
+    properties: {
+      categories: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            categoryId: { type: "integer" },
+            name: { type: "string" },
+            description: { type: "string" },
+          },
+        },
+      },
+    },
+  },
+
+  GetEventLocation: {
+    type: "object",
+    properties: {
+      locations: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            groupId: { type: "integer" },
+            name: { type: "string" },
+          },
+        },
+      },
+    },
+  },
+
+  EventReport: {
+    type: "object",
+    properties: {
+      eventId: { type: "integer" },
+      reason: {
+        type: "string",
+        description: "신고 사유",
+      },
+    },
+    required: ["eventId", "reason"],
+  },
+};
+// ----------------------------------------------------------------------
 export const eventSwagger = {
   // 이벤트 조회, 삭제, 생성
   "/": {
@@ -135,7 +706,11 @@ export const eventSwagger = {
           required: false,
           description: "유저가 선택한 카테고리",
           schema: {
-            type: "string",
+            type: "array",
+            items: {
+              type: "string",
+            },
+            example: ["문화", "교육"],
           },
         },
         {
@@ -144,7 +719,11 @@ export const eventSwagger = {
           required: false,
           description: "유저가 선택한 지역 그룹id",
           schema: {
-            type: "integer", // 어 근데 생각해보니 '전체'도 포함인데.. 머라해야대지
+            type: "array",
+            items: {
+              type: "string",
+            },
+            example: ["1", "3"],
           },
         },
         {
@@ -154,6 +733,7 @@ export const eventSwagger = {
           description: "유저가 선택한 가격 정보",
           schema: {
             type: "string",
+            enum: ["전체", "무료", "유료"],
           },
         },
         {
@@ -457,6 +1037,50 @@ export const eventSwagger = {
       tags: ["Events"],
       summary: "이벤트 상세정보 수정",
       description: "이벤트 상세정보를 수정합니다.",
+      parameters: [
+        {
+          name: "eventId",
+          in: "path",
+          required: true,
+          description: "수정할 이벤트id",
+          schema: {
+            type: "integer",
+          },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/UpdateDetailEvents",
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "이벤트 수정 완료",
+                  },
+                },
+              },
+            },
+          },
+        },
+        404: {
+          description: "이벤트가 존재하지 않습니다.",
+        },
+        403: {
+          description: "본인이 작성하지 않은 게시글을 수정할 수 없습니다.",
+        },
+      },
     },
   },
 
