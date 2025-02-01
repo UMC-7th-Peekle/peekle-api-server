@@ -26,6 +26,7 @@ const PORT = config.SERVER.PORT;
 import {
   errorHandler,
   responseHandler,
+  setNoCache,
 } from "./utils/handlers/response.handlers.js";
 
 import swaggerUi from "swagger-ui-express";
@@ -68,21 +69,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Swagger 설정
 // app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerOptions));
-app.use(
-  "/docs",
-  (req, res, next) => {
-    res.setHeader(
-      "Cache-Control",
-      "no-store, no-cache, must-revalidate, proxy-revalidate"
-    );
-    res.setHeader("Pragma", "no-cache");
-    res.setHeader("Expires", "0");
-    res.setHeader("Surrogate-Control", "no-store");
-    next();
-  },
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerOptions)
-);
+app.use("/docs", setNoCache, swaggerUi.serve, swaggerUi.setup(swaggerOptions));
 
 // Router 연결
 app.use("/", routers);
