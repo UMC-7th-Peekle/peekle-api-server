@@ -8,7 +8,6 @@ import { authenticateRefreshToken } from "../middleware/authenticate.jwt.js";
 
 import * as authSchema from "../utils/validators/auth/auth.validators.js";
 import { validateRequestBody } from "../middleware/validate.js";
-import { deprecate } from "util";
 
 const router = Router();
 
