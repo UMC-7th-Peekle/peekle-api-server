@@ -139,6 +139,42 @@ export const noticesSwaggerSchema = {
       },
     },
   },
+
+  // 400 에러
+  invalidInputError: {
+    type: "object",
+    properties: {
+      resultType: {
+        type: "string",
+        example: "FAIL",
+      },
+      error: {
+        type: "object",
+        properties: {
+          errorCode: {
+            type: "string",
+            example: "INVALID_INPUT",
+          },
+          reason: {
+            type: "string",
+            enum: [
+              "공지사항 제목 또는 내용이 누락되었습니다.",
+              "검색어가 누락되었습니다.",
+            ],
+          },
+          data: {
+            type: "object",
+            example: null,
+          },
+        },
+      },
+      success: {
+        type: "object",
+        example: null,
+      },
+    },
+  },
+
   getNoticesByCategory: {
     type: "object",
     properties: {
@@ -540,13 +576,7 @@ export const noticesSwagger = {
           content: {
             "application/json": {
               schema: {
-                type: "object",
-                properties: {
-                  message: {
-                    type: "string",
-                    example: "공지사항 제목 또는 내용이 누락되었습니다.",
-                  },
-                },
+                $ref: "#/components/schemas/invalidInputError",
               },
             },
           },
@@ -641,13 +671,7 @@ export const noticesSwagger = {
           content: {
             "application/json": {
               schema: {
-                type: "object",
-                properties: {
-                  message: {
-                    type: "string",
-                    example: "검색어가 누락되었습니다.",
-                  },
-                },
+                $ref: "#/components/schemas/invalidInputError",
               },
             },
           },
@@ -752,13 +776,7 @@ export const noticesSwagger = {
           content: {
             "application/json": {
               schema: {
-                type: "object",
-                properties: {
-                  message: {
-                    type: "string",
-                    example: "공지사항 제목 또는 내용이 누락되었습니다.",
-                  },
-                },
+                $ref: "#/components/schemas/invalidInputError",
               },
             },
           },
