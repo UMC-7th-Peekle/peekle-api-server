@@ -17,6 +17,9 @@ export const eventCategory = async (req, res, next) => {
   }
 };
 
+/**
+ * 이벤트 지역 설정 전체 항목 조회
+ */
 export const eventLocation = async (req, res, next) => {
   try {
     const location = await categoryService.eventLocation();

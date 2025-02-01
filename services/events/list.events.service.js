@@ -5,8 +5,17 @@ import logger from "../../utils/logger/logger.js";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
 // 이벤트 목록 조회
-export const listEvent = async (category = "전체", paginationOptions) => {
-  const { limit, cursor } = paginationOptions;
+export const listEvent = async (paginationOptions) => {
+  const {
+    limit,
+    cursor,
+    query,
+    category,
+    location,
+    price,
+    startDate,
+    endDate,
+  } = paginationOptions;
 
   // 커서 기준 조건 설정
   let cursorWhereClause = {};
@@ -18,14 +27,77 @@ export const listEvent = async (category = "전체", paginationOptions) => {
 
   // 카테고리 조건 설정
   let categoryWhereClause = {};
-  if (category !== "전체") {
-    categoryWhereClause = { name: category }; // 카테고리 이름으로 필터링
+  // if (category !== "전체") {
+  //   categoryWhereClause = { name: category }; // 카테고리 이름으로 필터링
+  // }
+  if (category.length > 0 && category[0] !== "전체") {
+    categoryWhereClause = {
+      name: {
+        [Op.in]: category, // 배열인 카테고리로
+      },
+    };
   }
 
   // TODO : category Id로 filtering 해도 되지 않을까 하는 생각
 
+  // 검색어 조건 설정
+  let queryWhereClause = {};
+  if (query) {
+    queryWhereClause = {
+      [Op.or]: [
+        {
+          title: { [Op.like]: `%${query}%` }, // 제목에 검색어 포함
+        },
+        {
+          content: { [Op.like]: `%${query}%` }, // 내용에 검색어 포함
+        },
+      ],
+    };
+  }
+
+  // 지역 조건 설정
+  let locationWhereClause = {};
+  // if (location !== "전체") {
+  //   // 지역그룹Id로 필터링
+  //   const locationGroup = await models.EventLocationGroups.findAll({
+  //     where: { groupId: location },
+  //     attributes: ["groupId"],
+  //   });
+  //   if (locationGroup) {
+  //     locationWhereClause = { locationGroupId: location };
+  //   }
+  // }
+  if (location.length > 0 && location[0] !== "전체") {
+    locationWhereClause = {
+      locationGroupId: {
+        [Op.in]: location, // 배열인 location
+      },
+    };
+  }
+
+  // 금액 조건 설정
+  let priceWhereClause = {};
+  if (price === "무료") {
+    priceWhereClause = { price: 0 };
+  } else if (price === "유료") {
+    priceWhereClause = { price: { [Op.gt]: 0 } }; // price가 0보다 큰 값들
+  }
+
+  // 날짜 조건 설정
+  let dateWhereClause = {};
+  if (startDate)
+    dateWhereClause.applicationStart = { [Op.gte]: startDate.split("T")[0] }; // 2025-01-28 같은 형식
+  if (endDate)
+    dateWhereClause.applicationEnd = { [Op.lte]: endDate.split("T")[0] };
+
   const events = await models.Events.findAll({
-    where: cursorWhereClause, // 커서 기준 조건 추가
+    where: {
+      ...cursorWhereClause, // 커서 기준 조건 추가
+      ...priceWhereClause, // 금액 기준 조건 추가
+      ...locationWhereClause, // 위치 기준 조건 추가
+      ...dateWhereClause, // 날짜 기준 조건 추가
+      ...queryWhereClause, // 검색어 기준 조건 추가
+    },
     limit: limit + 1, // 다음 페이지 존재 여부 확인을 위해 하나 더 조회
     order: [["eventId", "DESC"]],
 
@@ -40,7 +112,7 @@ export const listEvent = async (category = "전체", paginationOptions) => {
       {
         model: models.EventImages,
         as: "eventImages",
-        attributes: ["imageUrl", "sequence", "createdAt", "updatedAt"],
+        attributes: ["imageUrl", "sequence"],
       },
       {
         model: models.EventSchedules,
@@ -82,9 +154,14 @@ export const listEvent = async (category = "전체", paginationOptions) => {
     };
   });
 
+  logger.debug("이벤트 조회 완료", {
+    action: "events:getEvents",
+    actionType: "success",
+  });
+
   return { events: modifiedEvents, nextCursor, hasNextPage };
 };
-
+// --------------------------------------------------------------------------------------------------
 export const validateEventQuery = (queries) => {
   const {
     limit,
@@ -97,7 +174,7 @@ export const validateEventQuery = (queries) => {
     endDate,
   } = queries;
 
-  if (queries !== undefined && queries.trim().length < 2) {
+  if (query !== undefined && query.trim().length < 2) {
     throw new InvalidQueryError(
       "검색어는 공백을 제외하고 2자 이상이여야 합니다."
     );
@@ -111,27 +188,73 @@ export const validateEventQuery = (queries) => {
     throw new InvalidQueryError("cursor는 정수여야 합니다.");
   }
 
-  // price 유효성 검증 (boolean 확인)
-  const pricePool = ["true", "false"];
+  // price 유효성 검증
+  const pricePool = ["전체", "무료", "유료"];
   if (price !== undefined && (price === "" || !pricePool.includes(price))) {
-    throw new InvalidQueryError("price는 true 또는 false여야 합니다.");
+    throw new InvalidQueryError(
+      "올바르지 않은 가격입니다. 허용되는 값은 다음과 같습니다.",
+      pricePool
+    );
   }
 
   // 카테고리 검증
   const categoryPool = ["전체", "교육", "문화", "활동"];
-  if (
-    category !== undefined &&
-    (category === "" || !categoryPool.includes(category))
-  ) {
+  // if (
+  //   category !== undefined &&
+  //   (category === "" || !categoryPool.includes(category))
+  // ) {
+  //   throw new InvalidQueryError(
+  //     "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
+  //     categoryPool
+  //   );
+  // }
+
+  // 중복인 경우와 중복이 아닌 경우 나누기
+  if (Array.isArray(category)) {
+    category.forEach((cate) => {
+      if (cate !== "전체" && !categoryPool.includes(cate)) {
+        throw new InvalidQueryError(
+          "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
+          categoryPool
+        );
+      }
+    });
+  } else if (category === "" || !categoryPool.includes(category)) {
     throw new InvalidQueryError(
       "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
       categoryPool
     );
   }
 
+  // 위치 검증
+  const locationPool = ["전체", "1", "2", "3", "4", "5", "6", "7", "8"];
+  // if (location && (location === "" || !locationPool.includes(location))) {
+  //   throw new InvalidQueryError(
+  //     "올바르지 않은 위치입니다. 허용되는 값은 다음과 같습니다.",
+  //     locationPool
+  //   );
+  // }
+
+  // 중복인 경우와 중복이 아닌 경우 나누기
+  if (Array.isArray(location)) {
+    location.forEach((locate) => {
+      if (locate === "" || !locationPool.includes(locate)) {
+        throw new InvalidQueryError(
+          "올바르지 않은 위치입니다. 허용되는 값은 다음과 같습니다.",
+          locationPool
+        );
+      }
+    });
+  } else if (location === "" || !locationPool.includes(location)) {
+    throw new InvalidQueryError(
+      "올바르지 않은 위치입니다. 허용되는 값은 다음과 같습니다.",
+      locationPool
+    );
+  }
+
   // 날짜 형식 및 유효성 검증
   const isValidDate = (dateString) => {
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    const regex = /^\d{4}-\d{2}-\d{2}$/; // 2024-12-31
     if (!regex.test(dateString)) return false;
     const date = new Date(dateString);
     return date instanceof Date && !isNaN(date);
