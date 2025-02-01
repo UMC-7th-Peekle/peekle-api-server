@@ -4,13 +4,13 @@ yaml ... 어차피
 
 */
 
-import { authSwagger } from "./auth.router.js";
-import { eventSwagger, eventSwaggerSchema } from "./events.router.js";
 import { authSwagger, authSwaggerSchema } from "./auth.router.js";
 import { eventSwagger, eventSwaggerSchema } from "./events.router.js";
 import { noticesSwaggerSchema, noticesSwagger } from "./notices.router.js";
-import { communitySwagger, communitySwaggerSchema } from "./community.router.js";
-import * as articleValidator from "../utils/validators/community/article.validators.js";
+import {
+  communitySwagger,
+  communitySwaggerSchema,
+} from "./community.router.js";
 
 const tags = [
   {
