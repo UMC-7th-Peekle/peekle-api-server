@@ -67,7 +67,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Swagger 설정
 // app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerOptions));
 app.use(
-  "/docs2",
+  "/docs",
   (req, res, next) => {
     res.setHeader(
       "Cache-Control",
