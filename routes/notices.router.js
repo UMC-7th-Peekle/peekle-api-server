@@ -106,7 +106,7 @@ export const noticesSwaggerSchema = {
     },
   },
   // TODO: 403 Forbidden 에러 스키마 추가
-  forbiddenError: {
+  notAllowedError: {
     type: "object",
     properties: {
       resultType: {
@@ -122,7 +122,10 @@ export const noticesSwaggerSchema = {
           },
           reason: {
             type: "string",
-            example: "해당 권한이 없습니다.",
+            enum: [
+              "본인이 작성하지 않은 게시글을 수정할 수 없습니다.",
+              "본인이 작성하지 않은 게시글을 삭제할 수 없습니다.",
+            ],
           },
           data: {
             type: "object",
@@ -564,7 +567,7 @@ export const noticesSwagger = {
           content: {
             "application/json": {
               schema: {
-                $ref: "#/components/schemas/forbiddenError",
+                $ref: "#/components/schemas/notAllowedError",
               },
             },
           },
@@ -776,7 +779,7 @@ export const noticesSwagger = {
           content: {
             "application/json": {
               schema: {
-                $ref: "#/components/schemas/forbiddenError",
+                $ref: "#/components/schemas/notAllowedError",
               },
             },
           },
@@ -851,7 +854,7 @@ export const noticesSwagger = {
           content: {
             "application/json": {
               schema: {
-                $ref: "#/components/schemas/forbiddenError",
+                $ref: "#/components/schemas/notAllowedError",
               },
             },
           },
