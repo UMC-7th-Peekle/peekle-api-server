@@ -216,7 +216,7 @@ export const communitySwaggerSchema = {
 export const communitySwagger = {
   "/community": {
     post: {
-      tags: ["Community - 관리자: 게시판 생성"],
+      tags: ["Community/Admin"],
       summary: "게시판 생성",
       description: "게시판을 생성합니다.",
       requestBody: {
@@ -265,7 +265,7 @@ export const communitySwagger = {
       },
     },
     get: {
-      tags: ["Community - 게시글 조회"],
+      tags: ["Community/Articles"],
       summary: "커뮤니티 게시글 목록 조회",
       description:
         "커뮤니티 ID를 통해 해당 커뮤니티의 게시글 목록을 조회합니다.",
@@ -454,7 +454,7 @@ export const communitySwagger = {
   },
   "/community/article/like": {
     get: {
-      tags: ["Community - 게시글 조회"],
+      tags: ["Community/Articles"],
       summary: "좋아요 누른 게시글 목록 조회",
       description: "사용자가 좋아요를 누른 게시글 목록을 조회합니다.",
       parameters: [
@@ -580,7 +580,7 @@ export const communitySwagger = {
   },
   "/community/{communityId}/articles/{articleId}": {
     get: {
-      tags: ["Community - 게시글 CRUD"],
+      tags: ["Community/Articles"],
       summary: "게시글 조회",
       description: "게시글 ID를 통해 해당 게시글을 조회합니다.",
       parameters: [
@@ -627,7 +627,7 @@ export const communitySwagger = {
       },
     },
     patch: {
-      tags: ["Community - 게시글 CRUD"],
+      tags: ["Community/Articles"],
       summary: "게시글 수정",
       description: "게시글 ID에 해당하는 게시글을 수정합니다.",
       parameters: [
@@ -690,7 +690,7 @@ export const communitySwagger = {
   },
   "/community/{communityId}/articles": {
     post: {
-      tags: ["Community - 게시글 CRUD"],
+      tags: ["Community/Articles"],
       summary: "게시글 작성",
       description: "커뮤니티 ID에 해당하는 게시판에 게시글을 작성합니다.",
       parameters: [
@@ -741,7 +741,7 @@ export const communitySwagger = {
   },
   "/community/articles": {
     delete: {
-      tags: ["Community - 게시글 CRUD"],
+      tags: ["Community/Articles"],
       summary: "게시글 삭제",
       description: "게시글 ID에 해당하는 게시글을 삭제합니다.",
       requestBody: {
@@ -781,7 +781,7 @@ export const communitySwagger = {
   },
   "/community/articles/like": {
     post: {
-      tags: ["Community - 게시글 및 댓글 좋아요"],
+      tags: ["Community/Likes"],
       summary: "게시글 좋아요",
       description: "게시글에 좋아요를 누릅니다.",
       requestBody: {
@@ -822,7 +822,7 @@ export const communitySwagger = {
       },
     },
     delete: {
-      tags: ["Community - 게시글 및 댓글 좋아요"],
+      tags: ["Community/Likes"],
       summary: "게시글 좋아요 취소",
       description: "게시글에 좋아요를 취소합니다.",
       requestBody: {
@@ -865,7 +865,7 @@ export const communitySwagger = {
   },
   "/community/articles/comments/like": {
     post: {
-      tags: ["Community - 게시글 및 댓글 좋아요"],
+      tags: ["Community/Likes"],
       summary: "댓글 좋아요",
       description: "댓글에 좋아요를 누릅니다.",
       requestBody: {
@@ -906,7 +906,7 @@ export const communitySwagger = {
       },
     },
     delete: {
-      tags: ["Community - 게시글 및 댓글 좋아요"],
+      tags: ["Community/Likes"],
       summary: "댓글 좋아요 취소",
       description: "댓글에 좋아요를 취소합니다.",
       requestBody: {
@@ -949,7 +949,7 @@ export const communitySwagger = {
   },
   "/community/articles/comments": {
     get: {
-      tags: ["Community - 댓글"],
+      tags: ["Community/Article/Comments"],
       summary: "댓글 조회",
       description: "게시글 ID에 해당하는 게시글의 댓글을 조회합니다.",
       parameters: [
@@ -1003,7 +1003,7 @@ export const communitySwagger = {
       },
     },
     post: {
-      tags: ["Community - 댓글"],
+      tags: ["Community/Article/Comments"],
       summary: "댓글 작성",
       description: "게시글 ID에 해당하는 게시글에 댓글을 작성합니다.",
       requestBody: {
@@ -1041,7 +1041,7 @@ export const communitySwagger = {
       },
     },
     patch: {
-      tags: ["Community - 댓글"],
+      tags: ["Community/Article/Comments"],
       summary: "댓글 수정",
       description: "댓글 ID에 해당하는 댓글을 수정합니다.",
       requestBody: {
@@ -1082,7 +1082,7 @@ export const communitySwagger = {
       },
     },
     delete: {
-      tags: ["Community - 댓글"],
+      tags: ["Community/Article/Comments"],
       summary: "댓글 삭제",
       description: "댓글 ID에 해당하는 댓글을 삭제합니다.",
       requestBody: {
@@ -1125,7 +1125,7 @@ export const communitySwagger = {
   },
   "/community/articles/comments/reply": {
     post: {
-      tags: ["Community - 댓글"],
+      tags: ["Community/Article/Comments"],
       summary: "대댓글 작성",
       description: "댓글 ID에 해당하는 댓글에 대댓글을 작성합니다.",
       requestBody: {
@@ -1165,7 +1165,7 @@ export const communitySwagger = {
   },
   "/community/articles/report": {
     post: {
-      tags: ["Community - 게시글 및 댓글 신고"],
+      tags: ["Community/Report"],
       summary: "게시글 신고",
       description: "게시글을 신고합니다.",
       requestBody: {
@@ -1235,7 +1235,7 @@ export const communitySwagger = {
   },
   "/community/articles/comments/report": {
     post: {
-      tags: ["Community - 게시글 및 댓글 신고"],
+      tags: ["Community/Report"],
       summary: "댓글 신고",
       description: "댓글을 신고합니다.",
       requestBody: {
@@ -1305,7 +1305,7 @@ export const communitySwagger = {
   },
   "/community/{communityId}/articles/popular": {
     get: {
-      tags: ["Community - 인기 게시글 집계"],
+      tags: ["Community/Statistics"],
       summary: "인기글 조회",
       description: "커뮤니티 ID에 해당하는 게시판의 인기글을 조회합니다.",
       parameters: [
