@@ -2,10 +2,13 @@ import { AjvError, InvalidContentTypeError } from "../utils/errors/errors.js";
 
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
+import localize from "ajv-i18n";
+
 import logger from "../utils/logger/logger.js";
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
+ajv.addKeyword("example");
 
 /**
  * 요청 데이터를 주어진 스키마로 검증하는 미들웨어 생성기.
@@ -21,7 +24,8 @@ export const validateRequestBody = (schema, isParsedFormData = false) => {
     const isValid = validator(data);
 
     if (!isValid) {
-      const errorDetails = formatErrors(validator.errors);
+      console.log(localize.ko(validator.errors));
+      const errorDetails = formatErrors(localize.ko(validator.errors));
       return next(new AjvError("올바르지 않은 요청 형식입니다.", errorDetails));
     }
 

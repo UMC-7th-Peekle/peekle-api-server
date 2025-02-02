@@ -113,6 +113,7 @@ const servers = [
     description: "Local Server",
   },
 ];
+
 const parameters = {
   userId: {
     name: "userId",
@@ -512,9 +513,9 @@ export const swaggerUiOptions = {
   deepLinking: true, // 각 API 항목에 고유 URL 링크 활성화
   showRequestHeaders: true, // 요청 헤더를 표시할지 여부
   showResponseHeaders: true, // 응답 헤더를 표시할지 여부
-  operationsSorter: "alpha", // API 메서드를 알파벳 순으로 정렬
-  tagsSorter: "alpha", // 태그를 알파벳 순으로 정렬
-  layout: "BaseLayout", // Swagger UI의 레이아웃을 설정
+  // operationsSorter: "alpha", // API 메서드를 알파벳 순으로 정렬
+  // tagsSorter: "alpha", // 태그를 알파벳 순으로 정렬
+  // layout: "BaseLayout", // Swagger UI의 레이아웃을 설정
   jsonEditor: true, // JSON 편집기 사용 여부
   tryItOutEnabled: true, // 'Try it out' 기능 활성화
   validatorUrl: null, // Swagger UI에서 사용하는 유효성 검사 URL 비활성화
