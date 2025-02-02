@@ -86,9 +86,9 @@ export const authSwaggerSchema = {
   localRegisterSchema: {
     type: "object",
     properties: {
-      name: { type: "string", example: "김철수" },
-      nickname: { type: "string", example: "철수야" },
-      birthdate: { type: "string", format: "date", example: "1995-05-15" },
+      name: { type: "string", example: "박경운" },
+      nickname: { type: "string", example: "하늘" },
+      birthdate: { type: "string", format: "date", example: "2001-12-09" },
       gender: { type: "string", enum: ["male", "female"], example: "male" },
       email: { type: "string", format: "email", example: "user@example.com" },
       phone: {
@@ -96,7 +96,10 @@ export const authSwaggerSchema = {
         pattern: "^[0-9]{10,11}$",
         example: "01012345678",
       },
-      phoneVerificationSessionId: { type: "string", example: "session_5678" },
+      phoneVerificationSessionId: {
+        type: "string",
+        example: "encrypted session ID",
+      },
       terms: {
         type: "array",
         items: {
@@ -135,17 +138,20 @@ export const authSwaggerSchema = {
         enum: ["kakao", "google", "facebook"],
         example: "kakao",
       },
-      name: { type: "string", example: "이영희" },
-      nickname: { type: "string", example: "영희양" },
-      birthdate: { type: "string", format: "date", example: "2000-12-25" },
-      gender: { type: "string", enum: ["male", "female"], example: "female" },
-      email: { type: "string", format: "email", example: "user@social.com" },
+      name: { type: "string", example: "박경운" },
+      nickname: { type: "string", example: "하늘" },
+      birthdate: { type: "string", format: "date", example: "2001-12-09" },
+      gender: { type: "string", enum: ["male", "female"], example: "male" },
+      email: { type: "string", format: "email", example: "user@example.com" },
       phone: {
         type: "string",
         pattern: "^[0-9]{10,11}$",
-        example: "01087654321",
+        example: "01012345678",
       },
-      phoneVerificationSessionId: { type: "string", example: "session_abcd" },
+      phoneVerificationSessionId: {
+        type: "string",
+        example: "encrypted session ID",
+      },
       terms: {
         type: "array",
         items: {
@@ -182,13 +188,16 @@ export const authSwaggerSchema = {
       phone: {
         type: "string",
         pattern: "^[0-9]{10,11}$",
-        example: "01011223344",
+        example: "01012345678",
       },
-      phoneVerificationSessionId: { type: "string", example: "session_efgh" },
+      phoneVerificationSessionId: {
+        type: "string",
+        example: "encrypted session ID",
+      },
       phoneVerificationCode: {
         type: "string",
         pattern: "^[0-9]{4}$",
-        example: "9876",
+        example: "0000",
       },
     },
     required: ["phone", "phoneVerificationSessionId", "phoneVerificationCode"],
@@ -200,7 +209,7 @@ export const authSwaggerSchema = {
       phone: {
         type: "string",
         pattern: "^[0-9]{10,11}$",
-        example: "01055667788",
+        example: "01012345678",
       },
     },
     required: ["phone"],
@@ -209,21 +218,236 @@ export const authSwaggerSchema = {
 };
 
 export const authSwagger = {
-  "/phone/verify": {
+  "/auth/terms": {
+    get: {
+      tags: ["Auth"],
+      summary: "현행 약관을 가져옵니다. 회원가입 시 활용합니다.",
+      responses: {
+        200: {
+          description: "성공",
+        },
+      },
+    },
+  },
+  "/auth/register/local": {
     post: {
-      tags: ["회원가입"],
-      summary: "휴대폰 인증",
-      description: "휴대폰 인증을 진행합니다.",
-      deprecated: false, // 사용하지 않는 API일 경우 true로 변경
+      tags: ["Auth"],
+      summary: "회원가입 (local)",
       requestBody: {
-        required: true,
+        $ref: "#/components/requestBodies/sample",
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/register/oauth": {
+    post: {
+      tags: ["Auth"],
+      summary: "회원가입 (OAuth)",
+      requestBody: {
         content: {
           "application/json": {
             schema: {
-              $ref: "#/components/schemas/localRegisterSchema",
+              $ref: "#/components/schemas/auth/oauthRegisterSchema",
             },
           },
         },
+        required: true,
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/register/nickname/check": {
+    get: {
+      tags: ["Auth"],
+      summary: "닉네임 중복확인",
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/register/test": {
+    post: {
+      tags: ["Auth"],
+      summary: "테스트 회원가입",
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/login/local": {
+    post: {
+      tags: ["Auth"],
+      summary: "로그인 (local)",
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/phoneVerifySchema",
+            },
+          },
+        },
+        required: true,
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/logout": {
+    delete: {
+      tags: ["Auth"],
+      summary: "로그아웃",
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/token/reissue": {
+    get: {
+      tags: ["Auth"],
+      summary: "토큰 재발급",
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/login/test/{userId}": {
+    get: {
+      tags: ["Auth"],
+      summary: "테스트 로그인",
+      parameters: [
+        {
+          $ref: "#/components/parameters/userId",
+        },
+      ],
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/login/kakao": {
+    get: {
+      tags: ["Auth"],
+      summary: "카카오 로그인",
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/login/kakao/callback": {
+    get: {
+      tags: ["Auth"],
+      summary: "카카오 로그인 콜백",
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/phone/account/status": {
+    get: {
+      tags: ["Auth"],
+      summary: "휴대폰 번호로 계정 상태 확인",
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/phone/send": {
+    post: {
+      tags: ["Auth"],
+      summary: "휴대폰 번호로 인증번호 전송",
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/sendTokenToPhoneSchema",
+            },
+          },
+        },
+        required: true,
+      },
+      responses: {
+        200: {
+          description: "성공",
+        },
+        400: {
+          description: "실패",
+        },
+      },
+    },
+  },
+  "/auth/phone/verify": {
+    post: {
+      tags: ["Auth"],
+      summary: "휴대폰 인증번호 확인",
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/phoneVerifySchema",
+            },
+          },
+        },
+        required: true,
       },
       responses: {
         200: {
