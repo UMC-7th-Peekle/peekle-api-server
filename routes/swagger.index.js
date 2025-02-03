@@ -6,15 +6,12 @@ yaml ... 어차피
 
 import { authSwagger, authSwaggerSchema } from "./auth.router.js";
 import { eventSwagger, eventSwaggerSchema } from "./events.router.js";
-<<<<<<< HEAD
-=======
 import { noticesSwaggerSchema, noticesSwagger } from "./notices.router.js";
 import {
   communitySwagger,
   communitySwaggerSchema,
 } from "./community.router.js";
 import { userSwagger } from "./users.router.js";
->>>>>>> 05988d65476c9d5b433f640c27f3e563465baa24
 
 const tags = [
   {
@@ -434,14 +431,10 @@ export const swaggerDoc = {
       // ...yourSchema,
       ...errorSchemas,
       ...eventSwaggerSchema,
-<<<<<<< HEAD
-      ...authSwaggerSchema,
-=======
       ...noticesSwaggerSchema,
       ...authSwaggerSchema,
       ...communitySwaggerSchema,
       auth: authSwaggerSchema,
->>>>>>> 05988d65476c9d5b433f640c27f3e563465baa24
     },
     requestBodies: {
       // ...yourRequestBody,
