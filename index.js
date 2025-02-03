@@ -38,9 +38,10 @@ import path from "path";
 
 // __dirname을 사용하기 위한 설정
 // static file을 serve하기 위해 사용합니다.
-import { fileURLToPath } from "url";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { getPathDetails } from "./utils/path.util.js"; // 유틸리티 파일의 경로에 맞게 설정
+
+const { __filename, __dirname } = getPathDetails();
+console.log("Static files served from:", __dirname);
 
 // Socket.io Router는 이 주석 아래에 import 해주시면 됩니다.
 // ex) const exampleSocketRouter = require("./routes/example.socket.router"); // commonJS
