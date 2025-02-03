@@ -30,10 +30,10 @@ export const listEvent = async (paginationOptions) => {
   // if (category !== "전체") {
   //   categoryWhereClause = { name: category }; // 카테고리 이름으로 필터링
   // }
-  if (category.length > 0 && category[0] !== "전체") {
+  if (Array.isArray(category) && category.length > 0) {
     categoryWhereClause = {
-      name: {
-        [Op.in]: category, // 배열인 카테고리로
+      categoryId: {
+        [Op.in]: category, // 카테고리 id로 필터링
       },
     };
   }
@@ -67,7 +67,7 @@ export const listEvent = async (paginationOptions) => {
   //     locationWhereClause = { locationGroupId: location };
   //   }
   // }
-  if (location.length > 0 && location[0] !== "전체") {
+  if (Array.isArray(location) && location.length > 0) {
     locationWhereClause = {
       locationGroupId: {
         [Op.in]: location, // 배열인 location
@@ -198,7 +198,7 @@ export const validateEventQuery = (queries) => {
   }
 
   // 카테고리 검증
-  const categoryPool = ["전체", "교육", "문화", "활동"];
+  const categoryPool = [1, 2, 3];
   // if (
   //   category !== undefined &&
   //   (category === "" || !categoryPool.includes(category))
@@ -212,14 +212,14 @@ export const validateEventQuery = (queries) => {
   // 중복인 경우와 중복이 아닌 경우 나누기
   if (Array.isArray(category)) {
     category.forEach((cate) => {
-      if (cate !== "전체" && !categoryPool.includes(cate)) {
+      if (!categoryPool.includes(cate)) {
         throw new InvalidQueryError(
           "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
           categoryPool
         );
       }
     });
-  } else if (category === "" || !categoryPool.includes(category)) {
+  } else if (!categoryPool.includes(category)) {
     throw new InvalidQueryError(
       "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
       categoryPool
@@ -227,7 +227,7 @@ export const validateEventQuery = (queries) => {
   }
 
   // 위치 검증
-  const locationPool = ["전체", "1", "2", "3", "4", "5", "6", "7", "8"];
+  const locationPool = [1, 2, 3, 4, 5, 6, 7, 8];
   // if (location && (location === "" || !locationPool.includes(location))) {
   //   throw new InvalidQueryError(
   //     "올바르지 않은 위치입니다. 허용되는 값은 다음과 같습니다.",
@@ -238,14 +238,14 @@ export const validateEventQuery = (queries) => {
   // 중복인 경우와 중복이 아닌 경우 나누기
   if (Array.isArray(location)) {
     location.forEach((locate) => {
-      if (locate === "" || !locationPool.includes(locate)) {
+      if (!locationPool.includes(locate)) {
         throw new InvalidQueryError(
           "올바르지 않은 위치입니다. 허용되는 값은 다음과 같습니다.",
           locationPool
         );
       }
     });
-  } else if (location === "" || !locationPool.includes(location)) {
+  } else if (!locationPool.includes(location)) {
     throw new InvalidQueryError(
       "올바르지 않은 위치입니다. 허용되는 값은 다음과 같습니다.",
       locationPool

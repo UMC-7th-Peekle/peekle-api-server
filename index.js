@@ -7,7 +7,7 @@ import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { v4 as uuidv4 } from "uuid";
-import http from "http";
+// import http from "http";
 import https from "https"; // https를 사용해야 하는 경우 사용하면 됩니다.
 // import { Server } from "socket.io"; // socket을 사용하려면 주석 해제
 
@@ -26,13 +26,14 @@ const PORT = config.SERVER.PORT;
 import {
   errorHandler,
   responseHandler,
+  setNoCache,
 } from "./utils/handlers/response.handlers.js";
 
 import swaggerUi from "swagger-ui-express";
 
 // Router import , /routes/index.js에서 Router들을 1차적으로 모아서 export 합니다.
 import routers from "./routes/index.js";
-import swaggerOptions from "./routes/swagger.index.js";
+import { swaggerDoc, swaggerUiOptions } from "./routes/swagger.index.js";
 import path from "path";
 
 // __dirname을 사용하기 위한 설정
@@ -49,13 +50,16 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(responseHandler);
-app.use(cookieParser());
-app.use(cors(corsOptions));
-
 app.use((req, res, next) => {
   req.transactionId = uuidv4(); // 고유한 트랜잭션 ID 생성
   next();
 });
+
+app.use(cookieParser());
+app.use(cors(corsOptions));
+// Preflight 요청 수동 처리 (필요한 경우)
+// app.options("*", cors(corsOptions));
+
 app.use(morgan(morganFormat, morgranOptions));
 
 app.use(express.json());
@@ -64,7 +68,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Swagger 설정
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerOptions));
+// app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerOptions));
+app.use(
+  "/docs",
+  setNoCache,
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDoc, swaggerUiOptions)
+);
 
 // Router 연결
 app.use("/", routers);
@@ -76,10 +86,17 @@ app.use(errorHandler);
 const server = https.createServer(sslOptions, app);
 // const server = http.createServer(app);
 
+const serverStartMessage = `
+#############################################
+    🛡️  Server listening on port: ${PORT} 🛡️     
+#############################################
+`;
+
 server.listen(PORT, "0.0.0.0", () => {
-  logger.info(`SEVER LISTENING TO PORT ${PORT}`, {
+  logger.info(`🛡️ Server listening on port: ${PORT} 🛡️`, {
     action: "server:start",
   });
+  console.log(serverStartMessage);
 });
 
 // 상단에 socket.io import 주석을 해제하고 사용하시면 됩니다.

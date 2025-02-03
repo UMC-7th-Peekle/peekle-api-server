@@ -46,6 +46,11 @@ export const detailEvent = async (eventId) => {
           "endTime",
         ],
       },
+      {
+        model: models.EventLocation, // 추가된 부분: EventLocation 모델 포함
+        as: "eventLocation",
+        attributes: ["address", "place_name", "position"], // 필요한 필드 추가
+      },
     ],
   });
 
