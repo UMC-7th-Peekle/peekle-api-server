@@ -26,6 +26,11 @@ export const createComment = async ({
     },
   });
 
+  // 테스트 코드에서 Mock으로 처리하는 부분은 DB의 FK 제약을 테스트하기 어려우므로 이 부분 다시 추가
+  if (!article) {
+    throw new NotExistsError("해당 게시글이 존재하지 않습니다");
+  }
+
   let comment;
   /* try-catch 블록 외부에서 comment 선언
   try-catch 블록 내부에서 comment를 생성하고 반환하면
