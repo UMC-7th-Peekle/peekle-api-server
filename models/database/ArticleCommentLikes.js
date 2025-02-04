@@ -6,13 +6,13 @@ export default class ArticleCommentLikes extends Model {
   return super.init({
     likeId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'like_id'
     },
     commentId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'article_comments',
@@ -21,7 +21,7 @@ export default class ArticleCommentLikes extends Model {
       field: 'comment_id'
     },
     likedUserId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'users',

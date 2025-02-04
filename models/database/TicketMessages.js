@@ -6,13 +6,13 @@ export default class TicketMessages extends Model {
   return super.init({
     ticketMessageId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'ticket_message_id'
     },
     ticketId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'tickets',
@@ -29,7 +29,7 @@ export default class TicketMessages extends Model {
       allowNull: true
     },
     createdUserId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'users',

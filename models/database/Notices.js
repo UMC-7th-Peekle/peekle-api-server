@@ -6,13 +6,13 @@ export default class Notices extends Model {
   return super.init({
     noticeId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'notice_id'
     },
     categoryId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'notice_category',
@@ -21,7 +21,7 @@ export default class Notices extends Model {
       field: 'category_id'
     },
     authorId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',

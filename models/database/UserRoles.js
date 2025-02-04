@@ -5,7 +5,7 @@ export default class UserRoles extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
     roleId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       references: {
@@ -15,7 +15,7 @@ export default class UserRoles extends Model {
       field: 'role_id'
     },
     userId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       references: {

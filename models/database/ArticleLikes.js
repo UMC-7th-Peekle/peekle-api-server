@@ -6,13 +6,13 @@ export default class ArticleLikes extends Model {
   return super.init({
     articleLikesId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'article_likes_id'
     },
     articleId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'articles',
@@ -21,7 +21,7 @@ export default class ArticleLikes extends Model {
       field: 'article_id'
     },
     likedUserId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'users',
@@ -61,13 +61,6 @@ export default class ArticleLikes extends Model {
         fields: [
           { name: "article_id" },
           { name: "liked_user_id" },
-        ]
-      },
-      {
-        name: "article_likes_articles_article_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "article_id" },
         ]
       },
       {

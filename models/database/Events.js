@@ -6,7 +6,7 @@ export default class Events extends Model {
   return super.init({
     eventId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'event_id'
@@ -24,7 +24,7 @@ export default class Events extends Model {
       allowNull: false
     },
     categoryId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'event_category',
@@ -32,12 +32,22 @@ export default class Events extends Model {
       },
       field: 'category_id'
     },
+    detailAddress: {
+      type: DataTypes.STRING(512),
+      allowNull: false,
+      field: 'detail_address'
+    },
+    placeName: {
+      type: DataTypes.STRING(225),
+      allowNull: true,
+      field: 'place_name'
+    },
     location: {
       type: DataTypes.STRING(512),
       allowNull: false
     },
     locationGroupId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'event_location_groups',
@@ -61,7 +71,7 @@ export default class Events extends Model {
       field: 'application_end'
     },
     createdUserId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',
@@ -102,17 +112,17 @@ export default class Events extends Model {
         ]
       },
       {
-        name: "events_users_user_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "created_user_id" },
-        ]
-      },
-      {
         name: "events_event_location_groups_group_id_fk",
         using: "BTREE",
         fields: [
           { name: "location_group_id" },
+        ]
+      },
+      {
+        name: "events_users_user_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "created_user_id" },
         ]
       },
     ]

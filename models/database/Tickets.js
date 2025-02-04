@@ -6,7 +6,7 @@ export default class Tickets extends Model {
   return super.init({
     ticketId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'ticket_id'
@@ -20,7 +20,7 @@ export default class Tickets extends Model {
       allowNull: false
     },
     createdUserId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',
