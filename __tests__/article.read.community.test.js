@@ -117,12 +117,20 @@ describe("Article Read Service", () => {
             articleId: 1,
             title: "Liked Article 1",
             content: "This is a liked article.",
+            isAnonymous: true,
             createdAt: new Date().toISOString(),
             articleComments: [
               { dataValues: { commentId: 1, content: "댓글 1" } },
             ],
             articleLikes: [{ dataValues: { likedUserId: 2 } }],
             articleImages: [{ dataValues: { imageUrl: "image1.jpg" } }],
+            author: {
+              dataValues: {
+                userId: 3,
+                nickname: "User1",
+                profileImage: "profile1.jpg",
+              },
+            },
           },
         },
         {
@@ -130,10 +138,18 @@ describe("Article Read Service", () => {
             articleId: 2,
             title: "Liked Article 2",
             content: "Another liked article.",
+            isAnonymous: false,
             createdAt: new Date().toISOString(),
             articleComments: [],
             articleLikes: [{ dataValues: { likedUserId: 3 } }],
             articleImages: [{ dataValues: { imageUrl: "image2.jpg" } }],
+            author: {
+              dataValues: {
+                userId: 4,
+                nickname: "User2",
+                profileImage: "profile2.jpg",
+              },
+            },
           },
         },
       ]);
@@ -158,11 +174,13 @@ describe("Article Read Service", () => {
       expect(result.articles[0].dataValues.articleComments).toBe(1);
       expect(result.articles[0].dataValues.articleLikes).toBe(1);
       expect(result.articles[0].dataValues.thumbnail).toContain("image1.jpg");
+      expect(result.articles[0].dataValues.authorInfo.nickname).toBeNull;
 
       expect(result.articles[1].dataValues.title).toBe("Liked Article 2");
       expect(result.articles[1].dataValues.articleComments).toBe(0);
       expect(result.articles[1].dataValues.articleLikes).toBe(1);
       expect(result.articles[1].dataValues.thumbnail).toContain("image2.jpg");
+      expect(result.articles[1].dataValues.authorInfo.nickname).toBe("User2");
 
     });
 
