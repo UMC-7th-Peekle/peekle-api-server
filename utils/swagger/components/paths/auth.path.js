@@ -1,28 +1,4 @@
-import { paramForm } from "../parameters.js";
-import { requestBodyForm } from "../request.body.js";
-import { generalResponse } from "../responses.js";
-
-const responseRef = (path) => {
-  return {
-    $ref: `#/components/responses/${path}`,
-  };
-};
-
-const swaggerFormat = ({
-  tag,
-  summary,
-  requestBody,
-  params = null,
-  responses = generalResponse,
-}) => {
-  return {
-    tags: [tag],
-    summary,
-    requestBody,
-    parameters: paramForm(params),
-    responses,
-  };
-};
+import { swaggerFormat } from "../formats.js";
 
 const registerTag = "Auth: 회원가입";
 
@@ -37,14 +13,14 @@ const register = {
     post: swaggerFormat({
       tag: registerTag,
       summary: "회원가입 (local)",
-      requestBody: requestBodyForm("auth/localRegisterSchema"),
+      requestBody: "auth/localRegisterSchema",
     }),
   },
   "/auth/register/oauth": {
     post: swaggerFormat({
       tag: registerTag,
       summary: "회원가입 (oauth)",
-      requestBody: requestBodyForm("auth/oauthRegisterSchema"),
+      requestBody: "auth/oauthRegisterSchema",
     }),
   },
   "/auth/register/nickname/check": {
@@ -67,7 +43,7 @@ const login = {
     post: swaggerFormat({
       tag: loginTag,
       summary: "로그인 (local)",
-      requestBody: requestBodyForm("auth/phoneVerifySchema"),
+      requestBody: "auth/phoneVerifySchema",
     }),
   },
   "/auth/logout": {
@@ -96,18 +72,16 @@ const kakaoTag = {
 };
 const kakaoOAuth = {
   "/auth/login/kakao": {
-    get: {
-      ...kakaoTag,
-      summary: "카카오 로그인",
-      responses: generalResponse,
-    },
+    get: swaggerFormat({
+      tag: "Auth: 카카오 로그인",
+      summary: "kakao 로그인",
+    }),
   },
   "/auth/login/kakao/callback": {
-    get: {
-      ...kakaoTag,
-      summary: "카카오 로그인 콜백",
-      responses: generalResponse,
-    },
+    get: swaggerFormat({
+      tag: "Auth: 카카오 로그인",
+      summary: "kakao callback",
+    }),
   },
 };
 
@@ -123,14 +97,14 @@ const phone = {
     post: swaggerFormat({
       tag: phoneTag,
       summary: "휴대폰 번호로 인증번호 전송",
-      requestBody: requestBodyForm("auth/sendTokenToPhoneSchema"),
+      requestBody: "auth/sendTokenToPhoneSchema",
     }),
   },
   "/auth/phone/verify": {
     post: swaggerFormat({
       tag: phoneTag,
       summary: "휴대폰 인증번호 확인",
-      requestBody: requestBodyForm("auth/phoneVerifySchema"),
+      requestBody: "auth/phoneVerifySchema",
     }),
   },
 };

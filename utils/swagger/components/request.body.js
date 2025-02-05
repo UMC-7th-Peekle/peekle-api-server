@@ -15,16 +15,3 @@ export const requestBodies = {
     },
   },
 };
-
-export const requestBodyForm = (path) => {
-  return {
-    content: {
-      "application/json": {
-        schema: {
-          $ref: `#/components/schemas/${path}`,
-        },
-      },
-    },
-    required: true,
-  };
-};
