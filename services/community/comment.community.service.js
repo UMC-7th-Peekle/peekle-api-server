@@ -184,9 +184,17 @@ export const getComments = async ({ communityId, articleId }) => {
       {
         model: models.ArticleComments,
         as: "articleComments",
+        include: [
+          {
+            model: models.Users,
+            as: "author",
+            attributes: ["userId", "nickname", "profileImage"],
+          },
+        ],
       },
     ],
   });
+
 
   // 게시글이 없는 경우 404 에러 반환
   if (!articleWithComments) {
@@ -196,6 +204,21 @@ export const getComments = async ({ communityId, articleId }) => {
     throw new NotExistsError("게시글이 존재하지 않습니다");
   }
 
-  // 댓글만 반환
-  return { comments: articleWithComments.articleComments };
+
+  // 댓글 데이터 변환
+  const transformedComments = articleWithComments.articleComments.map(
+    (comment) => {
+      const { author, ...commentData } = comment.dataValues;
+      return {
+        authorInfo: comment.dataValues.isAnonymous
+          ? { nickname: null, profileImage: null, userId: null }
+          : author,
+        ...commentData,
+      };
+    }
+  );
+
+  return {
+    comments: transformedComments,
+  };
 };

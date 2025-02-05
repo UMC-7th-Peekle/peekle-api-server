@@ -58,13 +58,13 @@ describe("Comment Service", () => {
   describe("updateComment()", () => {
     it("should successfully update a comment", async () => {
       const mockUpdate = jest.fn().mockResolvedValue(true); // update 메서드 Mock 설정
-  
+
       models.ArticleComments.findOne.mockResolvedValue({
         commentId: 1,
         authorId: 1001,
         update: mockUpdate, // Mock된 update 메서드 포함
       });
-  
+
       await commentService.updateComment({
         communityId: 4,
         articleId: 1,
@@ -73,21 +73,21 @@ describe("Comment Service", () => {
         content: "Updated comment",
         isAnonymous: false,
       });
-  
+
       expect(models.ArticleComments.findOne).toHaveBeenCalledWith({
         where: { articleId: 1, commentId: 1 },
       });
-  
+
       // update 메서드가 제대로 호출되었는지 검증
       expect(mockUpdate).toHaveBeenCalledWith({
         content: "Updated comment",
         isAnonymous: false,
       });
     });
-  
+
     it("should throw NotExistsError if the comment does not exist", async () => {
       models.ArticleComments.findOne.mockResolvedValue(null); // 댓글이 없는 경우
-  
+
       await expect(
         commentService.updateComment({
           communityId: 4,
@@ -99,13 +99,13 @@ describe("Comment Service", () => {
         })
       ).rejects.toThrow(NotExistsError);
     });
-  
+
     it("should throw NotAllowedError if the user is not the comment author", async () => {
       models.ArticleComments.findOne.mockResolvedValue({
         commentId: 1,
         authorId: 9999, // 다른 사용자 ID
       });
-  
+
       await expect(
         commentService.updateComment({
           communityId: 4,
@@ -214,15 +214,37 @@ describe("Comment Service", () => {
   describe("getComments()", () => {
     it("should successfully return comments for an article", async () => {
       models.Articles.findOne.mockResolvedValue({
-        articleId: 1,
+        dataValues: {
+          articleId: 1,
+          communityId: 4,
+          title: "Test Article",
+          content: "Test Content",
+          isAnonymous: false,
+        },
         articleComments: [
           {
-            commentId: 1,
-            content: "First comment",
+            dataValues: {
+              author: {
+                userId: 5,
+                nickname: "CommentUser1",
+                profileImage: "commentProfile1.jpg",
+              },
+              commentId: 1,
+              content: "Test Comment",
+              isAnonymous: false,
+            },
           },
           {
-            commentId: 2,
-            content: "Second comment",
+            dataValues: {
+              author: {
+                userId: 6,
+                nickname: "CommentUser2",
+                profileImage: "commentProfile2.jpg",
+              },
+              commentId: 2,
+              content: "Another Comment",
+              isAnonymous: true,
+            },
           },
         ],
       });
@@ -232,17 +254,24 @@ describe("Comment Service", () => {
         articleId: 1,
       });
 
-      expect(models.Articles.findOne).toHaveBeenCalledWith({
-        where: { communityId: 4, articleId: 1 },
-        include: [
-          {
-            model: models.ArticleComments,
-            as: "articleComments",
-          },
-        ],
-      });
+      // 반환된 댓글 개수 검증
       expect(result.comments).toHaveLength(2);
-      expect(result.comments[0].content).toBe("First comment");
+
+      // 첫 번째 댓글 검증
+      expect(result.comments[0].commentId).toBe(1);
+      expect(result.comments[0].content).toBe("Test Comment");
+      expect(result.comments[0].isAnonymous).toBe(false);
+      expect(result.comments[0].authorInfo.userId).toBe(5);
+      expect(result.comments[0].authorInfo.nickname).toBe("CommentUser1");
+      expect(result.comments[0].authorInfo.profileImage).toContain("commentProfile1.jpg");
+
+      // 두 번째 댓글 검증
+      expect(result.comments[1].commentId).toBe(2);
+      expect(result.comments[1].content).toBe("Another Comment");
+      expect(result.comments[1].isAnonymous).toBe(true);
+      expect(result.comments[1].authorInfo.userId).toBeNull();
+      expect(result.comments[1].authorInfo.nickname).toBeNull();
+      expect(result.comments[1].authorInfo.profileImage).toBeNull();
     });
 
     it("should throw NotExistsError if the article does not exist", async () => {
