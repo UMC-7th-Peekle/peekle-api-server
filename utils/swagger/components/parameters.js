@@ -146,8 +146,52 @@ const eventParams = {
   },
 };
 
+const noticeParams = {
+  limit: {
+    name: "limit",
+    in: "query",
+    required: false,
+    description: "한 번에 가져올 게시글 수",
+    schema: {
+      type: "integer",
+      example: 5,
+    },
+  },
+  offset: {
+    name: "offset",
+    in: "query",
+    required: false,
+    description: "페이지네이션을 위한 오프셋",
+    schema: {
+      type: "string",
+      example: 2,
+    },
+  },
+  categoryId: {
+    name: "categoryId",
+    in: "path",
+    required: true,
+    description: "카테고리 ID",
+    schema: {
+      type: "integer",
+      example: 1,
+    },
+  },
+  query: {
+    name: "query",
+    in: "query",
+    required: true,
+    description: "검색어",
+    schema: {
+      type: "string",
+      example: "검색어",
+    },
+  },
+};
+
 export const parameters = {
   auth: authParams,
   community: communityParams,
   event: eventParams,
+  notice: noticeParams,
 };
