@@ -6,7 +6,7 @@ export default class EventCategory extends Model {
   return super.init({
     categoryId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'category_id'

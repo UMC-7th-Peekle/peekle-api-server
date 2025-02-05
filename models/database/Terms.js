@@ -6,7 +6,7 @@ export default class Terms extends Model {
   return super.init({
     termId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'term_id'

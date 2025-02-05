@@ -6,7 +6,7 @@ export default class Peekling extends Model {
   return super.init({
     peeklingId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'peekling_id'
@@ -34,7 +34,7 @@ export default class Peekling extends Model {
       allowNull: false
     },
     categoryId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'peekling_category',
@@ -43,7 +43,7 @@ export default class Peekling extends Model {
       field: 'category_id'
     },
     createdUserId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',

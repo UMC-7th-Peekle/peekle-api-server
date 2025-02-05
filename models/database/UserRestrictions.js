@@ -6,13 +6,13 @@ export default class UserRestrictions extends Model {
   return super.init({
     userRestrictionId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'user_restriction_id'
     },
     userId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'users',
@@ -21,7 +21,7 @@ export default class UserRestrictions extends Model {
       field: 'user_id'
     },
     adminUserId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',
@@ -30,7 +30,7 @@ export default class UserRestrictions extends Model {
       field: 'admin_user_id'
     },
     type: {
-      type: DataTypes.ENUM('suspend','ban','cancelled','expired'),
+      type: DataTypes.ENUM('suspend','ban','canceled','expired'),
       allowNull: false
     },
     reason: {
@@ -68,17 +68,17 @@ export default class UserRestrictions extends Model {
         ]
       },
       {
+        name: "user_restrictions_users_user_id_fk_2",
+        using: "BTREE",
+        fields: [
+          { name: "user_id" },
+        ]
+      },
+      {
         name: "user_restrictions_admins_admin_id_fk",
         using: "BTREE",
         fields: [
           { name: "admin_user_id" },
-        ]
-      },
-      {
-        name: "user_restrictions_users_user_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "user_id" },
         ]
       },
     ]

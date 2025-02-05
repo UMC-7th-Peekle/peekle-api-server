@@ -6,7 +6,7 @@ export default class Communities extends Model {
   return super.init({
     communityId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'community_id'

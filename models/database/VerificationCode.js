@@ -6,7 +6,7 @@ export default class VerificationCode extends Model {
   return super.init({
     sessionId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'session_id'

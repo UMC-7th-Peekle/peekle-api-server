@@ -1,38 +1,28 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class UserTerms extends Model {
+export default class EventLocation extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    userTermsId: {
+    eventLocationId: {
       autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
-      field: 'user_terms_id'
+      field: 'event_location_id'
     },
-    userId: {
+    eventId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
-        model: 'users',
-        key: 'user_id'
+        model: 'events',
+        key: 'event_id'
       },
-      field: 'user_id'
+      field: 'event_id'
     },
-    termId: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: true,
-      references: {
-        model: 'terms',
-        key: 'term_id'
-      },
-      field: 'term_id'
-    },
-    isAgreed: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      field: 'is_agreed'
+    position: {
+      type: DataTypes.GEOMETRY,
+      allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -48,7 +38,7 @@ export default class UserTerms extends Model {
     }
   }, {
     sequelize,
-    tableName: 'user_terms',
+    tableName: 'event_location',
     timestamps: false,
     indexes: [
       {
@@ -56,21 +46,14 @@ export default class UserTerms extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "user_terms_id" },
+          { name: "event_location_id" },
         ]
       },
       {
-        name: "user_terms_terms_term_id_fk",
+        name: "event_id",
         using: "BTREE",
         fields: [
-          { name: "term_id" },
-        ]
-      },
-      {
-        name: "user_terms_users_user_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "user_id" },
+          { name: "event_id" },
         ]
       },
     ]
