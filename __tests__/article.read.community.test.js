@@ -21,6 +21,7 @@ describe("Article Read Service", () => {
                 articleId: 1,
                 title: "Test Article 1",
                 content: "Content 1",
+                isAnonymous: false,
                 createdAt: new Date().toISOString(),
                 articleComments: [], // 댓글이 없는 경우에도 빈 배열로 설정
                 articleLikes: [], // 좋아요가 없는 경우에도 빈 배열로 설정
@@ -39,6 +40,7 @@ describe("Article Read Service", () => {
                 articleId: 2,
                 title: "Test Article 2",
                 content: "Content 2",
+                isAnonymous: false,
                 createdAt: new Date().toISOString(),
                 articleComments: [{ dataValues: { commentId: 1 } }], // 댓글이 있는 경우 설정
                 articleLikes: [{ dataValues: { likedUserId: 2 } }], // 좋아요가 있는 경우 설정
