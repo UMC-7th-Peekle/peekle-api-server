@@ -1,13 +1,15 @@
-import CoolsmsMessageService from "coolsms-node-sdk"; // default import로 변경
+import CoolsmsModule from "coolsms-node-sdk";
+
 import axios from "axios";
 import crypto from "crypto";
+
 import logger from "../logger/logger.js";
+
 import config from "../../config.json" with { type: "json" };
 import { logError } from "../handlers/error.logger.js";
-
 const { API_KEY, API_SECRET, SENDER } = config.COOLSMS;
 
-// 바로 생성자를 사용하여 messageService 생성
+const CoolsmsMessageService = CoolsmsModule.default;
 const messageService = new CoolsmsMessageService(API_KEY, API_SECRET);
 
 const getAuthorizationHeader = async (apiKey, apiSecret) => {
@@ -28,7 +30,7 @@ export const axiosSendSMS = async (to, from, text) => {
 
   const headers = {
     "Content-Type": "application/json",
-    Authorization: await getAuthorizationHeader(apiKey, apiSecret),
+    Authorization: getAuthorizationHeader(apiKey, apiSecret),
   };
 
   const data = {
@@ -43,7 +45,7 @@ export const axiosSendSMS = async (to, from, text) => {
     return response.data;
   } catch (error) {
     logger.error("메시지 전송 중 오류가 발생했습니다:", {
-      data: error.response?.data || error.message,
+      data: error.response.data,
     });
     throw error;
   }
@@ -100,16 +102,7 @@ export const sdkGetMessage = async ({
   if (type) params.type = type;
   if (duration) params.duration = duration;
 
-  try {
-    const result = await messageService.getMessages(params);
-    logger.debug("메시지 조회 성공", {
-      result,
-    });
-    return result;
-  } catch (error) {
-    logError(error);
-    throw error;
-  }
+  return await messageService.getMessages(params);
 };
 
 export const sdkGetStatistics = async ({ start_date, end_date }) => {
@@ -118,14 +111,5 @@ export const sdkGetStatistics = async ({ start_date, end_date }) => {
     end_date: end_date || new Date().toISOString().split("T")[0],
   };
 
-  try {
-    const result = await messageService.getStatistics(params);
-    logger.debug("통계 조회 성공", {
-      result,
-    });
-    return result;
-  } catch (error) {
-    logError(error);
-    throw error;
-  }
+  return await messageService.getStatistics(params);
 };
