@@ -49,16 +49,18 @@ const generalResponse = {
 
 export const swaggerFormat = ({
   tag,
-  summary,
-  requestBody,
+  summary = "요약을 입력해주세요.",
+  description = "설명을 입력해주세요.",
+  requestBody = null,
   params = null,
   responses = generalResponse,
 }) => {
   return {
     tags: [tag],
     summary,
-    requestBody: requestBodyForm(requestBody),
-    parameters: paramForm(params),
+    description,
+    requestBody: requestBody ? requestBodyForm(requestBody) : null,
+    parameters: params ? paramForm(params) : null,
     responses,
   };
 };

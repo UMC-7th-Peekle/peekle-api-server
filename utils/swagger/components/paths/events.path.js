@@ -1,4 +1,4 @@
-export default {
+const crudEvent = {
   // 이벤트 조회, 삭제, 생성
   "/": {
     get: {
@@ -215,6 +215,112 @@ export default {
     },
   },
 
+  // 이벤트 상세정보 조회, 수정
+  "/:eventId": {
+    get: {
+      tags: ["Events"],
+      summary: "이벤트 상세정보 조회",
+      description: "이벤트 상세 정보를 조회합니다.",
+      parameters: [
+        {
+          name: "eventId",
+          in: "path",
+          required: true,
+          description: "조회할 이벤트id",
+          schema: {
+            type: "integer",
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/GetDetailEvents",
+              },
+            },
+          },
+        },
+        404: {
+          description: "이벤트가 존재하지 않습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotExistsError",
+              },
+            },
+          },
+        },
+      },
+    },
+    patch: {
+      tags: ["Events"],
+      summary: "이벤트 상세정보 수정",
+      description: "이벤트 상세정보를 수정합니다.",
+      parameters: [
+        {
+          name: "eventId",
+          in: "path",
+          required: true,
+          description: "수정할 이벤트id",
+          schema: {
+            type: "integer",
+          },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/UpdateDetailEvents",
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "성공",
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  message: {
+                    type: "string",
+                    example: "이벤트 수정 완료",
+                  },
+                },
+              },
+            },
+          },
+        },
+        404: {
+          description: "이벤트가 존재하지 않습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotExistsError",
+              },
+            },
+          },
+        },
+        403: {
+          description: "본인이 작성하지 않은 게시글을 수정할 수 없습니다.",
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/NotAllowedError",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+const scrapEvent = {
   // 스크랩된 이벤트 조회, 이벤트 스크랩, 스크랩 취소
   "/scrap": {
     get: {
@@ -381,112 +487,8 @@ export default {
       },
     },
   },
-
-  // 이벤트 상세정보 조회, 수정
-  "/:eventId": {
-    get: {
-      tags: ["Events"],
-      summary: "이벤트 상세정보 조회",
-      description: "이벤트 상세 정보를 조회합니다.",
-      parameters: [
-        {
-          name: "eventId",
-          in: "path",
-          required: true,
-          description: "조회할 이벤트id",
-          schema: {
-            type: "integer",
-          },
-        },
-      ],
-      responses: {
-        200: {
-          description: "성공",
-          content: {
-            "application/json": {
-              schema: {
-                $ref: "#/components/schemas/GetDetailEvents",
-              },
-            },
-          },
-        },
-        404: {
-          description: "이벤트가 존재하지 않습니다.",
-          content: {
-            "application/json": {
-              schema: {
-                $ref: "#/components/schemas/NotExistsError",
-              },
-            },
-          },
-        },
-      },
-    },
-    patch: {
-      tags: ["Events"],
-      summary: "이벤트 상세정보 수정",
-      description: "이벤트 상세정보를 수정합니다.",
-      parameters: [
-        {
-          name: "eventId",
-          in: "path",
-          required: true,
-          description: "수정할 이벤트id",
-          schema: {
-            type: "integer",
-          },
-        },
-      ],
-      requestBody: {
-        required: true,
-        content: {
-          "application/json": {
-            schema: {
-              $ref: "#/components/schemas/UpdateDetailEvents",
-            },
-          },
-        },
-      },
-      responses: {
-        200: {
-          description: "성공",
-          content: {
-            "application/json": {
-              schema: {
-                properties: {
-                  message: {
-                    type: "string",
-                    example: "이벤트 수정 완료",
-                  },
-                },
-              },
-            },
-          },
-        },
-        404: {
-          description: "이벤트가 존재하지 않습니다.",
-          content: {
-            "application/json": {
-              schema: {
-                $ref: "#/components/schemas/NotExistsError",
-              },
-            },
-          },
-        },
-        403: {
-          description: "본인이 작성하지 않은 게시글을 수정할 수 없습니다.",
-          content: {
-            "application/json": {
-              schema: {
-                $ref: "#/components/schemas/NotAllowedError",
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-
+};
+const groups = {
   // 이벤트 카테고리 조회
   "/groups/category": {
     get: {
@@ -534,7 +536,8 @@ export default {
       },
     },
   },
-
+};
+const report = {
   // 이벤트 신고
   "/report": {
     post: {
@@ -600,4 +603,11 @@ export default {
       },
     },
   },
+};
+
+export default {
+  ...crudEvent,
+  ...scrapEvent,
+  ...groups,
+  ...report,
 };

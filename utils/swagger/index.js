@@ -32,7 +32,7 @@ export const swaggerDoc = {
     url: "https://www.notion.so/API-0abd444acbf44291a14204991c8cf4ac?pvs=4",
   },
   servers: servers,
-  tags: tags,
+  // tags: tags,
   security: security,
   components: {
     securitySchemes: securitySchemes,
