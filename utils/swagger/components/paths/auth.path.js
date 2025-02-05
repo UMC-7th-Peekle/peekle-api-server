@@ -12,12 +12,16 @@ const register = {
     get: swaggerFormat({
       tag: authTags.registerTag,
       summary: "현행 약관 조회",
+      description:
+        "회원가입 시 사용합니다. 조회 시점에 `active` 상태인 모든 약관을 조회합니다.",
     }),
   },
   "/auth/register/local": {
     post: swaggerFormat({
       tag: authTags.registerTag,
-      summary: "회원가입 (local)",
+      summary: "로컬 회원가입",
+      description:
+        "Peekle의 자체 회원가입 과정을 통한 (OAuth가 아닌) 회원가입을 진행합니다.",
       requestBody: "auth/localRegisterSchema",
     }),
   },
@@ -100,11 +104,17 @@ const phone = {
       tag: authTags.phoneTag,
       summary: "휴대폰 번호로 인증번호 전송",
       requestBody: "auth/sendTokenToPhoneSchema",
+      responses: {
+        200: {
+          description: "게시글 목록 조회 성공",
+        },
+      },
     }),
   },
   "/auth/phone/verify": {
     post: swaggerFormat({
       tag: authTags.phoneTag,
+      operationId: "phoneVerify",
       summary: "휴대폰 인증번호 확인",
       requestBody: "auth/phoneVerifySchema",
     }),

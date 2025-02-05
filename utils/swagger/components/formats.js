@@ -22,9 +22,36 @@ const paramForm = (multiplePaths) => {
   });
 };
 
+const responseContent = {
+  "application/json": {
+    schema: {
+      type: "object",
+      properties: {
+        resultType: {
+          type: "string",
+          example: "SUCCESS",
+          description: "요청 결과의 타입입니다.",
+        },
+        error: {
+          type: ["object", "null"],
+          example: null,
+          description: "요청이 실패했을 경우 message 및 data가 반환됩니다.",
+        },
+        success: {
+          type: ["object", "null"],
+          example: null,
+          description: "요청이 성공했을 경우 message 및 data가 반환됩니다.",
+          properties: {},
+        },
+      },
+    },
+  },
+};
+
 const generalResponse = {
   200: {
     description: "요청이 성공하였습니다.",
+    content: responseContent,
   },
   400: {
     description: "잘못된 요청입니다.",
@@ -49,18 +76,31 @@ const generalResponse = {
 
 export const swaggerFormat = ({
   tag,
-  summary = "요약을 입력해주세요.",
-  description = "설명을 입력해주세요.",
-  requestBody = null,
-  params = null,
+  operationId,
+  summary = "요약 추가 안하고 뭐하십니까?",
+  description = "설명 추가 안하고 뭐하십니까?",
+  requestBody,
+  customRequestBody = {},
+  params,
   responses = generalResponse,
+  links,
 }) => {
-  return {
-    tags: [tag],
-    summary,
-    description,
-    requestBody: requestBody ? requestBodyForm(requestBody) : null,
-    parameters: params ? paramForm(params) : null,
-    responses,
-  };
+  const result = {};
+
+  if (tag) result.tags = [tag];
+  if (operationId) result.operationId = operationId;
+  if (summary) result.summary = summary;
+  if (description) result.description = description;
+  if (requestBody)
+    result.requestBody = Object.assign(
+      {},
+      requestBodyForm(requestBody),
+      customRequestBody
+    );
+  if (params) result.parameters = paramForm(params);
+  if (responses)
+    result.responses = Object.assign({}, generalResponse, responses);
+  if (links) result.links = links;
+
+  return result;
 };
