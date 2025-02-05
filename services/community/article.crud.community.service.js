@@ -114,6 +114,11 @@ export const createArticle = async ({
       communityId,
     },
   });
+  
+  // 테스트 코드에서 Mock으로 처리하는 부분은 DB의 FK 제약을 테스트하기 어려우므로 이 부분 다시 추가
+  if(!community) { 
+    throw new NotExistsError("존재하지 않는 게시판입니다.");
+  }
 
   // 게시글 생성
   let article;
