@@ -20,3 +20,14 @@ export const parameters = {
     },
   },
 };
+
+export const paramForm = (multiplePaths) => {
+  if (!multiplePaths) {
+    return [];
+  }
+  return multiplePaths.map((path) => {
+    return {
+      $ref: `#/components/parameters/${path}`,
+    };
+  });
+};

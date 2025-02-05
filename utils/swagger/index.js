@@ -65,6 +65,7 @@ export const swaggerUiOptions = {
   },
   responseInterceptor: (response) => {
     // 응답을 가로채고 수정할 수 있습니다.
+
     return response;
   },
   // maxDisplayedTags: 50, // 한 번에 표시할 수 있는 최대 태그 수

@@ -1,7 +1,7 @@
 const community = {
   "/community": {
     post: {
-      tags: ["Community/Admin"],
+      tags: ["Community: 관리자"],
       summary: "게시판 생성",
       description: "게시판을 생성합니다.",
       requestBody: {
@@ -50,7 +50,7 @@ const community = {
       },
     },
     get: {
-      tags: ["Community/Articles"],
+      tags: ["Community: 게시글"],
       summary: "커뮤니티 게시글 목록 조회",
       description:
         "커뮤니티 ID를 통해 해당 커뮤니티의 게시글 목록을 조회합니다.",
@@ -242,7 +242,7 @@ const community = {
 const article = {
   "/community/{communityId}/articles/{articleId}": {
     get: {
-      tags: ["Community/Articles"],
+      tags: ["Community: 게시글"],
       summary: "게시글 조회",
       description: "게시글 ID를 통해 해당 게시글을 조회합니다.",
       parameters: [
@@ -289,7 +289,7 @@ const article = {
       },
     },
     patch: {
-      tags: ["Community/Articles"],
+      tags: ["Community: 게시글"],
       summary: "게시글 수정",
       description: "게시글 ID에 해당하는 게시글을 수정합니다.",
       parameters: [
@@ -352,7 +352,7 @@ const article = {
   },
   "/community/{communityId}/articles": {
     post: {
-      tags: ["Community/Articles"],
+      tags: ["Community: 게시글"],
       summary: "게시글 작성",
       description: "커뮤니티 ID에 해당하는 게시판에 게시글을 작성합니다.",
       parameters: [
@@ -403,7 +403,7 @@ const article = {
   },
   "/community/articles": {
     delete: {
-      tags: ["Community/Articles"],
+      tags: ["Community: 게시글"],
       summary: "게시글 삭제",
       description: "게시글 ID에 해당하는 게시글을 삭제합니다.",
       requestBody: {
@@ -446,7 +446,7 @@ const article = {
 const comments = {
   "/community/articles/comments": {
     get: {
-      tags: ["Community/Article/Comments"],
+      tags: ["Community: 댓글"],
       summary: "댓글 조회",
       description: "게시글 ID에 해당하는 게시글의 댓글을 조회합니다.",
       parameters: [
@@ -500,7 +500,7 @@ const comments = {
       },
     },
     post: {
-      tags: ["Community/Article/Comments"],
+      tags: ["Community: 댓글"],
       summary: "댓글 작성",
       description: "게시글 ID에 해당하는 게시글에 댓글을 작성합니다.",
       requestBody: {
@@ -538,7 +538,7 @@ const comments = {
       },
     },
     patch: {
-      tags: ["Community/Article/Comments"],
+      tags: ["Community: 댓글"],
       summary: "댓글 수정",
       description: "댓글 ID에 해당하는 댓글을 수정합니다.",
       requestBody: {
@@ -579,7 +579,7 @@ const comments = {
       },
     },
     delete: {
-      tags: ["Community/Article/Comments"],
+      tags: ["Community: 댓글"],
       summary: "댓글 삭제",
       description: "댓글 ID에 해당하는 댓글을 삭제합니다.",
       requestBody: {
@@ -620,9 +620,9 @@ const comments = {
       },
     },
   },
-  "/community/articles/comments/reply": {
+  "/communiy/articles/comments/reply": {
     post: {
-      tags: ["Community/Article/Comments"],
+      tags: ["Community: 댓글"],
       summary: "대댓글 작성",
       description: "댓글 ID에 해당하는 댓글에 대댓글을 작성합니다.",
       requestBody: {
@@ -665,7 +665,7 @@ const comments = {
 const like = {
   "/community/article/like": {
     get: {
-      tags: ["Community/Articles"],
+      tags: ["Community: 게시글"],
       summary: "좋아요 누른 게시글 목록 조회",
       description: "사용자가 좋아요를 누른 게시글 목록을 조회합니다.",
       parameters: [
@@ -791,7 +791,7 @@ const like = {
   },
   "/community/articles/like": {
     post: {
-      tags: ["Community/Likes"],
+      tags: ["Community: 좋아요"],
       summary: "게시글 좋아요",
       description: "게시글에 좋아요를 누릅니다.",
       requestBody: {
@@ -832,7 +832,7 @@ const like = {
       },
     },
     delete: {
-      tags: ["Community/Likes"],
+      tags: ["Community: 좋아요"],
       summary: "게시글 좋아요 취소",
       description: "게시글에 좋아요를 취소합니다.",
       requestBody: {
@@ -875,7 +875,7 @@ const like = {
   },
   "/community/articles/comments/like": {
     post: {
-      tags: ["Community/Likes"],
+      tags: ["Community: 좋아요"],
       summary: "댓글 좋아요",
       description: "댓글에 좋아요를 누릅니다.",
       requestBody: {
@@ -916,7 +916,7 @@ const like = {
       },
     },
     delete: {
-      tags: ["Community/Likes"],
+      tags: ["Community: 좋아요"],
       summary: "댓글 좋아요 취소",
       description: "댓글에 좋아요를 취소합니다.",
       requestBody: {
@@ -962,7 +962,7 @@ const like = {
 const reports = {
   "/community/articles/report": {
     post: {
-      tags: ["Community/Report"],
+      tags: ["Community: 신고"],
       summary: "게시글 신고",
       description: "게시글을 신고합니다.",
       requestBody: {
@@ -1032,7 +1032,7 @@ const reports = {
   },
   "/community/articles/comments/report": {
     post: {
-      tags: ["Community/Report"],
+      tags: ["Community: 신고"],
       summary: "댓글 신고",
       description: "댓글을 신고합니다.",
       requestBody: {

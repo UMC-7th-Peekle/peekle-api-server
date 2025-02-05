@@ -1,257 +1,137 @@
+import { paramForm } from "../parameters.js";
+import { requestBodyForm } from "../request.body.js";
+import { generalResponse } from "../responses.js";
+
 const responseRef = (path) => {
   return {
     $ref: `#/components/responses/${path}`,
   };
 };
 
-const successResponse = responseRef("successResponse");
+const swaggerFormat = ({
+  tag,
+  summary,
+  requestBody,
+  params = null,
+  responses = generalResponse,
+}) => {
+  return {
+    tags: [tag],
+    summary,
+    requestBody,
+    parameters: paramForm(params),
+    responses,
+  };
+};
+
+const registerTag = "Auth: 회원가입";
 
 const register = {
   "/auth/terms": {
-    get: {
-      tags: ["Auth: 회원가입"],
-      summary: "현행 약관을 가져옵니다. 회원가입 시 활용합니다.",
-      responses: successResponse,
-    },
+    get: swaggerFormat({
+      tag: registerTag,
+      summary: "현행 약관 조회",
+    }),
   },
   "/auth/register/local": {
-    post: {
-      tags: ["Auth: 회원가입"],
+    post: swaggerFormat({
+      tag: registerTag,
       summary: "회원가입 (local)",
-      requestBody: {
-        $ref: "#/components/requestBodies/sample",
-      },
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+      requestBody: requestBodyForm("auth/localRegisterSchema"),
+    }),
   },
   "/auth/register/oauth": {
-    post: {
-      tags: ["Auth: 회원가입"],
-      summary: "회원가입 (OAuth)",
-      requestBody: {
-        content: {
-          "application/json": {
-            schema: {
-              $ref: "#/components/schemas/auth/oauthRegisterSchema",
-            },
-          },
-        },
-        required: true,
-      },
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+    post: swaggerFormat({
+      tag: registerTag,
+      summary: "회원가입 (oauth)",
+      requestBody: requestBodyForm("auth/oauthRegisterSchema"),
+    }),
   },
   "/auth/register/nickname/check": {
-    get: {
-      tags: ["Auth: 회원가입"],
-      summary: "닉네임 중복확인",
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+    get: swaggerFormat({
+      tag: registerTag,
+      summary: "닉네임 중복확인 제공",
+    }),
   },
   "/auth/register/test": {
-    post: {
-      tags: ["Auth: 회원가입"],
-      summary: "테스트 회원가입",
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+    post: swaggerFormat({
+      tag: registerTag,
+      summary: "테스트용 회원가입",
+    }),
   },
 };
 
+const loginTag = "Auth: 로그인, 로그아웃, 토큰 재발급";
 const login = {
   "/auth/login/local": {
-    post: {
-      tags: ["Auth: 로그인/로그아웃/AT 재발급"],
+    post: swaggerFormat({
+      tag: loginTag,
       summary: "로그인 (local)",
-      requestBody: {
-        content: {
-          "application/json": {
-            schema: {
-              $ref: "#/components/schemas/phoneVerifySchema",
-            },
-          },
-        },
-        required: true,
-      },
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+      requestBody: requestBodyForm("auth/phoneVerifySchema"),
+    }),
   },
   "/auth/logout": {
-    delete: {
-      tags: ["Auth: 로그인/로그아웃/AT 재발급"],
+    delete: swaggerFormat({
+      tag: loginTag,
       summary: "로그아웃",
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+    }),
   },
   "/auth/token/reissue": {
-    get: {
-      tags: ["Auth: 로그인/로그아웃/AT 재발급"],
+    get: swaggerFormat({
+      tag: loginTag,
       summary: "토큰 재발급",
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+    }),
   },
   "/auth/login/test/{userId}": {
-    get: {
-      tags: ["Auth: 로그인/로그아웃/AT 재발급"],
+    get: swaggerFormat({
+      tag: loginTag,
       summary: "테스트 로그인",
-      parameters: [
-        {
-          $ref: "#/components/parameters/userId",
-        },
-      ],
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+      params: ["userId"],
+    }),
   },
 };
 
+const kakaoTag = {
+  tags: ["Auth: 카카오 로그인"],
+};
 const kakaoOAuth = {
   "/auth/login/kakao": {
     get: {
-      tags: ["Auth: 카카오 로그인"],
+      ...kakaoTag,
       summary: "카카오 로그인",
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
+      responses: generalResponse,
     },
   },
   "/auth/login/kakao/callback": {
     get: {
-      tags: ["Auth: 카카오 로그인"],
+      ...kakaoTag,
       summary: "카카오 로그인 콜백",
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
+      responses: generalResponse,
     },
   },
 };
 
+const phoneTag = "Auth: 휴대폰 인증";
 const phone = {
   "/auth/phone/account/status": {
-    get: {
-      tags: ["Auth: 휴대폰 인증"],
+    get: swaggerFormat({
+      tag: phoneTag,
       summary: "휴대폰 번호로 계정 상태 확인",
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+    }),
   },
   "/auth/phone/send": {
-    post: {
-      tags: ["Auth: 휴대폰 인증"],
+    post: swaggerFormat({
+      tag: phoneTag,
       summary: "휴대폰 번호로 인증번호 전송",
-      requestBody: {
-        content: {
-          "application/json": {
-            schema: {
-              $ref: "#/components/schemas/sendTokenToPhoneSchema",
-            },
-          },
-        },
-        required: true,
-      },
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+      requestBody: requestBodyForm("auth/sendTokenToPhoneSchema"),
+    }),
   },
   "/auth/phone/verify": {
-    post: {
-      tags: ["Auth: 휴대폰 인증"],
+    post: swaggerFormat({
+      tag: phoneTag,
       summary: "휴대폰 인증번호 확인",
-      requestBody: {
-        content: {
-          "application/json": {
-            schema: {
-              $ref: "#/components/schemas/phoneVerifySchema",
-            },
-          },
-        },
-        required: true,
-      },
-      responses: {
-        200: {
-          description: "성공",
-        },
-        400: {
-          description: "실패",
-        },
-      },
-    },
+      requestBody: requestBodyForm("auth/phoneVerifySchema"),
+    }),
   },
 };
 
