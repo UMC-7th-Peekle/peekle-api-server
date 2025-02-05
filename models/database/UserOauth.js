@@ -5,7 +5,7 @@ export default class UserOauth extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
     userId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       references: {
@@ -15,7 +15,7 @@ export default class UserOauth extends Model {
       field: 'user_id'
     },
     oauthId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'oauth_id'

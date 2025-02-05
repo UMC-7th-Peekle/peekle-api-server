@@ -6,13 +6,13 @@ export default class EventScraps extends Model {
   return super.init({
     eventScrapId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'event_scrap_id'
     },
     eventId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'events',
@@ -21,7 +21,7 @@ export default class EventScraps extends Model {
       field: 'event_id'
     },
     userId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',

@@ -6,7 +6,7 @@ export default class Articles extends Model {
   return super.init({
     articleId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'article_id'
@@ -20,7 +20,7 @@ export default class Articles extends Model {
       allowNull: false
     },
     authorId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',
@@ -34,7 +34,7 @@ export default class Articles extends Model {
       field: 'is_anonymous'
     },
     communityId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'communities',

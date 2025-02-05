@@ -6,13 +6,13 @@ export default class NoticeImages extends Model {
   return super.init({
     imageId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'image_id'
     },
     noticeId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'notices',

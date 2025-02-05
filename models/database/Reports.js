@@ -6,7 +6,7 @@ export default class Reports extends Model {
   return super.init({
     reportId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'report_id'
@@ -16,12 +16,12 @@ export default class Reports extends Model {
       allowNull: false
     },
     targetId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       field: 'target_id'
     },
     reportedUserId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',

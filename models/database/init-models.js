@@ -8,6 +8,7 @@ import _Articles from  "./Articles.js";
 import _Communities from  "./Communities.js";
 import _EventCategory from  "./EventCategory.js";
 import _EventImages from  "./EventImages.js";
+import _EventLocation from  "./EventLocation.js";
 import _EventLocationGroups from  "./EventLocationGroups.js";
 import _EventSchedules from  "./EventSchedules.js";
 import _EventScraps from  "./EventScraps.js";
@@ -46,6 +47,7 @@ export default function initModels(sequelize) {
   const Communities = _Communities.init(sequelize, DataTypes);
   const EventCategory = _EventCategory.init(sequelize, DataTypes);
   const EventImages = _EventImages.init(sequelize, DataTypes);
+  const EventLocation = _EventLocation.init(sequelize, DataTypes);
   const EventLocationGroups = _EventLocationGroups.init(sequelize, DataTypes);
   const EventSchedules = _EventSchedules.init(sequelize, DataTypes);
   const EventScraps = _EventScraps.init(sequelize, DataTypes);
@@ -97,6 +99,8 @@ export default function initModels(sequelize) {
   EventLocationGroups.hasMany(Events, { as: "events", foreignKey: "locationGroupId"});
   EventImages.belongsTo(Events, { as: "event", foreignKey: "eventId"});
   Events.hasMany(EventImages, { as: "eventImages", foreignKey: "eventId"});
+  EventLocation.belongsTo(Events, { as: "event", foreignKey: "eventId"});
+  Events.hasMany(EventLocation, { as: "eventLocations", foreignKey: "eventId"});
   EventSchedules.belongsTo(Events, { as: "event", foreignKey: "eventId"});
   Events.hasMany(EventSchedules, { as: "eventSchedules", foreignKey: "eventId"});
   EventScraps.belongsTo(Events, { as: "event", foreignKey: "eventId"});
@@ -175,6 +179,7 @@ export default function initModels(sequelize) {
     Communities,
     EventCategory,
     EventImages,
+    EventLocation,
     EventLocationGroups,
     EventSchedules,
     EventScraps,

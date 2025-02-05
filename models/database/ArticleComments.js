@@ -6,13 +6,13 @@ export default class ArticleComments extends Model {
   return super.init({
     commentId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'comment_id'
     },
     articleId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'articles',
@@ -21,7 +21,7 @@ export default class ArticleComments extends Model {
       field: 'article_id'
     },
     parentCommentId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'article_comments',
@@ -34,7 +34,7 @@ export default class ArticleComments extends Model {
       allowNull: false
     },
     authorId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',
