@@ -6,7 +6,7 @@ export default class EventLocationGroups extends Model {
   return super.init({
     groupId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'group_id'

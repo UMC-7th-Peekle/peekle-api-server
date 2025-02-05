@@ -6,13 +6,13 @@ export default class UserBlocks extends Model {
   return super.init({
     blockId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'block_id'
     },
     blockerUserId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       comment: "차단을 하는 사람",
       references: {
@@ -22,7 +22,7 @@ export default class UserBlocks extends Model {
       field: 'blocker_user_id'
     },
     blockedUserId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       comment: "차단 당한 사람",
       references: {

@@ -6,7 +6,7 @@ export default class Users extends Model {
   return super.init({
     userId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'user_id'

@@ -6,7 +6,7 @@ export default class PeeklingImages extends Model {
   return super.init({
     imageId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'image_id'
@@ -22,7 +22,7 @@ export default class PeeklingImages extends Model {
       allowNull: false
     },
     peeklingId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
         model: 'peekling',

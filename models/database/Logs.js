@@ -6,7 +6,7 @@ export default class Logs extends Model {
   return super.init({
     logId: {
       autoIncrement: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       field: 'log_id'
@@ -21,7 +21,7 @@ export default class Logs extends Model {
       allowNull: false
     },
     userId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',
