@@ -94,10 +94,10 @@ export const unpenalizeUser = async ({ userId }) => {
     throw new NotExistsError("해당 사용자에게 유효한 제재가 없습니다.");
   }
 
-  // 찾은 userRestrictionId를 기준으로 type을 'cancelled'로 업데이트
+  // 찾은 userRestrictionId를 기준으로 type을 'canceled'로 업데이트
   await models.UserRestrictions.update(
     {
-      type: "cancelled",
+      type: "canceled",
     },
     {
       where: {
