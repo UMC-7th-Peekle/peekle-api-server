@@ -37,7 +37,8 @@ export const validateArticleQuery = (queries) => {
 export const getArticles = async (
   communityId,
   query,
-  { limit, cursor = null }
+  { limit, cursor = null },
+  userId
 ) => {
   // 게시판 및 게시글 조회
   const community = await models.Communities.findOne({
@@ -124,8 +125,19 @@ export const getArticles = async (
   // 좋아요, 댓글 수 및 썸네일만을 반환하도록 가공
   articles.map((article) => {
     article = article.dataValues;
+    
+    // 좋아요 여부 확인
+    if (userId) {
+      article.isLikedByUser = article.articleLikes.some(
+        (like) => like.likedUserId === userId
+      );
+    } else {
+      article.isLikedByUser = false;  // 비로그인 사용자는 항상 false
+    }
+
     article.articleComments = article.articleComments.length; // 댓글 개수만 추출
     article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
+    
     if (article.articleImages.length > 0) {
       article.articleImages = addBaseUrl(
         article.articleImages[0].dataValues.imageUrl
