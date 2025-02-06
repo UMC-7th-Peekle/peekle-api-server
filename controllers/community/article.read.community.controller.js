@@ -9,6 +9,7 @@ export const getArticles = async (req, res, next) => {
   try {
     articleReadService.validateArticleQuery(req.query);
     const { communityId, limit, cursor, query } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
+    const userId = req.user ? req.user.userId : null;  // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
 
     logger.debug("게시글 목록 조회", {
       action: "article:getArticles",
@@ -29,7 +30,8 @@ export const getArticles = async (req, res, next) => {
       await articleReadService.getArticles(
         communityId,
         query,
-        paginationOptions
+        paginationOptions,
+        userId
       );
 
     // 게시글이 없는 경우

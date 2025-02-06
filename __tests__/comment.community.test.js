@@ -212,7 +212,7 @@ describe("Comment Service", () => {
   });
 
   describe("getComments()", () => {
-    it("should successfully return comments for an article", async () => {
+    it("should successfully return comments for an article with likes and author info", async () => {
       models.Articles.findOne.mockResolvedValue({
         dataValues: {
           articleId: 1,
@@ -232,6 +232,9 @@ describe("Comment Service", () => {
               commentId: 1,
               content: "Test Comment",
               isAnonymous: false,
+              articleCommentLikes: [
+                { likedUserId: 10 }, // 첫 번째 댓글에 좋아요 1개
+              ],
             },
           },
           {
@@ -244,19 +247,21 @@ describe("Comment Service", () => {
               commentId: 2,
               content: "Another Comment",
               isAnonymous: true,
+              articleCommentLikes: [], // 두 번째 댓글에 좋아요 없음
             },
           },
         ],
       });
-
+    
       const result = await commentService.getComments({
         communityId: 4,
         articleId: 1,
+        userId: 10, // 현재 사용자 ID (좋아요 여부 확인용)
       });
-
+    
       // 반환된 댓글 개수 검증
       expect(result.comments).toHaveLength(2);
-
+    
       // 첫 번째 댓글 검증
       expect(result.comments[0].commentId).toBe(1);
       expect(result.comments[0].content).toBe("Test Comment");
@@ -264,14 +269,18 @@ describe("Comment Service", () => {
       expect(result.comments[0].authorInfo.userId).toBe(5);
       expect(result.comments[0].authorInfo.nickname).toBe("CommentUser1");
       expect(result.comments[0].authorInfo.profileImage).toContain("commentProfile1.jpg");
-
+      expect(result.comments[0].isLikedByUser).toBe(true); // 현재 사용자(10)가 좋아요를 눌렀음
+      expect(result.comments[0].commentLikesCount).toBe(1); // 좋아요 개수 검증
+    
       // 두 번째 댓글 검증
       expect(result.comments[1].commentId).toBe(2);
       expect(result.comments[1].content).toBe("Another Comment");
       expect(result.comments[1].isAnonymous).toBe(true);
-      expect(result.comments[1].authorInfo.userId).toBeNull();
-      expect(result.comments[1].authorInfo.nickname).toBeNull();
-      expect(result.comments[1].authorInfo.profileImage).toBeNull();
+      expect(result.comments[1].authorInfo.userId).toBe(6);
+      expect(result.comments[1].authorInfo.nickname).toBe("CommentUser2");
+      expect(result.comments[1].authorInfo.profileImage).toBe("commentProfile2.jpg");
+      expect(result.comments[1].isLikedByUser).toBe(false); // 좋아요 없음
+      expect(result.comments[1].commentLikesCount).toBe(0); // 좋아요 개수 검증
     });
 
     it("should throw NotExistsError if the article does not exist", async () => {
