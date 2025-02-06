@@ -23,10 +23,11 @@ export const createCommunity = async (req, res, next) => {
 export const getArticleById = async (req, res, next) => {
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
-
+    const userId = req.user ? req.user.userId : null;  // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
     const article = await articleCrudService.getArticleById({
       communityId,
       articleId,
+      userId,
     }); // 게시글 조회
 
     // 게시글이 존재하는 경우

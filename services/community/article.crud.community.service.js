@@ -53,7 +53,7 @@ export const createCommunity = async ({ communityName }) => {
 /**
  * communityId와 articleId에 해당하는 게시글을 가져옵니다
  */
-export const getArticleById = async ({ communityId, articleId }) => {
+export const getArticleById = async ({ communityId, articleId, userId }) => {
   // 게시글 조회 및 댓글 포함
   const data = await models.Articles.findOne({
     where: {
@@ -70,12 +70,22 @@ export const getArticleById = async ({ communityId, articleId }) => {
             as: "author",
             attributes: ["userId", "nickname", "profileImage"], // 댓글 작성자의 정보만 선택
           },
+          {
+            model: models.ArticleCommentLikes,  // 댓글 좋아요 모델 추가
+            as: "articleCommentLikes",
+            attributes: ["likedUserId"], // 좋아요를 누른 사용자 ID
+          },
         ],
       },
       {
         model: models.ArticleImages,
         as: "articleImages",
-        attributes: ["imageUrl", "sequence"], // 필요한 필드만 가져오기
+        attributes: ["imageUrl", "sequence"],
+      },
+      {
+        model: models.ArticleLikes,  // 게시글 좋아요 모델 추가
+        as: "articleLikes",
+        attributes: ["likedUserId"],
       },
       {
         model: models.Users,
@@ -86,16 +96,11 @@ export const getArticleById = async ({ communityId, articleId }) => {
   });
 
   if (!data) {
-    // 게시글이 존재하지 않는 경우
     logger.error(
       `[getArticleById] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
     );
     throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
   }
-
-  // 게시글 데이터와 댓글 데이터를 분리
-  // const { articleComments, articleImages, ...articleData } =
-  //   data;
 
   // STATIC_FILE_BASE_URL 추가
   const transformedImages = data.articleImages.map((image) => ({
@@ -103,21 +108,31 @@ export const getArticleById = async ({ communityId, articleId }) => {
     sequence: image.sequence,
   }));
 
-  // 댓글 정보에 댓글 작성자 정보 추가 및 중복된 author 제거
+  // 게시글에 대한 좋아요 여부 추가
+  const isArticleLikedByUser = userId
+    ? data.articleLikes.some((like) => like.likedUserId === userId)
+    : false;
+
+  // 댓글 정보에 좋아요 여부 및 작성자 정보 추가
   const transformedComments = data.articleComments.map((comment) => {
-    const { author, ...commentData } = comment.dataValues; // author 제거
+    const { author, articleCommentLikes, ...commentData } = comment.dataValues;
+
+    // 댓글 좋아요 여부 확인
+    const isCommentLikedByUser = userId
+      ? articleCommentLikes.some((like) => like.likedUserId === userId)
+      : false;
+
     return {
       authorInfo: author,
+      isLikedByUser: isCommentLikedByUser,
       ...commentData,
     };
   });
 
-  // author, article 데이터 분리
+  // 게시글의 작성자 정보 및 익명 처리
   const { author, ...articleData } = data.dataValues;
-
   let transformedAuthorInfo = author;
 
-  // 익명 상태일 경우 작성자 정보를 null로 설정
   if (articleData.isAnonymous === true) {
     transformedAuthorInfo = {
       nickname: null,
@@ -125,7 +140,6 @@ export const getArticleById = async ({ communityId, articleId }) => {
       authorId: null,
     };
 
-    // 모든 댓글의 작성자 정보도 null로 설정
     transformedComments.forEach((comment) => {
       if (comment.isAnonymous === true) {
         comment.authorInfo = {
@@ -139,11 +153,12 @@ export const getArticleById = async ({ communityId, articleId }) => {
 
   const ret = {
     authorInfo: transformedAuthorInfo,
+    isLikedByUser: isArticleLikedByUser,
     ...articleData,
     articleComments: transformedComments,
     articleImages: transformedImages,
   };
-  // 결과 반환
+
   return ret;
 };
 

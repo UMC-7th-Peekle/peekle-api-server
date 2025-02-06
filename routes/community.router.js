@@ -57,6 +57,7 @@ router.get(
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글을 가져옵니다
 router.get(
   "/:communityId/articles/:articleId",
+  autheticateAccessTokenIfExists,
   articleCrudController.getArticleById
 );
 
