@@ -34,8 +34,7 @@ export const seedEventLocationGroup = async () => {
     await models.sequelize.query("SET foreign_key_checks = 1;");
 
     await models.EventLocationGroups.bulkCreate(
-      groups,
-      { logging: false }.map((group) => ({ name: group }))
+      groups.map((group) => ({ name: group }))
     );
     logger.warn("[Seeding] EventLocationGroups Seeding", {
       action: "seed:eventLocationGroups",
