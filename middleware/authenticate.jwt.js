@@ -112,3 +112,60 @@ export const authenticateRefreshToken = async (req, res, next) => {
   // 성공적으로 통과
   next();
 };
+
+
+/**
+ * 로그인된 경우에만 사용자 권한을 검증하는 미들웨어
+ */
+export const autheticateAccessTokenIfExists = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    logger.debug("Authorization 헤더가 제공되지 않았습니다.");
+    return next();
+  }
+
+  if (authHeader.startsWith("Bearer ")) {
+    const token = authHeader.split(" ")[1];
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+      if (err) {
+        logger.debug("JWT 토큰 검증 실패", {
+          action: "token:authenticate",
+          message: err.message,
+        });
+
+        // if (err.name === "TokenExpiredError") {
+        //   return next();
+        // } else if (err.name === "JsonWebTokenError") {
+        //   return next();
+        // } else if (err.name === "NotBeforeError") {
+        //   return next();
+        // } else {
+        //   return next();
+        // }
+
+        req.user = {
+          userId: null,
+        };
+        return next();
+      }
+
+      logger.debug("JWT 토큰 검증 성공", {
+        action: "token:authenticate",
+        actionType: "success",
+        userId: user.userId,
+      });
+
+      req.user = {
+        userId: user.userId,
+      }; // 검증된 사용자 정보를 요청 객체에 추가
+      next();
+    });
+  } else {
+    req.user = {
+      userId: null,
+    };
+    return next();
+  }
+};
