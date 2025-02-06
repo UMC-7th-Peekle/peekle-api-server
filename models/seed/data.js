@@ -1,3 +1,5 @@
+import config from "../../config.json" with { type: "json" };
+
 export const getRandomNumber = (n) => Math.floor(Math.random() * n) + 1;
 export const getRandomArticleContent = () => {
   return articleContentSample[getRandomNumber(articleContentSample.length) - 1];
@@ -107,3 +109,8 @@ export const commentContentSample = [
   "피자에 피클 먹고 싶다",
   "비오는 날에는 코딩을",
 ];
+
+export const userSample = config.SEEDER.USER.map((user) => ({
+  ...user,
+  profileImage: config.PEEKLE.DEFAULT_PROFILE_IMAGE,
+}));
