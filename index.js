@@ -33,7 +33,7 @@ import swaggerUi from "swagger-ui-express";
 
 // Router import , /routes/index.js에서 Router들을 1차적으로 모아서 export 합니다.
 import routers from "./routes/index.js";
-import { swaggerDoc, swaggerUiOptions } from "./routes/swagger.index.js";
+import { swaggerDoc, swaggerUiOptions } from "./utils/swagger/index.js";
 import path from "path";
 
 // __dirname을 사용하기 위한 설정
