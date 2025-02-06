@@ -13,12 +13,11 @@ import {
   groups,
   terms,
   community,
-  articleContentSample,
-  commentContentSample,
   getRandomNumber,
   getRandomArticleContent,
   getRandomCommentContent,
   gacha,
+  userSample,
 } from "./data.js";
 
 export const seedEventLocationGroup = async () => {
@@ -34,8 +33,7 @@ export const seedEventLocationGroup = async () => {
     await models.sequelize.query("SET foreign_key_checks = 1;");
 
     await models.EventLocationGroups.bulkCreate(
-      groups,
-      { logging: false }.map((group) => ({ name: group }))
+      groups.map((group) => ({ name: group }))
     );
     logger.warn("[Seeding] EventLocationGroups Seeding", {
       action: "seed:eventLocationGroups",
@@ -184,7 +182,7 @@ export const seedCommunity = async () => {
           },
         });
         // console.log(articles);
-        await models.Articles.bulkCreate(articles);
+        await models.Articles.bulkCreate(articles, { logging: false });
         // console.log(ret);
         articles = [];
       } else if (articles.length === CREATE_ARTICLE_COUNT) {
@@ -196,7 +194,7 @@ export const seedCommunity = async () => {
             queryCount: QUERY_COUNT,
           },
         });
-        await models.Articles.bulkCreate(articles);
+        await models.Articles.bulkCreate(articles, { logging: false });
         articles = [];
       }
     }
@@ -229,7 +227,7 @@ export const seedCommunity = async () => {
             queryCount: QUERY_COUNT,
           },
         });
-        await models.ArticleLikes.bulkCreate(articleLikes);
+        await models.ArticleLikes.bulkCreate(articleLikes, { logging: false });
         CREATED_ARTICLE_LIKE_COUNT += articleLikes.length;
         articleLikes = [];
       } else if (i === CREATE_ARTICLE_COUNT) {
@@ -241,7 +239,7 @@ export const seedCommunity = async () => {
             queryCount: QUERY_COUNT,
           },
         });
-        await models.ArticleLikes.bulkCreate(articleLikes);
+        await models.ArticleLikes.bulkCreate(articleLikes, { logging: false });
         CREATED_ARTICLE_LIKE_COUNT += articleLikes.length;
         articleLikes = [];
       }
@@ -369,7 +367,9 @@ export const seedCommunity = async () => {
             queryCount: QUERY_COUNT,
           },
         });
-        await models.ArticleCommentLikes.bulkCreate(commentLikes);
+        await models.ArticleCommentLikes.bulkCreate(commentLikes, {
+          logging: false,
+        });
         CREATED_COMMENT_LIKE_COUNT += commentLikes.length;
         commentLikes = [];
         console.log(
@@ -384,7 +384,9 @@ export const seedCommunity = async () => {
             queryCount: QUERY_COUNT,
           },
         });
-        await models.ArticleCommentLikes.bulkCreate(commentLikes);
+        await models.ArticleCommentLikes.bulkCreate(commentLikes, {
+          logging: false,
+        });
         CREATED_COMMENT_LIKE_COUNT += commentLikes.length;
         commentLikes = [];
       }
@@ -406,5 +408,21 @@ export const seedCommunity = async () => {
     });
   } catch (error) {
     throw error;
+  }
+};
+
+export const seedUsers = async () => {
+  try {
+    await models.Users.destroy({
+      where: {},
+    });
+
+    await models.sequelize.query("SET foreign_key_checks = 0;");
+    await models.sequelize.query("TRUNCATE TABLE users;");
+    await models.sequelize.query("SET foreign_key_checks = 1;");
+
+    await models.Users.bulkCreate(userSample, { logging: false });
+  } catch (err) {
+    throw err;
   }
 };
