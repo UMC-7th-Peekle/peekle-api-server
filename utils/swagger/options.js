@@ -1,3 +1,5 @@
+import config from "../../config.json" with { type: "json" };
+
 export const tags = [
   // {
   //   name: "Admin",
@@ -29,20 +31,22 @@ export const tags = [
   // },
 ];
 
-export const servers = [
-  {
-    url: "https://test2.shop:41021", // API 서버 URL
-    description: "Main Server",
-  },
-  {
-    url: "https://test2.shop:41021", // API 서버 URL
-    description: "Develop Server",
-  },
-  {
-    url: "https://localhost:7777", // API 서버 URL
-    description: "Local Server",
-  },
-];
+// export const servers = [
+//   {
+//     url: "https://test2.shop:41021", // API 서버 URL
+//     description: "Main Server",
+//   },
+//   {
+//     url: "https://test2.shop:41021", // API 서버 URL
+//     description: "Develop Server",
+//   },
+//   {
+//     url: "https://localhost:7777", // API 서버 URL
+//     description: "Local Server",
+//   },
+// ];
+
+export const servers = config.SWAGGER.SERVERS;
 
 const description = `
 ![image](https://github.com/user-attachments/assets/3e95d821-7a5c-4594-953e-e2f7a2c9a30f)
