@@ -108,26 +108,29 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     sequence: image.sequence,
   }));
 
-  // 게시글에 대한 좋아요 여부 추가
+  // 게시글 좋아요 여부 및 좋아요 개수
   const isArticleLikedByUser = userId
     ? data.articleLikes.some((like) => like.likedUserId === userId)
     : false;
+  const articleLikesCount = data.articleLikes.length;
 
-  // 댓글 정보에 좋아요 여부 및 작성자 정보 추가
+  // 댓글 정보에 좋아요 여부, 좋아요 개수 및 작성자 정보 추가
   const transformedComments = data.articleComments.map((comment) => {
     const { author, articleCommentLikes, ...commentData } = comment.dataValues;
 
-    // 댓글 좋아요 여부 확인
     const isCommentLikedByUser = userId
       ? articleCommentLikes.some((like) => like.likedUserId === userId)
       : false;
+    const commentLikesCount = articleCommentLikes.length;
 
     return {
       authorInfo: author,
       isLikedByUser: isCommentLikedByUser,
+      commentLikesCount,  // 댓글 좋아요 개수
       ...commentData,
     };
   });
+
 
   // 게시글의 작성자 정보 및 익명 처리
   const { author, ...articleData } = data.dataValues;
@@ -154,6 +157,7 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
   const ret = {
     authorInfo: transformedAuthorInfo,
     isLikedByUser: isArticleLikedByUser,
+    articleLikesCount,
     ...articleData,
     articleComments: transformedComments,
     articleImages: transformedImages,
