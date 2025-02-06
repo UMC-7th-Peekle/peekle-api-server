@@ -6,6 +6,7 @@ import notices from "./notices.path.js";
 import tests from "./tests.path.js";
 import tickets from "./tickets.path.js";
 import users from "./users.path.js";
+import erros from "./errors.path.js";
 
 export const paths = {
   ...admin,
@@ -16,4 +17,5 @@ export const paths = {
   ...tests,
   ...tickets,
   ...users,
+  ...erros,
 };

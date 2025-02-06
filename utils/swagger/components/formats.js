@@ -49,28 +49,28 @@ const responseContent = {
 };
 
 const generalResponse = {
-  200: {
-    description: "요청이 성공하였습니다.",
-    content: responseContent,
+  "2XX": {
+    description: `요청이 **성공**하였습니다.  
+- **200**: 요청이 성공적으로 처리되었습니다.  
+- **201**: 요청이 성공적으로 처리되었으며, 새로운 리소스가 생성되었습니다.`,
+    // content: responseContent,
   },
-  400: {
-    description: "잘못된 요청입니다.",
+  "4XX": {
+    description: `요청이 잘못되거나 실패하였습니다.  
+상세 내용은 **error** 관련 노션을 참고해주시고, 대표적인 사유는 다음과 같습니다.    
+- **400**: 잘못된 요청입니다.  
+- **401**: 인증이 필요합니다.  
+- **403**: 접근이 금지되었습니다.  
+- **404**: 요청한 리소스를 찾을 수 없습니다.`,
+    // content: responseContent,
   },
-  401: {
-    description: "요청에 인증 정보가 제공되지 않았습니다.",
-  },
-  403: {
-    description: "제공된 인증 정보의 주체는 해당 요청에 대한 권한이 없습니다.",
-  },
-  404: {
-    description: "요청한 리소스를 찾을 수 없습니다.",
-  },
-  409: {
-    description: "요청한 리소스가 이미 존재합니다.",
-  },
-  500: {
-    description:
-      "`UNHANDLED_ERROR`가 발생한 경우, 반드시 Backend Team에 전달해주세요.",
+  "5XX": {
+    description: `예상되지 않던 동작이거나, 연관된 서비스들에 문제가 발생하였습니다.    
+\`UNHANDLED_ERROR\` 발생 시 BE Team에게 전달 부탁드립니다.    
+- **500**: 서버 내부 오류입니다.  
+- **502**: 잘못된 게이트웨이입니다.  
+- **503**: 서비스 이용이 불가능합니다.`,
+    // content: responseContent,
   },
 };
 

@@ -40,12 +40,12 @@ export const swaggerDoc = {
     requestBodies: requestBodies,
     responses: responses,
     parameters: parameters,
-    examples: {},
-    headers: {},
-    links: {},
+    // examples: {},
+    // headers: {},
+    // links: {},
   },
   paths: paths,
-  webhooks: {},
+  // webhooks: {},
 };
 
 export const swaggerUiOptions = {
