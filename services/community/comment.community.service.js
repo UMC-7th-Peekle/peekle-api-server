@@ -174,7 +174,7 @@ export const createCommentReply = async ({
 /**
  * communityId, articleId에 해당하는 댓글 목록을 조회합니다
  */
-export const getComments = async ({ communityId, articleId }) => {
+export const getComments = async ({ communityId, articleId, userId }) => {
   const articleWithComments = await models.Articles.findOne({
     where: {
       communityId,
@@ -190,11 +190,15 @@ export const getComments = async ({ communityId, articleId }) => {
             as: "author",
             attributes: ["userId", "nickname", "profileImage"],
           },
+          {
+            model: models.ArticleCommentLikes, // 댓글 좋아요 모델 추가
+            as: "articleCommentLikes",
+            attributes: ["likedUserId"], // 좋아요를 누른 사용자 ID
+          },
         ],
       },
     ],
   });
-
 
   // 게시글이 없는 경우 404 에러 반환
   if (!articleWithComments) {
@@ -204,19 +208,21 @@ export const getComments = async ({ communityId, articleId }) => {
     throw new NotExistsError("게시글이 존재하지 않습니다");
   }
 
+  // 댓글 정보에 좋아요 여부 및 작성자 정보 추가
+  const transformedComments = articleWithComments.articleComments.map((comment) => {
+    const { author, articleCommentLikes, ...commentData } = comment.dataValues;
 
-  // 댓글 데이터 변환
-  const transformedComments = articleWithComments.articleComments.map(
-    (comment) => {
-      const { author, ...commentData } = comment.dataValues;
-      return {
-        authorInfo: comment.dataValues.isAnonymous
-          ? { nickname: null, profileImage: null, userId: null }
-          : author,
-        ...commentData,
-      };
-    }
-  );
+    // 댓글 좋아요 여부 확인
+    const isCommentLikedByUser = userId
+      ? articleCommentLikes.some((like) => like.likedUserId === userId)
+      : false;
+
+    return {
+      authorInfo: author,
+      isLikedByUser: isCommentLikedByUser,
+      ...commentData,
+    };
+  });
 
   return {
     comments: transformedComments,

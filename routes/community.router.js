@@ -10,7 +10,10 @@ import * as articleAggregateController from "../controllers/community/article.ag
 import * as articleValidator from "../utils/validators/community/article.validators.js";
 
 // 사용자 인증 미들웨어 (추후 네임스페이스 방식으로 변경 필요)
-import { authenticateAccessToken, autheticateAccessTokenIfExists } from "../middleware/authenticate.jwt.js";
+import {
+  authenticateAccessToken,
+  autheticateAccessTokenIfExists,
+} from "../middleware/authenticate.jwt.js";
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
 import { validateRequestBody } from "../middleware/validate.js";
 import * as aritcleSchema from "../utils/validators/community/article.validators.js";
@@ -33,7 +36,11 @@ router.post(
 */
 
 // communityId에 해당하는 게시판의 게시글들을 가져옵니다, 좋아요 누른 게시글만 가져올 수도 있습니다
-router.get("/", autheticateAccessTokenIfExists, articleReadController.getArticles);
+router.get(
+  "/",
+  autheticateAccessTokenIfExists,
+  articleReadController.getArticles
+);
 router.get(
   "/article/like",
   authenticateAccessToken,
@@ -126,7 +133,11 @@ router.delete(
 */
 
 // communityId에 해당하는 게시판의 articleId에 해당하는 게시글의 댓글 정보를 가져옵니다.
-router.get("/articles/comments", commentController.getComments);
+router.get(
+  "/articles/comments",
+  autheticateAccessTokenIfExists,
+  commentController.getComments
+);
 
 // article에 댓글을 추가합니다.
 router.post(
