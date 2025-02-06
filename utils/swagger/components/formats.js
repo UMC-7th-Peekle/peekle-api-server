@@ -48,6 +48,46 @@ const responseContent = {
   },
 };
 
+/**
+ * Response 형식에 맞게 응답 예시를 반환해줍니다.
+ *
+ * resultType, error, success에 해당하는 값만 넣어주시면 됩니다.
+ *
+ * @param {{
+ *   resultType: boolean,
+ *   error: Object | null,
+ *   success: Object | null
+ * }} params - 응답 예시를 위한 매개변수
+ * @returns {Object} Swagger 문서화를 위한 응답 예시 폼
+ */
+export const responseExampleForm = ({ resultType, error, success }) => {
+  return {
+    "application/json": {
+      schema: {
+        type: "object",
+        properties: {
+          resultType: {
+            type: "string",
+            example: resultType ? "SUCCESS" : "FAIL",
+            description: "요청 결과의 타입입니다.",
+          },
+          error: {
+            type: ["object", "null"],
+            example: error,
+            description: "요청이 실패했을 경우 message 및 data가 반환됩니다.",
+          },
+          success: {
+            type: ["object", "null"],
+            example: success,
+            description: "요청이 성공했을 경우 message 및 data가 반환됩니다.",
+            properties: {},
+          },
+        },
+      },
+    },
+  };
+};
+
 const generalResponse = {
   "2XX": {
     description: `요청이 **성공**하였습니다.  
@@ -74,6 +114,9 @@ const generalResponse = {
   },
 };
 
+/**
+ * 각 엔드포인트에 대한 문서화를 위한 기본 형식을 반환합니다.
+ */
 export const swaggerFormat = ({
   tag,
   operationId,
