@@ -208,22 +208,22 @@ export const getComments = async ({ communityId, articleId, userId }) => {
     throw new NotExistsError("게시글이 존재하지 않습니다");
   }
 
-  // 댓글 정보에 좋아요 여부 및 작성자 정보 추가
+  // 댓글 정보에 좋아요 여부, 좋아요 개수 및 작성자 정보 추가
   const transformedComments = articleWithComments.articleComments.map((comment) => {
     const { author, articleCommentLikes, ...commentData } = comment.dataValues;
 
-    // 댓글 좋아요 여부 확인
     const isCommentLikedByUser = userId
       ? articleCommentLikes.some((like) => like.likedUserId === userId)
       : false;
+    const commentLikesCount = articleCommentLikes.length;
 
     return {
       authorInfo: author,
       isLikedByUser: isCommentLikedByUser,
+      commentLikesCount, // 댓글 좋아요 개수
       ...commentData,
     };
   });
-
   return {
     comments: transformedComments,
   };
