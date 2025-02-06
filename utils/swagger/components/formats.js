@@ -22,32 +22,6 @@ const paramForm = (multiplePaths) => {
   });
 };
 
-const responseContent = {
-  "application/json": {
-    schema: {
-      type: "object",
-      properties: {
-        resultType: {
-          type: "string",
-          example: "SUCCESS",
-          description: "요청 결과의 타입입니다.",
-        },
-        error: {
-          type: ["object", "null"],
-          example: null,
-          description: "요청이 실패했을 경우 message 및 data가 반환됩니다.",
-        },
-        success: {
-          type: ["object", "null"],
-          example: null,
-          description: "요청이 성공했을 경우 message 및 data가 반환됩니다.",
-          properties: {},
-        },
-      },
-    },
-  },
-};
-
 /**
  * Response 형식에 맞게 응답 예시를 반환해줍니다.
  *
@@ -73,12 +47,12 @@ export const responseExampleForm = ({ resultType, error, success }) => {
           },
           error: {
             type: ["object", "null"],
-            example: error,
+            example: error || null,
             description: "요청이 실패했을 경우 message 및 data가 반환됩니다.",
           },
           success: {
             type: ["object", "null"],
-            example: success,
+            example: success || null,
             description: "요청이 성공했을 경우 message 및 data가 반환됩니다.",
             properties: {},
           },
@@ -97,11 +71,12 @@ const generalResponse = {
   },
   "4XX": {
     description: `요청이 잘못되거나 실패하였습니다.  
-상세 내용은 **error** 관련 노션을 참고해주시고, 대표적인 사유는 다음과 같습니다.    
-- **400**: 잘못된 요청입니다.  
-- **401**: 인증이 필요합니다.  
-- **403**: 접근이 금지되었습니다.  
-- **404**: 요청한 리소스를 찾을 수 없습니다.`,
+상세 내용은 **error** 관련 노션 및 하단 필드를 참고해주시고,  
+대표적인 사유는 다음과 같습니다.    
+- **400**: 요청 형식이 잘못되었습니다.  
+- **401**: JWT Token 등 인증 정보가 제공되지 않았습니다.  
+- **403**: 해당 리소스에 접근권한이 부여되지 않은 인증 주체입니다.  
+- **404**: 요청한 리소스가 존재하지 않습니다.`,
     // content: responseContent,
   },
   "5XX": {
