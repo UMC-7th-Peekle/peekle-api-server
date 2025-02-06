@@ -41,7 +41,6 @@ import path from "path";
 import { getPathDetails } from "./utils/path.util.js"; // 유틸리티 파일의 경로에 맞게 설정
 
 const { __filename, __dirname } = getPathDetails();
-console.log("Static files served from:", __dirname);
 
 // Socket.io Router는 이 주석 아래에 import 해주시면 됩니다.
 // ex) const exampleSocketRouter = require("./routes/example.socket.router"); // commonJS
@@ -98,6 +97,7 @@ server.listen(PORT, "0.0.0.0", () => {
     action: "server:start",
   });
   console.log(serverStartMessage);
+  console.log("Static files served from:", __dirname);
 });
 
 // 상단에 socket.io import 주석을 해제하고 사용하시면 됩니다.
