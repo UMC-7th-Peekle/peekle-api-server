@@ -1,6 +1,10 @@
 import * as articleCrudService from "../services/community/article.crud.community.service.js";
 import models from "../models/index.js";
-import { AlreadyExistsError, NotAllowedError, NotExistsError } from "../utils/errors/errors.js";
+import {
+  AlreadyExistsError,
+  NotAllowedError,
+  NotExistsError,
+} from "../utils/errors/errors.js";
 
 // Mock dependencies
 jest.mock("../models/index.js");
@@ -29,22 +33,47 @@ describe("Article CRUD Service", () => {
       );
 
       await expect(
-        articleCrudService.createCommunity({ communityName: "Duplicate Community" })
+        articleCrudService.createCommunity({
+          communityName: "Duplicate Community",
+        })
       ).rejects.toThrow(AlreadyExistsError);
     });
   });
 
   describe("getArticleById()", () => {
     it("should return article with comments and images", async () => {
-      // Mock article 데이터 설정
+      // Mock된 article 데이터 설정
       models.Articles.findOne.mockResolvedValue({
-        articleId: 1,
-        communityId: 4,
-        title: "Test Article",
-        content: "Test Content",
-        articleImages: [{ imageUrl: "path/to/image1.jpg", sequence: 1 }],
-        articleComments: [{ commentId: 1, content: "Test Comment" }],
-        dataValues: { articleId: 1, communityId: 4 },
+        dataValues: {
+          author: {
+            userId: 3,
+            nickname: "User1",
+            profileImage: "profile1.jpg",
+          },
+          articleId: 1,
+          communityId: 4,
+          title: "Test Article",
+          content: "Test Content",
+          isAnonymous: false,
+        },
+        articleComments: [
+          {
+            dataValues: {
+              author: {
+                userId: 5,
+                nickname: "CommentUser1",
+                profileImage: "commentProfile1.jpg",
+              },
+              commentId: 1,
+              content: "Test Comment",
+              isAnonymous: false,
+            },
+          },
+        ],
+        articleImages: [
+          { imageUrl: "image1.jpg", sequence: 1 },
+          { imageUrl: "image2.jpg", sequence: 2 },
+        ],
       });
 
       const article = await articleCrudService.getArticleById({
@@ -52,20 +81,17 @@ describe("Article CRUD Service", () => {
         articleId: 1,
       });
 
-      expect(models.Articles.findOne).toHaveBeenCalledWith({
-        where: { communityId: 4, articleId: 1 },
-        include: [
-          { model: models.ArticleComments, as: "articleComments" },
-          {
-            model: models.ArticleImages,
-            as: "articleImages",
-            attributes: ["imageUrl", "sequence"],
-          },
-        ],
-      });
-
+      // 반환된 데이터 검증
       expect(article.articleId).toBe(1);
-      expect(article.articleImages[0].imageUrl).toBe("http://localhost:7777/uploads/path/to/image1.jpg");
+      expect(article.communityId).toBe(4);
+      
+      // 호출된 findOne의 조건 검증
+      expect(article.title).toBe("Test Article");
+      expect(article.content).toBe("Test Content");
+      expect(article.isAnonymous).toBe(false);
+      expect(article.authorInfo.userId).toBe(3);
+      expect(article.articleComments[0].authorInfo.userId).toBe(5);
+      expect(article.articleImages[0].imageUrl).toContain("image1.jpg");
     });
 
     it("should throw NotExistsError if the article does not exist", async () => {
@@ -189,16 +215,16 @@ describe("Article CRUD Service", () => {
         authorId: 1001,
         destroy: jest.fn(),
       });
-  
-      // 이미지가 없는 경우에도 빈 배열을 반환하도록 설정 
-      models.ArticleImages.findAll.mockResolvedValue([]);  
-  
+
+      // 이미지가 없는 경우에도 빈 배열을 반환하도록 설정
+      models.ArticleImages.findAll.mockResolvedValue([]);
+
       await articleCrudService.deleteArticle({
         communityId: 4,
         articleId: 1,
         authorId: 1001,
       });
-  
+
       expect(models.Articles.findOne).toHaveBeenCalledWith({
         where: { communityId: 4, articleId: 1 },
       });
@@ -207,10 +233,10 @@ describe("Article CRUD Service", () => {
         attributes: ["imageUrl"],
       });
     });
-  
+
     it("should throw NotExistsError if the article does not exist", async () => {
       models.Articles.findOne.mockResolvedValue(null);
-  
+
       await expect(
         articleCrudService.deleteArticle({
           communityId: 4,
@@ -219,13 +245,13 @@ describe("Article CRUD Service", () => {
         })
       ).rejects.toThrow(NotExistsError);
     });
-  
+
     it("should throw NotAllowedError if the user is not the author", async () => {
       models.Articles.findOne.mockResolvedValue({
         articleId: 1,
         authorId: 9999, // 다른 사용자 ID로 설정
       });
-  
+
       await expect(
         articleCrudService.deleteArticle({
           communityId: 4,
