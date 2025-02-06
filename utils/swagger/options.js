@@ -31,11 +31,11 @@ export const tags = [
 
 export const servers = [
   {
-    url: "https://test.shop:41021", // API 서버 URL
+    url: "https://test2.shop:41021", // API 서버 URL
     description: "Main Server",
   },
   {
-    url: "https://test.shop:41021", // API 서버 URL
+    url: "https://test2.shop:41021", // API 서버 URL
     description: "Develop Server",
   },
   {
