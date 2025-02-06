@@ -71,7 +71,7 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
             attributes: ["userId", "nickname", "profileImage"], // 댓글 작성자의 정보만 선택
           },
           {
-            model: models.ArticleCommentLikes,  // 댓글 좋아요 모델 추가
+            model: models.ArticleCommentLikes, // 댓글 좋아요 모델 추가
             as: "articleCommentLikes",
             attributes: ["likedUserId"], // 좋아요를 누른 사용자 ID
           },
@@ -83,7 +83,7 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
         attributes: ["imageUrl", "sequence"],
       },
       {
-        model: models.ArticleLikes,  // 게시글 좋아요 모델 추가
+        model: models.ArticleLikes, // 게시글 좋아요 모델 추가
         as: "articleLikes",
         attributes: ["likedUserId"],
       },
@@ -126,14 +126,16 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     return {
       authorInfo: author,
       isLikedByUser: isCommentLikedByUser,
-      commentLikesCount,  // 댓글 좋아요 개수
+      commentLikesCount, // 댓글 좋아요 개수
       ...commentData,
     };
   });
 
+  // 댓글 개수 계산
+  const commentsCount = data.articleComments.length;
 
   // 게시글의 작성자 정보 및 익명 처리
-  const { author, ...articleData } = data.dataValues;
+  const { author, articleLikes, ...articleData } = data.dataValues;
   let transformedAuthorInfo = author;
 
   if (articleData.isAnonymous === true) {
@@ -158,6 +160,7 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     authorInfo: transformedAuthorInfo,
     isLikedByUser: isArticleLikedByUser,
     articleLikesCount,
+    commentsCount,
     ...articleData,
     articleComments: transformedComments,
     articleImages: transformedImages,
