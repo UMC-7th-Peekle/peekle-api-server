@@ -311,7 +311,7 @@ export const getComments = async ({ communityId, articleId, userId }) => {
   // 댓글 정보에 좋아요 여부, 좋아요 개수 및 작성자 정보 추가
   const transformedComments = articleWithComments.articleComments.map(
     (comment) => {
-      const { author, articleCommentLikes, ...commentData } =
+      const { author, articleCommentLikes, status, content, ...commentData } =
         comment.dataValues;
 
       const isCommentLikedByUser = userId
@@ -319,10 +319,15 @@ export const getComments = async ({ communityId, articleId, userId }) => {
         : false;
       const commentLikesCount = articleCommentLikes.length;
 
+      // status가 'deleted'인 경우 content를 빈 문자열로 설정
+      const processedContent = status === "deleted" ? "" : content;
+
       return {
-        authorInfo: author,
+        authorInfo: status === "deleted" ? null : author, // 삭제된 경우 작성자 정보 숨김
         isLikedByUser: isCommentLikedByUser,
-        commentLikesCount, // 댓글 좋아요 개수
+        commentLikesCount: status === "deleted" ? 0 : commentLikesCount,
+        content: processedContent,
+        status, // 상태 정보도 포함해 응답
         ...commentData,
       };
     }

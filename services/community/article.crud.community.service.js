@@ -116,17 +116,23 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
 
   // 댓글 정보에 좋아요 여부, 좋아요 개수 및 작성자 정보 추가
   const transformedComments = data.articleComments.map((comment) => {
-    const { author, articleCommentLikes, ...commentData } = comment.dataValues;
+    const { author, articleCommentLikes, status, content, ...commentData } =
+      comment.dataValues;
 
     const isCommentLikedByUser = userId
       ? articleCommentLikes.some((like) => like.likedUserId === userId)
       : false;
     const commentLikesCount = articleCommentLikes.length;
 
+    // status가 'deleted'인 경우 content를 빈 문자열로 설정
+    const processedContent = status === "deleted" ? "" : content;
+
     return {
-      authorInfo: author,
+      authorInfo: status === "deleted" ? null : author,
       isLikedByUser: isCommentLikedByUser,
-      commentLikesCount, // 댓글 좋아요 개수
+      commentLikesCount: status === "deleted" ? 0 : commentLikesCount, 
+      content: processedContent,
+        status, // 상태 정보도 포함해 응답
       ...commentData,
     };
   });
