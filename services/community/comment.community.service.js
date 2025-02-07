@@ -26,6 +26,11 @@ export const createComment = async ({
     },
   });
 
+  // 테스트 코드에서 Mock으로 처리하는 부분은 DB의 FK 제약을 테스트하기 어려우므로 이 부분 다시 추가
+  if (!article) {
+    throw new NotExistsError("해당 게시글이 존재하지 않습니다");
+  }
+
   let comment;
   /* try-catch 블록 외부에서 comment 선언
   try-catch 블록 내부에서 comment를 생성하고 반환하면
@@ -179,9 +184,17 @@ export const getComments = async ({ communityId, articleId }) => {
       {
         model: models.ArticleComments,
         as: "articleComments",
+        include: [
+          {
+            model: models.Users,
+            as: "author",
+            attributes: ["userId", "nickname", "profileImage"],
+          },
+        ],
       },
     ],
   });
+
 
   // 게시글이 없는 경우 404 에러 반환
   if (!articleWithComments) {
@@ -191,6 +204,21 @@ export const getComments = async ({ communityId, articleId }) => {
     throw new NotExistsError("게시글이 존재하지 않습니다");
   }
 
-  // 댓글만 반환
-  return { comments: articleWithComments.articleComments };
+
+  // 댓글 데이터 변환
+  const transformedComments = articleWithComments.articleComments.map(
+    (comment) => {
+      const { author, ...commentData } = comment.dataValues;
+      return {
+        authorInfo: comment.dataValues.isAnonymous
+          ? { nickname: null, profileImage: null, userId: null }
+          : author,
+        ...commentData,
+      };
+    }
+  );
+
+  return {
+    comments: transformedComments,
+  };
 };

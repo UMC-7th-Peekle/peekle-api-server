@@ -106,7 +106,7 @@ export const getArticles = async (
   // console.log(
   //   `communityId: ${communityId}, query: ${query}, limit: ${limit}, cursor: ${cursor}`
   // );
-  // console.log(community);
+  // console.log(community.dataValues.articles[0].dataValues.author.dataValues.profileImage);
 
   if (!community) {
     // 결과값이 존재하지 않는 경우
@@ -119,7 +119,7 @@ export const getArticles = async (
   }
 
   // 게시글만 추출
-  const articles = community.articles;
+  const articles = community.dataValues.articles; // dataValues가 빠져 있어서 오류 발생했었음
 
   // 좋아요, 댓글 수 및 썸네일만을 반환하도록 가공
   articles.map((article) => {
@@ -127,23 +127,37 @@ export const getArticles = async (
     article.articleComments = article.articleComments.length; // 댓글 개수만 추출
     article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
     if (article.articleImages.length > 0) {
-      article.articleImages = addBaseUrl(article.articleImages[0].imageUrl); // 대표 이미지 URL
+      article.articleImages = addBaseUrl(
+        article.articleImages[0].dataValues.imageUrl
+      ); // 대표 이미지 URL
+      // dataValues가 빠져 있어서 오류 발생했었음
     } else {
       article.articleImages = null;
     }
     article.thumbnail = article.articleImages;
     delete article.articleImages;
 
-    // 작성자 정보
-    article.author = article.author.dataValues;
-    article.author.profileImage = addBaseUrl(article.author.profileImage);
+    // 작성자 정보 처리
+    if (article.isAnonymous === true) {
+      // 익명 상태면 모든 작성자 정보를 null로 설정
+      // test 코드를 위해서 authorInfo 자체를 null로 보내는 것이 아닌 각각을 null로 설정
+      article.authorInfo = {
+        nickname: null,
+        profileImage: null,
+        authorId: null,
+      };
+      
+    } else {
+      article.author = article.author.dataValues;
+      article.author.profileImage = addBaseUrl(article.author.profileImage);
 
-    // author.userId를 authorId로 변경
-    article.author.authorId = article.author.userId;
-    delete article.author.userId;
+      // author.userId를 authorId로 변경
+      article.author.authorId = article.author.userId;
+      delete article.author.userId;
 
-    // author를 authorInfo로 변경
-    article.authorInfo = article.author;
+      // author를 authorInfo로 변경
+      article.authorInfo = article.author;
+    }
     delete article.author;
   });
 
@@ -215,9 +229,14 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
         separate: true, // 좋아요 수 계산을 위해 쿼리를 분리
         required: false,
       },
+      {
+        model: models.Users,
+        as: "author",
+        attributes: ["userId", "nickname", "profileImage"], // 필요한 필드만 가져오기
+        required: true,
+      },
     ],
   });
-
   // 좋아요, 댓글 수 및 썸네일만을 반환하도록 가공
   likedArticles.map((article) => {
     // console.log(article);
@@ -225,12 +244,38 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
     article.articleComments = article.articleComments.length; // 댓글 개수만 추출
     article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
     if (article.articleImages.length > 0) {
-      article.articleImages = addBaseUrl(article.articleImages[0].imageUrl); // 대표 이미지 URL
+      article.articleImages = addBaseUrl(
+        article.articleImages[0].dataValues.imageUrl
+      ); // 대표 이미지 URL
+      // dataValues가 빠져 있어서 오류 발생했었음
     } else {
       article.articleImages = null;
     }
     article.thumbnail = article.articleImages;
     delete article.articleImages;
+
+    // 작성자 정보 처리
+    if (article.isAnonymous === true) {
+      // 익명 상태면 모든 작성자 정보를 null로 설정
+      // test 코드를 위해서 authorInfo 자체를 null로 보내는 것이 아닌 각각을 null로 설정
+      article.authorInfo = {
+        nickname: null,
+        profileImage: null,
+        authorId: null,
+      };
+      
+    } else {
+      article.author = article.author.dataValues;
+      article.author.profileImage = addBaseUrl(article.author.profileImage);
+
+      // author.userId를 authorId로 변경
+      article.author.authorId = article.author.userId;
+      delete article.author.userId;
+
+      // author를 authorInfo로 변경
+      article.authorInfo = article.author;
+    }
+    delete article.author;
   });
 
   // 다음 커서 설정

@@ -16,6 +16,7 @@ import {
   seedCommunity,
   seedEventLocationGroup,
   seedTerms,
+  seedUsers,
 } from "../models/seed/seeder.js";
 import { logError } from "../utils/handlers/error.logger.js";
 
@@ -33,6 +34,15 @@ router.get("/seed/:type", authenticateAccessToken, async (req, res, next) => {
         await seedTerms();
         break;
       case "community":
+        await seedCommunity();
+        break;
+      case "users":
+        await seedUsers();
+        break;
+      case "all":
+        await seedEventLocationGroup();
+        await seedTerms();
+        await seedUsers();
         await seedCommunity();
         break;
       default:

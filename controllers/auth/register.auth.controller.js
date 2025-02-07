@@ -92,7 +92,6 @@ export const getTerms = async (req, res, next) => {
   } catch (error) {
     logError(error);
     next(error);
-    포;
   }
 };
 

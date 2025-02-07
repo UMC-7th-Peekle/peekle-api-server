@@ -7,6 +7,9 @@ import {
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Sequelize } from "sequelize";
+import { Op, fn, col } from "sequelize";
+import { addBaseUrl } from "../../utils/upload/uploader.object.js";
+
 
 export const validateStatisticsQuery = (queries) => {
   const { startTime, endTime } = queries;
@@ -80,12 +83,77 @@ export const getPopularArticles = async (communityId, startTime, endTime) => {
         "commentCount",
       ],
     ],
+    include: [
+          {
+            model: models.ArticleComments,
+            as: "articleComments",
+            attributes: ["commentId"], // 댓글 정보
+            where: { status: { [Op.ne]: "deleted" } }, // 삭제된 댓글 제외
+            required: false, // 댓글이 없어도 Article은 가져옴
+          },
+          {
+            model: models.ArticleImages,
+            as: "articleImages",
+            attributes: ["imageUrl"], // 이미지 정보
+            where: { sequence: 1 }, // 특정 조건(대표 이미지)
+            required: false, // 이미지가 없어도 Article은 가져옴
+          },
+          {
+            model: models.ArticleLikes,
+            as: "articleLikes",
+            attributes: ["likedUserId"], // 좋아요 개수
+            separate: true, // 좋아요 수 계산을 위해 쿼리를 분리
+            required: false,
+          },
+          {
+            model: models.Users,
+            as: "author",
+            attributes: ["userId", "nickname", "profileImage"], // 필요한 필드만 가져오기
+            required: true,
+          },
+        ],
     order: [
       // 좋아요 수 + 댓글 수로 정렬
       [Sequelize.literal("(likeCount + commentCount)"), "DESC"],
     ],
     having: Sequelize.literal("(likeCount + commentCount) > 0"), // 합계가 0 초과인 게시글만 가져옴
     limit: 2, // 상위 2개만 가져옴
+  });
+
+  // 게시글 데이터 가공
+  popularArticles.map((article) => {
+    article = article.dataValues;
+    article.articleComments = article.articleComments.length; // 댓글 개수만 추출
+    article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
+    if (article.articleImages.length > 0) {
+      article.articleImages = addBaseUrl(
+        article.articleImages[0].dataValues.imageUrl
+      ); // 대표 이미지 URL
+      // dataValues가 빠져 있어서 오류 발생했었음
+    } else {
+      article.articleImages = null;
+    }
+    article.thumbnail = article.articleImages;
+    delete article.articleImages;
+
+
+    // 작성자 정보 가공
+    if (article.isAnonymous === true) {
+      article.authorInfo = {
+        nickname: null,
+        profileImage: null,
+        authorId: null,
+      };
+    } else {
+      article.author = article.author.dataValues;
+      article.author.profileImage = addBaseUrl(article.author.profileImage);
+      article.author.authorId = article.author.userId;
+      delete article.author.userId;
+
+      // 작성자 정보를 authorInfo로 변경
+      article.authorInfo = article.author;
+    }
+    delete article.author;
   });
 
   return { articles: popularArticles };

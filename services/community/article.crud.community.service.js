@@ -64,11 +64,23 @@ export const getArticleById = async ({ communityId, articleId }) => {
       {
         model: models.ArticleComments,
         as: "articleComments",
+        include: [
+          {
+            model: models.Users,
+            as: "author",
+            attributes: ["userId", "nickname", "profileImage"], // 댓글 작성자의 정보만 선택
+          },
+        ],
       },
       {
         model: models.ArticleImages,
         as: "articleImages",
         attributes: ["imageUrl", "sequence"], // 필요한 필드만 가져오기
+      },
+      {
+        model: models.Users,
+        as: "author",
+        attributes: ["userId", "nickname", "profileImage"],
       },
     ],
   });
@@ -91,8 +103,46 @@ export const getArticleById = async ({ communityId, articleId }) => {
     sequence: image.sequence,
   }));
 
-  const ret = { ...data.dataValues, articleImages: transformedImages };
+  // 댓글 정보에 댓글 작성자 정보 추가 및 중복된 author 제거
+  const transformedComments = data.articleComments.map((comment) => {
+    const { author, ...commentData } = comment.dataValues; // author 제거
+    return {
+      authorInfo: author,
+      ...commentData,
+    };
+  });
 
+  // author, article 데이터 분리
+  const { author, ...articleData } = data.dataValues;
+
+  let transformedAuthorInfo = author;
+
+  // 익명 상태일 경우 작성자 정보를 null로 설정
+  if (articleData.isAnonymous === true) {
+    transformedAuthorInfo = {
+      nickname: null,
+      profileImage: null,
+      authorId: null,
+    };
+
+    // 모든 댓글의 작성자 정보도 null로 설정
+    transformedComments.forEach((comment) => {
+      if (comment.isAnonymous === true) {
+        comment.authorInfo = {
+          nickname: null,
+          profileImage: null,
+          authorId: null,
+        };
+      }
+    });
+  }
+
+  const ret = {
+    authorInfo: transformedAuthorInfo,
+    ...articleData,
+    articleComments: transformedComments,
+    articleImages: transformedImages,
+  };
   // 결과 반환
   return ret;
 };
@@ -114,6 +164,11 @@ export const createArticle = async ({
       communityId,
     },
   });
+
+  // 테스트 코드에서 Mock으로 처리하는 부분은 DB의 FK 제약을 테스트하기 어려우므로 이 부분 다시 추가
+  if (!community) {
+    throw new NotExistsError("존재하지 않는 게시판입니다.");
+  }
 
   // 게시글 생성
   let article;

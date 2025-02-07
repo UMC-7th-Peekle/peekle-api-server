@@ -35,7 +35,8 @@ export const reportArticle = async ({
   });
 
   // 이미 신고한 경우: 409
-  if (isReported) {
+  // 기존 방식 if (isReported)는 조건에서 targetId에 대한 검증이 없어서 테스트 코드 적용이 어려웠음
+  if (isReported.targetId === articleId) {
     throw new AlreadyExistsError("이미 신고한 게시글입니다.");
   }
 
@@ -85,7 +86,8 @@ export const reportComment = async ({
   });
 
   // 이미 신고한 경우: 409
-  if (isReported) {
+  // 기존 방식 if (isReported)는 조건에서 targetId에 대한 검증이 없어서 테스트 코드 적용이 어려웠음
+  if (isReported.targetId === commentId) {
     logger.error(
       `[reportComment] 이미 신고한 댓글입니다 - articleId: ${articleId}, commentId: ${commentId}`
     );
