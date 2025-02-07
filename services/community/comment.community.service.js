@@ -103,7 +103,7 @@ export const updateComment = async ({
  */
 export const hasReplies = async (commentId) => {
   const replyCount = await models.ArticleComments.count({
-    where: { parent_comment_id: commentId },
+    where: { parentCommentId: commentId },
   });
   return replyCount > 0;
 };
@@ -169,8 +169,70 @@ export const softDeleteComment = async ({ articleId, commentId, authorId }) => {
   // 댓글 상태를 "deleted"로 변경
   await models.ArticleComments.update(
     { status: "deleted" },
-    { where: { comment_id: commentId } }
+    { where: { commentId: commentId } }
   );
+};
+
+/**
+ * communityId, articleId, commentId에 해당하는 댓글의 대댓글 ID를 조회합니다
+ */
+export const getParentCommentId = async (commentId) => {
+  const comment = await models.ArticleComments.findOne({
+    attributes: ["parentCommentId"],
+    where: { commentId },
+  });
+  return comment ? comment.parentCommentId : null;
+};
+
+/**
+ * parentCommentId에 해당하는 댓글의 대댓글을 조회하고, 대댓글이 없는 경우 부모 댓글을 삭제해야 하는지 확인합니다
+ */
+const checkParentCommentStatusAndReplies = async (parentCommentId) => {
+  const parentComment = await models.ArticleComments.findOne({
+    where: { commentId: parentCommentId },
+  });
+  // 부모 댓글 자체가 존재하지 않거나 부모 댓글이 있지만 삭제되지 않은 경우
+  if (!parentComment || parentComment.status !== "deleted") {
+    return false;
+  }
+
+  const replyCount = await models.ArticleComments.count({
+    where: { parentCommentId: parentCommentId },
+  });
+
+  return replyCount === 1; // 부모 댓글에 남은 대댓글이 유일한 경우
+};
+
+/**
+ * parentCommentId에 해당하는 댓글의 대댓글을 삭제합니다.
+ */
+export const deleteReply = async ({
+  articleId,
+  commentId,
+  parentCommentId,
+  authorId,
+}) => {
+  const comment = await validateAndFindComment({
+    articleId,
+    commentId,
+    authorId,
+  });
+
+  // 부모 댓글을 삭제해야 하는지 확인
+  const shouldDeleteParent =
+    await checkParentCommentStatusAndReplies(parentCommentId);
+
+  if (shouldDeleteParent) {
+    // 부모 댓글과 대댓글을 함께 삭제 (ON DELETE CASCADE 적용)
+    await models.ArticleComments.destroy({
+      where: { commentId: parentCommentId },
+    });
+  } else {
+    // 대댓글만 삭제
+    await models.ArticleComments.destroy(
+      { where: { commentId: commentId } }
+    );
+  }
 };
 
 /**

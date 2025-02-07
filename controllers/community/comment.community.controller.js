@@ -56,24 +56,34 @@ export const updateComment = async (req, res, next) => {
 // 댓글 삭제
 export const deleteComment = async (req, res, next) => {
   try {
-    const { communityId, articleId, commentId } = req.body; // URL에서 communityId, articleId, commentId 추출
+    const { communityId, articleId, commentId } = req.body;
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
-    // 대댓글이 존재하는지 확인
-    const hasReplies = await commentService.hasReplies(commentId);
+    // 댓글 정보를 가져와 parentCommentId 확인
+    const parentCommentId = await commentService.getParentCommentId(commentId);
+    if (parentCommentId) { // 대댓글인 경우
+      await commentService.deleteReply({
+        articleId,
+        commentId,
+        parentCommentId,
+        authorId,
+      });
+    } else { // 일반 댓글인 경우
+      const hasReplies = await commentService.hasReplies(commentId); // 대댓글 존재 여부 확인
 
-    if (hasReplies) {
-      await commentService.softDeleteComment({
-        articleId,
-        commentId,
-        authorId,
-      }); // 대댓글이 있는 경우 statusaks deleted로 변경
-    } else { // 대댓글이 없는 경우
-      await commentService.deleteComment({
-        articleId,
-        commentId,
-        authorId,
-      }); // 댓글 DB에서 삭제
+      if (hasReplies) { // 대댓글이 있는 경우
+        await commentService.softDeleteComment({ // 댓글 status "deleted"로 변경
+          articleId,
+          commentId,
+          authorId,
+        });
+      } else { // 대댓글이 없는 경우
+        await commentService.deleteComment({ // 댓글 삭제
+          articleId,
+          commentId,
+          authorId,
+        });
+      }
     }
 
     return res.status(200).success({
