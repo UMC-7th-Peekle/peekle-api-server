@@ -48,6 +48,9 @@ export const updateEvent = async (req, res, next) => {
   }
 };
 
+/**
+ * 이벤트 삭제하기
+ */
 export const deleteEvent = async (req, res, next) => {
   try {
     await detailService.deleteEvent({

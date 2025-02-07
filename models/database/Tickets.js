@@ -16,7 +16,7 @@ export default class Tickets extends Model {
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('open','closed','in_progress','deleted'),
+      type: DataTypes.ENUM('open','closed','in_progress'),
       allowNull: false
     },
     createdUserId: {
