@@ -113,7 +113,6 @@ export const authenticateRefreshToken = async (req, res, next) => {
   next();
 };
 
-
 /**
  * 로그인된 경우에만 사용자 권한을 검증하는 미들웨어
  */

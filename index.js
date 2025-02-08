@@ -97,7 +97,7 @@ server.listen(PORT, "0.0.0.0", () => {
     action: "server:start",
   });
   console.log(serverStartMessage);
-  console.log("Static files served from:", __dirname);
+  console.log("Static files served from:", path.join(__dirname, "uploads"));
 });
 
 // 상단에 socket.io import 주석을 해제하고 사용하시면 됩니다.

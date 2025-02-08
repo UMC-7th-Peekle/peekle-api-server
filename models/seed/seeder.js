@@ -433,19 +433,19 @@ export const seedPermissions = async () => {
   const curdForm = (field) => {
     return [
       {
-        title: `${field}:create`,
+        name: `${field}:create`,
         description: `${field} 생성 권한`,
       },
       {
-        title: `${field}:read`,
+        name: `${field}:read`,
         description: `${field} 조회 권한`,
       },
       {
-        title: `${field}:update`,
+        name: `${field}:update`,
         description: `${field} 수정 권한`,
       },
       {
-        title: `${field}:delete`,
+        name: `${field}:delete`,
         description: `${field} 삭제 권한`,
       },
     ];
@@ -455,18 +455,22 @@ export const seedPermissions = async () => {
   crudFields.forEach((field) => {
     permissions = [...permissions, ...curdForm(field)];
   });
+  permissions.push({
+    name: "admin:super",
+    description: "SUPER ADMIN",
+  });
 
   const customPerms = [
     {
-      title: "user:ban",
+      name: "user:ban",
       description: "사용자 차단 권한",
     },
     {
-      title: "user:permanent_ban",
+      name: "user:permanent_ban",
       description: "사용자 영구 차단 권한",
     },
     {
-      title: "user:unban",
+      name: "user:unban",
       description: "사용자 차단 해제 권한",
     },
   ];
@@ -477,26 +481,80 @@ export const seedPermissions = async () => {
       name: "super_admin",
       description: "최고 관리자 권한",
     },
+    {
+      name: "crudCommunity",
+      description: "커뮤니티 CRUD 권한",
+    },
+    {
+      name: "crudArticle",
+      description: "게시글 CRUD 권한",
+    },
+    {
+      name: "crudComment",
+      description: "댓글 CRUD 권한",
+    },
+    {
+      name: "crudEvent",
+      description: "이벤트 CRUD 권한",
+    },
+    {
+      name: "crudTicket",
+      description: "티켓 CRUD 권한",
+    },
   ];
 
   let rolePermissions = [];
+
+  // role: super_admin 에게 모든 권한 부여
   for (let i = 1; i <= permissions.length; i++) {
     rolePermissions.push({
-      roleId: 1,
+      roleId: roles.findIndex((role) => role.name === "super_admin") + 1,
       permissionId: i,
     });
   }
 
-  await models.Permissions.destroy({
-    where: {},
-  });
-  await models.Roles.destroy({
+  // crud 카테고리에 해당하는 각 role 생성 및 권한 부여
+  // 권한은 index를 찾아서 부여하는 방식임
+  let idx = 2;
+  for (const category of crudFields) {
+    rolePermissions.push(
+      {
+        roleId: idx,
+        permissionId:
+          permissions.findIndex((perm) => perm.name === `${category}:create`) +
+          1,
+      },
+      {
+        roleId: idx,
+        permissionId:
+          permissions.findIndex((perm) => perm.name === `${category}:read`) + 1,
+      },
+      {
+        roleId: idx,
+        permissionId:
+          permissions.findIndex((perm) => perm.name === `${category}:update`) +
+          1,
+      },
+      {
+        roleId: idx,
+        permissionId:
+          permissions.findIndex((perm) => perm.name === `${category}:delete`) +
+          1,
+      }
+    );
+    idx += 1;
+  }
+
+  await models.UserRoles.destroy({
     where: {},
   });
   await models.RolePermissions.destroy({
     where: {},
   });
-  await models.UserRoles.destroy({
+  await models.Roles.destroy({
+    where: {},
+  });
+  await models.Permissions.destroy({
     where: {},
   });
 
