@@ -290,6 +290,7 @@ describe("Comment Service", () => {
               },
               commentId: 1,
               content: "Test Comment",
+              status: "active",
               isAnonymous: false,
               articleCommentLikes: [
                 { likedUserId: 10 }, // 첫 번째 댓글에 좋아요 1개
@@ -305,8 +306,25 @@ describe("Comment Service", () => {
               },
               commentId: 2,
               content: "Another Comment",
+              status: "active",
               isAnonymous: true,
               articleCommentLikes: [], // 두 번째 댓글에 좋아요 없음
+            },
+          },
+          {
+            dataValues: {
+              author: {
+                userId: 7,
+                nickname: "CommentUser3",
+                profileImage: "commentProfile3.jpg",
+              },
+              commentId: 3,
+              content: "The Other Comment",
+              status: "deleted",
+              isAnonymous: false,
+              articleCommentLikes: [
+                { likedUserId: 10 }, // 세 번째 댓글에 좋아요 1개
+              ], // 두 번째 댓글에 좋아요 없음
             },
           },
         ],
@@ -319,7 +337,7 @@ describe("Comment Service", () => {
       });
 
       // 반환된 댓글 개수 검증
-      expect(result.comments).toHaveLength(2);
+      expect(result.comments).toHaveLength(3);
 
       // 첫 번째 댓글 검증
       expect(result.comments[0].commentId).toBe(1);
@@ -342,6 +360,13 @@ describe("Comment Service", () => {
       expect(result.comments[1].authorInfo.profileImage).toBe(
         "commentProfile2.jpg"
       );
+      expect(result.comments[1].isLikedByUser).toBe(false); // 좋아요 없음
+      expect(result.comments[1].commentLikesCount).toBe(0); // 좋아요 개수 검증
+
+      // 세 번째 댓글 검증 (삭제된 댓글)
+      expect(result.comments[2].commentId).toBe(3);
+      expect(result.comments[2].content).toBe("");
+      expect(result.comments[2].authorInfo).toBeNull();
       expect(result.comments[1].isLikedByUser).toBe(false); // 좋아요 없음
       expect(result.comments[1].commentLikesCount).toBe(0); // 좋아요 개수 검증
     });
