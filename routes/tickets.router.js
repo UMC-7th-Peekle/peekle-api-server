@@ -4,6 +4,12 @@ import * as listTicketController from "../controllers/tickets/list.tickets.contr
 import * as detailTicketController from "../controllers/tickets/detail.tickets.controller.js";
 import * as createTicketController from "../controllers/tickets/create.tickets.controller.js";
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어 => 후순위..
+import * as ticketValidator from "../utils/validators/tickets/tickets.validators.js";
+
+import {
+  validateContentType,
+  validateRequestBody,
+} from "../middleware/validate.js";
 
 const router = Router();
 
@@ -12,6 +18,7 @@ const router = Router();
 router.get(
   "/",
   authMiddleware.authenticateAccessToken,
+  validateRequestBody(ticketValidator.getTicketSchema),
   listTicketController.listTicket
 );
 
@@ -19,6 +26,7 @@ router.get(
 router.get(
   "/:ticketId",
   authMiddleware.authenticateAccessToken,
+  validateRequestBody(ticketValidator.getDetailTicketSchema),
   detailTicketController.detailTicket
 );
 
@@ -27,6 +35,7 @@ router.get(
 router.post(
   "/",
   authMiddleware.authenticateAccessToken,
+  validateRequestBody(ticketValidator.postTicketSchema),
   createTicketController.createTicket
 );
 
@@ -34,6 +43,7 @@ router.post(
 router.patch(
   "/:ticketId",
   authMiddleware.authenticateAccessToken,
+  validateRequestBody(ticketValidator.patchTicketSchema),
   detailTicketController.updateTicket
 );
 
@@ -41,19 +51,21 @@ router.patch(
 router.delete(
   "/",
   authMiddleware.authenticateAccessToken,
+  validateRequestBody(ticketValidator.deleteTicketSchema),
   detailTicketController.deleteTicket
 );
 
 // tickets 메시지 생성 (이미지 업로드 관련 추가)
 router.post(
   "/message",
+  validateContentType,
   authMiddleware.authenticateAccessToken,
   fileUploadMiddleware.localStorage({
     restrictions: fileUploadMiddleware.restrictions("ticket"),
     field: [{ name: "ticket_images", maxCount: 5 }],
     destination: "uploads/tickets",
   }),
-  // 아직 validator 생성 안함
+  validateRequestBody(ticketValidator.postTicketMessageSchema, true),
   createTicketController.createTicketMessage
 );
 
