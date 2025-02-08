@@ -92,8 +92,12 @@ export const oauthRegister = async (data) => {
 
     await transaction.commit();
   } catch (error) {
-    logger.debug(`[oauthRegister] 에러가 발생하여 rollback을 실시합니다.`);
     await transaction.rollback();
+    // 중복 회원가입 에러 처리 추가 (원래도 안되긴 했었음)
+    if (error instanceof Sequelize.UniqueConstraintError) {
+      logger.debug(`[register] 이미 존재하는 사용자입니다.`);
+      throw new AlreadyExistsError("이미 존재하는 사용자입니다.");
+    }
     throw error;
   }
 
