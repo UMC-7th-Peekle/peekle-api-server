@@ -56,15 +56,35 @@ export const updateComment = async (req, res, next) => {
 // 댓글 삭제
 export const deleteComment = async (req, res, next) => {
   try {
-    const { communityId, articleId, commentId } = req.body; // URL에서 communityId, articleId, commentId 추출
+    const { communityId, articleId, commentId } = req.body;
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
-    await commentService.deleteComment({
-      communityId,
-      articleId,
-      commentId,
-      authorId,
-    }); // 댓글 삭제
+    // 댓글 정보를 가져와 parentCommentId 확인
+    const parentCommentId = await commentService.getParentCommentId(commentId);
+    if (parentCommentId) { // 대댓글인 경우
+      await commentService.deleteReply({
+        articleId,
+        commentId,
+        parentCommentId,
+        authorId,
+      });
+    } else { // 일반 댓글인 경우
+      const hasReplies = await commentService.hasReplies(commentId); // 대댓글 존재 여부 확인
+
+      if (hasReplies) { // 대댓글이 있는 경우
+        await commentService.softDeleteComment({ // 댓글 status "deleted"로 변경
+          articleId,
+          commentId,
+          authorId,
+        });
+      } else { // 대댓글이 없는 경우
+        await commentService.deleteComment({ // 댓글 삭제
+          articleId,
+          commentId,
+          authorId,
+        });
+      }
+    }
 
     return res.status(200).success({
       message: "댓글 삭제 성공",
@@ -104,6 +124,7 @@ export const createCommentReply = async (req, res, next) => {
 export const getComments = async (req, res, next) => {
   try {
     const { communityId, articleId } = req.query; // URL에서 communityId, articleId 추출
+    const userId = req.user ? req.user.userId : null; // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
 
     if (communityId === undefined || articleId === undefined) {
       throw new InvalidQueryError(
@@ -121,6 +142,7 @@ export const getComments = async (req, res, next) => {
     const { comments } = await commentService.getComments({
       communityId,
       articleId,
+      userId,
     }); // 댓글 조회
 
     if (comments && comments.length === 0) {
