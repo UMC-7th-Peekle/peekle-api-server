@@ -15,6 +15,7 @@ import logger from "../utils/logger/logger.js";
 import {
   seedCommunity,
   seedEventLocationGroup,
+  seedPermissions,
   seedTerms,
   seedUsers,
 } from "../models/seed/seeder.js";
@@ -27,6 +28,9 @@ router.get("/seed/:type", authenticateAccessToken, async (req, res, next) => {
 
   try {
     switch (type) {
+      case "permissions":
+        await seedPermissions();
+        break;
       case "eventLocation":
         await seedEventLocationGroup();
         break;

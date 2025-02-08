@@ -426,3 +426,95 @@ export const seedUsers = async () => {
     throw err;
   }
 };
+
+export const seedPermissions = async () => {
+  const crudFields = ["community", "article", "comment", "events", "tickets"];
+
+  const curdForm = (field) => {
+    return [
+      {
+        title: `${field}:create`,
+        description: `${field} 생성 권한`,
+      },
+      {
+        title: `${field}:read`,
+        description: `${field} 조회 권한`,
+      },
+      {
+        title: `${field}:update`,
+        description: `${field} 수정 권한`,
+      },
+      {
+        title: `${field}:delete`,
+        description: `${field} 삭제 권한`,
+      },
+    ];
+  };
+
+  let permissions = [];
+  crudFields.forEach((field) => {
+    permissions = [...permissions, ...curdForm(field)];
+  });
+
+  const customPerms = [
+    {
+      title: "user:ban",
+      description: "사용자 차단 권한",
+    },
+    {
+      title: "user:permanent_ban",
+      description: "사용자 영구 차단 권한",
+    },
+    {
+      title: "user:unban",
+      description: "사용자 차단 해제 권한",
+    },
+  ];
+  permissions = [...permissions, ...customPerms];
+
+  const roles = [
+    {
+      name: "super_admin",
+      description: "최고 관리자 권한",
+    },
+  ];
+
+  let rolePermissions = [];
+  for (let i = 1; i <= permissions.length; i++) {
+    rolePermissions.push({
+      roleId: 1,
+      permissionId: i,
+    });
+  }
+
+  await models.Permissions.destroy({
+    where: {},
+  });
+  await models.Roles.destroy({
+    where: {},
+  });
+  await models.RolePermissions.destroy({
+    where: {},
+  });
+  await models.UserRoles.destroy({
+    where: {},
+  });
+
+  await models.sequelize.query("SET foreign_key_checks = 0;");
+  await models.sequelize.query("TRUNCATE TABLE permissions;");
+  await models.sequelize.query("TRUNCATE TABLE roles;");
+  await models.sequelize.query("TRUNCATE TABLE role_permissions;");
+  await models.sequelize.query("TRUNCATE TABLE user_roles;");
+  await models.sequelize.query("SET foreign_key_checks = 1;");
+
+  await models.Permissions.bulkCreate(permissions, { logging: false });
+  await models.Roles.bulkCreate(roles, { logging: false });
+  await models.RolePermissions.bulkCreate(rolePermissions, { logging: false });
+
+  logger.warn("Permissions에 대한 Seeding이 실행되었습니다.", {
+    action: "seed:permissions",
+    actionType: "success",
+  });
+
+  return;
+};
