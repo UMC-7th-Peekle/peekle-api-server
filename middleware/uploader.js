@@ -116,6 +116,8 @@ export const restrictions = (type) => {
       return articleImageRestrictions;
     case "notice":
       return articleImageRestrictions;
+    case "ticket":
+      return articleImageRestrictions;
     default:
       throw new InvalidInputError("잘못된 Parameter 입니다.");
   }
