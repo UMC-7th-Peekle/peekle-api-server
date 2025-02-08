@@ -367,8 +367,7 @@ describe("Comment Service", () => {
       expect(result.comments[2].commentId).toBe(3);
       expect(result.comments[2].content).toBe("");
       expect(result.comments[2].authorInfo).toBeNull();
-      expect(result.comments[1].isLikedByUser).toBe(false); // 좋아요 없음
-      expect(result.comments[1].commentLikesCount).toBe(0); // 좋아요 개수 검증
+      expect(result.comments[2].commentLikesCount).toBe(0); // 좋아요 개수 검증
     });
 
     it("should throw NotExistsError if the article does not exist", async () => {

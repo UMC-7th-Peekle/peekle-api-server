@@ -67,9 +67,22 @@ describe("Article CRUD Service", () => {
               commentId: 1,
               content: "Test Comment",
               isAnonymous: false,
-              articleCommentLikes: [
-                { likedUserId: 7 }, // 댓글 좋아요
-              ],
+              status: "active",
+              articleCommentLikes: [{ likedUserId: 7 }], // 댓글 좋아요
+            },
+          },
+          {
+            dataValues: {
+              author: {
+                userId: 6,
+                nickname: "CommentUser2",
+                profileImage: "commentProfile2.jpg",
+              },
+              commentId: 2,
+              content: "Test Comment 2",
+              isAnonymous: false,
+              status: "deleted",
+              articleCommentLikes: [{ likedUserId: 7 }], // 댓글 좋아요
             },
           },
         ],
@@ -81,7 +94,6 @@ describe("Article CRUD Service", () => {
           { likedUserId: 6 }, // 게시글 좋아요
         ],
       });
-    
 
       const article = await articleCrudService.getArticleById({
         communityId: 4,
@@ -89,30 +101,36 @@ describe("Article CRUD Service", () => {
       });
 
       // 반환된 데이터 검증
-  expect(article.articleId).toBe(1);
-  expect(article.communityId).toBe(4);
-  expect(article.title).toBe("Test Article");
-  expect(article.content).toBe("Test Content");
-  expect(article.isAnonymous).toBe(false);
+      expect(article.articleId).toBe(1);
+      expect(article.communityId).toBe(4);
+      expect(article.title).toBe("Test Article");
+      expect(article.content).toBe("Test Content");
+      expect(article.isAnonymous).toBe(false);
 
-  // 작성자 정보 검증
-  expect(article.authorInfo.userId).toBe(3);
-  expect(article.authorInfo.nickname).toBe("User1");
+      // 작성자 정보 검증
+      expect(article.authorInfo.userId).toBe(3);
+      expect(article.authorInfo.nickname).toBe("User1");
 
-  // 댓글 정보 검증
-  expect(article.articleComments[0].commentId).toBe(1);
-  expect(article.articleComments[0].content).toBe("Test Comment");
-  expect(article.articleComments[0].authorInfo.userId).toBe(5);
-  expect(article.articleComments[0].isLikedByUser).toBe(false); // userId가 7과 다르므로 false
-  expect(article.articleComments[0].commentLikesCount).toBe(1); // 좋아요 개수 확인
+      // 댓글 정보 검증
+      expect(article.articleComments[0].commentId).toBe(1);
+      expect(article.articleComments[0].content).toBe("Test Comment");
+      expect(article.articleComments[0].authorInfo.userId).toBe(5);
+      expect(article.articleComments[0].isLikedByUser).toBe(false); // userId가 7과 다르므로 false
+      expect(article.articleComments[0].commentLikesCount).toBe(1); // 좋아요 개수 확인
 
-  // 이미지 검증
-  expect(article.articleImages[0].imageUrl).toContain("image1.jpg");
-  expect(article.articleImages[1].imageUrl).toContain("image2.jpg");
+      // 삭제된 댓글 정보 검증
+      expect(article.articleComments[1].commentId).toBe(2);
+      expect(article.articleComments[1].content).toBe("");
+      expect(article.articleComments[1].authorInfo).toBeNull();
+      expect(article.articleComments[1].commentLikesCount).toBe(0); // 좋아요 개수 검증
 
-  // 좋아요 및 댓글 개수 검증
-  expect(article.articleLikesCount).toBe(1); // 좋아요 개수 확인
-  expect(article.commentsCount).toBe(1); // 댓글 개수 확인
+      // 이미지 검증
+      expect(article.articleImages[0].imageUrl).toContain("image1.jpg");
+      expect(article.articleImages[1].imageUrl).toContain("image2.jpg");
+
+      // 좋아요 및 댓글 개수 검증
+      expect(article.articleLikesCount).toBe(1); // 좋아요 개수 확인
+      expect(article.commentsCount).toBe(2); // 댓글 개수 확인
     });
 
     it("should throw NotExistsError if the article does not exist", async () => {
