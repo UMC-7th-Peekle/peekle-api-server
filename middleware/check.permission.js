@@ -1,4 +1,3 @@
-import { Op } from "sequelize";
 import models from "../models/index.js";
 import {
   LackPermissionError,
@@ -27,6 +26,9 @@ export const checkPermission = (permission) => {
   };
 };
 
+/**
+ * 코파일럿 끄고 만든 고민의 산물
+ */
 const checkUserPermissions = async ({ userId, permission }) => {
   const userRoles = await models.UserRoles.findAll({
     where: {
