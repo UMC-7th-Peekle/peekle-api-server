@@ -15,18 +15,34 @@ import logger from "../utils/logger/logger.js";
 import {
   seedCommunity,
   seedEventLocationGroup,
+  seedPermissions,
   seedTerms,
   seedUsers,
 } from "../models/seed/seeder.js";
 import { logError } from "../utils/handlers/error.logger.js";
+import { checkPermission } from "../middleware/check.permission.js";
 
 const router = Router();
+
+router.get(
+  "/check-perms/admin",
+  authenticateAccessToken,
+  checkPermission("admin"),
+  (req, res) => {
+    res.status(201).success({
+      message: "권한이 있습니다.",
+    });
+  }
+);
 
 router.get("/seed/:type", authenticateAccessToken, async (req, res, next) => {
   const { type } = req.params;
 
   try {
     switch (type) {
+      case "permissions":
+        await seedPermissions();
+        break;
       case "eventLocation":
         await seedEventLocationGroup();
         break;

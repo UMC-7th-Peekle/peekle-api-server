@@ -9,7 +9,7 @@ export const logError = (err) => {
   //   STACK: ${err.stack}
   //   =====================
   // `);
-  // console.error(err);
+  console.error(err);
   const errorDetails = Object.getOwnPropertyNames(err).reduce((acc, key) => {
     acc[key] = err[key];
     return acc;

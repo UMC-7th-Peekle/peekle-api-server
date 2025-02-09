@@ -1,5 +1,11 @@
 import config from "../../config.json" with { type: "json" };
-const { KAKAO_REST_API_KEY, KAKAO_REDIRECT_URI } = config.KAKAO;
+const { KAKAO_REST_API_KEY } = config.KAKAO;
+let KAKAO_REDIRECT_URI;
+if (config.SERVER.ENV === "development") {
+  KAKAO_REDIRECT_URI = config.SERVER.LOCAL_SERVER_URL;
+} else if (config.SERVER.ENV === "production") {
+  KAKAO_REDIRECT_URI = config.SERVER.MAIN_SERVER_URL;
+}
 
 import * as kakaoService from "../../services/auth/kakao.auth.service.js";
 import { logError } from "../../utils/handlers/error.logger.js";
@@ -10,6 +16,7 @@ import {
 } from "../../utils/tokens/create.jwt.tokens.js";
 
 // http://localhost:7777/auth/login/kakao/
+// https://localhost:7777/auth/login/kakao
 
 export const kakaoLogin = async (req, res, next) => {
   try {
