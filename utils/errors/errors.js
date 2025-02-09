@@ -185,3 +185,12 @@ export class InvalidContentTypeError extends CustomError {
     super(reason, "INVALID_CONTENT_TYPE", 415, data);
   }
 }
+
+/**
+ * 해당 요청을 위한 권한이 없는 경우
+ */
+export class LackPermissionError extends CustomError {
+  constructor(reason, data = null) {
+    super(reason, "LACK_PERMISSION", 403, data);
+  }
+}

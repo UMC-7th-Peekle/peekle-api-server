@@ -5,6 +5,7 @@ export default class Permissions extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
     permissionId: {
+      autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
