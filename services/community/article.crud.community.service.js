@@ -163,7 +163,7 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     });
   }
 
-  const ret = {
+  const article = {
     authorInfo: transformedAuthorInfo,
     isLikedByUser: isArticleLikedByUser,
     articleLikesCount,
@@ -173,7 +173,7 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     articleImages: transformedImages,
   };
 
-  return ret;
+  return { article };
 };
 
 /**
