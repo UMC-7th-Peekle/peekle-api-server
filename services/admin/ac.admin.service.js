@@ -34,8 +34,10 @@ export const deleteRoleFromUser = async ({ userId, roleId }) => {
     );
   }
   const affectedRow = await models.UserRoles.destroy({
-    userId,
-    roleId,
+    where: {
+      userId,
+      roleId,
+    },
   });
 
   if (affectedRow === 0) {
