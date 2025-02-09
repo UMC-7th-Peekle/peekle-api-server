@@ -95,7 +95,7 @@ describe("Article CRUD Service", () => {
         ],
       });
 
-      const article = await articleCrudService.getArticleById({
+      const { article } = await articleCrudService.getArticleById({
         communityId: 4,
         articleId: 1,
       });
@@ -156,9 +156,15 @@ describe("Article CRUD Service", () => {
       const result = await articleCrudService.createArticle({
         communityId: 4,
         authorId: 1001,
-        title: "New Article",
-        content: "Article Content",
-        imagePaths: ["path/to/image1.jpg"],
+        requestBody: JSON.stringify({
+          title: "New Article",
+          content: "Article Content",
+          isAnonymous: true,
+        }),
+        uploadedFiles: [
+          { path: "uploads/path/to/image1.jpg" },
+          { path: "uploads/path/to/image2.jpg" },
+        ],
       });
 
       expect(models.Communities.findOne).toHaveBeenCalledWith({
@@ -181,9 +187,12 @@ describe("Article CRUD Service", () => {
         articleCrudService.createArticle({
           communityId: 9999,
           authorId: 1001,
-          title: "New Article",
-          content: "Article Content",
-          imagePaths: [],
+          requestBody: JSON.stringify({
+            title: "New Article",
+            content: "Article Content",
+            isAnonymous: true,
+          }),
+          uploadedFiles: [],
         })
       ).rejects.toThrow(NotExistsError);
     });
