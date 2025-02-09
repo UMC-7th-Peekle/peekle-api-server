@@ -2,16 +2,16 @@ import models from "../../models/index.js";
 import {
   InvalidInputError,
   NotExistsError,
+  NotAllowedError,
 } from "../../utils/errors/errors.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
 
 // 새로운 티켓 생성
-export const createTicket = async ({ userId, ticketData }) => {
-  // title, status
+export const createTicket = async ({ userId, ticketTitle }) => {
   // 티켓 제목, 티켓 상태 누락 400
-  if (!ticketData.title || !ticketData.status) {
-    throw new InvalidInputError("티켓 제목 또는 상태가 누락되었습니다.");
+  if (!ticketTitle) {
+    throw new InvalidInputError("티켓 제목이 누락되었습니다.");
   }
 
   const transaction = await models.sequelize.transaction();
@@ -20,7 +20,7 @@ export const createTicket = async ({ userId, ticketData }) => {
     // 티켓 생성
     const ticket = await models.Tickets.create(
       {
-        ...ticketData,
+        title: ticketTitle,
         status: "open", // status를 항상 open으로 설정
         createdUserId: userId,
       },
@@ -35,7 +35,7 @@ export const createTicket = async ({ userId, ticketData }) => {
       userId: userId,
     });
 
-    return ticket;
+    return { ticket };
   } catch (error) {
     logError(error);
     logger.error("티켓 생성 실패, Rollback 실행됨.", {
@@ -81,7 +81,7 @@ export const createTicketMessage = async ({ userId, ticketMessageData }) => {
         }
       );
       throw new NotAllowedError(
-        "본인이 작성하지 않은 티켓의 상태를 수정할 수 없습니다."
+        "본인이 작성하지 않은 티켓에 메시지를 추가할 수 없습니다."
       );
     }
 
@@ -118,7 +118,7 @@ export const createTicketMessage = async ({ userId, ticketMessageData }) => {
       userId: userId,
     });
 
-    return ticketMessage;
+    return { ticketMessage };
   } catch (error) {
     logError(error);
     logger.error("티켓 메시지 생성 실패, Rollback 실행됨.", {

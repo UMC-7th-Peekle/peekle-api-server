@@ -24,7 +24,7 @@ export const eventLocation = async (req, res, next) => {
   try {
     const location = await categoryService.eventLocation();
 
-    if (!location.length) return res.status(204).end();
+    if (!location) return res.status(204).end();
 
     return res.status(200).success({ location });
   } catch (error) {

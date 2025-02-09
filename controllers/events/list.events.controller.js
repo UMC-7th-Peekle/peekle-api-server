@@ -57,8 +57,9 @@ export const listEvent = async (req, res, next) => {
     };
 
     // TODO : location, price, startDate, endDate에 대한 처리를 하고 있지 않음
-    const { events, nextCursor, hasNextPage } =
-      await listService.listEvent(paginationOptions);
+    const { events, nextCursor, hasNextPage } = await listService.listEvent({
+      paginationOptions,
+    });
 
     if (!events || events.length === 0) {
       return res.status(204).end();

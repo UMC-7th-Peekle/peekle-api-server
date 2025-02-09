@@ -18,7 +18,6 @@ const router = Router();
 router.get(
   "/",
   authMiddleware.authenticateAccessToken,
-  validateRequestBody(ticketValidator.getTicketSchema),
   listTicketController.listTicket
 );
 
@@ -26,7 +25,6 @@ router.get(
 router.get(
   "/:ticketId",
   authMiddleware.authenticateAccessToken,
-  validateRequestBody(ticketValidator.getDetailTicketSchema),
   detailTicketController.detailTicket
 );
 
@@ -47,13 +45,16 @@ router.patch(
   detailTicketController.updateTicket
 );
 
-// enum('open', 'closed', 'in_progress') 중 status가 open일 때만 삭제 가능
-router.delete(
-  "/",
-  authMiddleware.authenticateAccessToken,
-  validateRequestBody(ticketValidator.deleteTicketSchema),
-  detailTicketController.deleteTicket
-);
+/**
+ * enum('open', 'closed', 'in_progress') 중 status가 open일 때만 삭제 가능
+ * => 티켓은 전체 삭제 기능 제공하지 않습니다.
+ **/
+// router.delete(
+//   "/",
+//   authMiddleware.authenticateAccessToken,
+//   validateRequestBody(ticketValidator.deleteTicketSchema),
+//   detailTicketController.deleteTicket
+// );
 
 // tickets 메시지 생성 (이미지 업로드 관련 추가)
 router.post(

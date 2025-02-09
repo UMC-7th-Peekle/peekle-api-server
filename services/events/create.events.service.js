@@ -4,7 +4,7 @@ import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
 
 // 새로운 이벤트 생성
-export const createEvent = async (userId, eventData) => {
+export const createEvent = async ({ userId, eventData }) => {
   // eventData는 기본적으로 형식 검증을 통해 유효한 값만이 전달된다고 가정.
 
   // title, content, price, categoryId, location, eventUrl,

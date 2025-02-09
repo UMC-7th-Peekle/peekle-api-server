@@ -63,7 +63,7 @@ const getLocationFromEventId = async (eventId) => {
   return { position: { latitude, longitude } };
 };
 
-export const detailEvent = async (eventId) => {
+export const detailEvent = async ({ eventId }) => {
   // eventId가 유효하지 않은 경우 400
   /**
    * 아직 Ajv로 유효성 검사 안했어요
@@ -72,7 +72,6 @@ export const detailEvent = async (eventId) => {
   // 주소로 위치 가져오기
   const { position } = await getLocationFromEventId(eventId);
   const { latitude, longitude } = position;
-  // console.log("Position:", position); // { latitude, longitude }
 
   const isExistLocation = await models.EventLocation.findOne({
     where: {
@@ -124,7 +123,7 @@ export const detailEvent = async (eventId) => {
           "endTime",
         ],
       },
-      // 상세 주소 관련 위치 및 장소명 (여기에요 여기!!!!!!!!!!!)
+      // 상세 주소 관련 위치 및 장소명
       {
         model: models.EventLocation,
         as: "eventLocations",
@@ -153,7 +152,7 @@ export const detailEvent = async (eventId) => {
 };
 
 // 이벤트 내용 수정
-export const updateEvent = async (eventId, userId, updateData) => {
+export const updateEvent = async ({ eventId, userId, updateData }) => {
   try {
     const event = await models.Events.findByPk(eventId);
 
@@ -186,11 +185,7 @@ export const updateEvent = async (eventId, userId, updateData) => {
       );
     }
 
-    // 필요한 필드만 업데이트
-    // shallow copy
-    Object.assign(event, updateData);
-
-    await event.save();
+    await event.update(updateData);
 
     logger.debug({
       action: "event:update",
@@ -340,7 +335,6 @@ export const deleteEvent = async ({ eventId, userId }) => {
     // await을 걸어서 처리하지 않았기에
     await Promise.all(deletePromises);
 
-    // TODO : 로컬에 저장된 이미지 또한 삭제하여야 함
     await event.destroy();
 
     logger.debug({
