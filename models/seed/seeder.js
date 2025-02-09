@@ -1,6 +1,5 @@
 import logger from "../../utils/logger/logger.js";
 import models from "../index.js";
-import fs from "fs";
 
 /*
   // truncate: true,
@@ -437,6 +436,9 @@ export const seedPermissions = async () => {
   await models.Roles.destroy({
     where: {},
   });
+  await models.RoleHierarchy.destroy({
+    where: {},
+  });
   await models.Permissions.destroy({
     where: {},
   });
@@ -445,6 +447,7 @@ export const seedPermissions = async () => {
   await models.sequelize.query("TRUNCATE TABLE permissions;");
   await models.sequelize.query("TRUNCATE TABLE roles;");
   await models.sequelize.query("TRUNCATE TABLE role_permissions;");
+  await models.sequelize.query("TRUNCATE TABLE role_hierarchy;");
   await models.sequelize.query("TRUNCATE TABLE user_roles;");
   await models.sequelize.query("SET foreign_key_checks = 1;");
 
