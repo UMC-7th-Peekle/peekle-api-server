@@ -7,6 +7,24 @@ import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 
 /**
+ * 댓글이 존재하는지 확인합니다.
+ */
+const checkCommentExists = async (articleId, commentId) => {
+  // 원래 ForeignKeyConstraintError를 처리하려 했지만, articleId에 대한 확인도 필요하여 이렇게 수정
+  const comment = await models.ArticleComments.findOne({
+    where: { articleId, commentId },
+  });
+
+  if (!comment) {
+    logger.error(
+      `[likeComment] 댓글이 존재하지 않음 - commentId: ${commentId}, articleId: ${articleId}`
+    );
+    throw new NotExistsError("해당 댓글이 존재하지 않습니다.");
+  }
+  return comment;
+};
+
+/**
  * 댓글 좋아요를 추가합니다
  */
 export const likeComment = async ({
@@ -15,20 +33,7 @@ export const likeComment = async ({
   commentId,
   likedUserId,
 }) => {
-  // 원래 ForeignKeyConstraintError를 처리하려 했지만, articleId에 대한 확인도 필요하여 이렇게 수정
-  const comment = await models.ArticleComments.findOne({
-    where: {
-      commentId,
-      articleId,
-    },
-  });
-
-  if (!comment) {
-    logger.error(
-      `[likeComment] 댓글이 존재하지 않음 - commentId: ${commentId}, articleId: ${articleId}`
-    );
-    throw new NotExistsError("해당 댓글이 존재하지 않습니다");
-  }
+  await checkCommentExists(articleId, commentId); // 댓글 존재 여부 확인
 
   let like;
   /* try-catch 블록 외부에서 like 선언
@@ -36,7 +41,6 @@ export const likeComment = async ({
   "like is not defined" 에러가 발생합니다.
   */
   try {
-    
     // 좋아요 추가 (Unique 제약 조건으로 중복 방지)
     like = await models.ArticleCommentLikes.create({
       commentId,
@@ -65,34 +69,14 @@ export const unlikeComment = async ({
   commentId,
   likedUserId,
 }) => {
-  // 댓글 조회
-  const comment = await models.ArticleComments.findOne({
-    where: {
-      articleId,
-      commentId,
-    },
-    include: [
-      {
-        model: models.ArticleCommentLikes,
-        as: "articleCommentLikes",
-        where: {
-          likedUserId,
-        },
-        required: false, // 좋아요가 없는 경우도 조회 가능하도록 설정
-      },
-    ],
+  await checkCommentExists(articleId, commentId); // 댓글 존재 여부 확인
+
+  // 좋아요 여부 확인
+  const like = await models.ArticleCommentLikes.findOne({
+    where: { commentId, likedUserId },
   });
-
-  // 댓글이 존재하지 않는 경우
-  if (!comment) {
-    logger.error(
-      `[unlikeComment] 댓글이 존재하지 않음 - commentId: ${commentId}`
-    );
-    throw new NotExistsError("댓글이 존재하지 않습니다"); // 404
-  }
-
   // 좋아요가 눌리지 않은 경우
-  if (comment.articleCommentLikes.length === 0) {
+  if (!like) {
     logger.error(
       `[unlikeComment] 이미 좋아요가 취소된 댓글 - commentId: ${commentId}, likedUserId: ${likedUserId}`
     );
@@ -100,8 +84,5 @@ export const unlikeComment = async ({
   }
 
   // 좋아요 삭제
-  await comment.articleCommentLikes[0].destroy();
-
-
-  return;
+  await like.destroy();
 };

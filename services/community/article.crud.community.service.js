@@ -11,6 +11,7 @@ import {
   deleteLocalFile,
   isEditInputCorrect,
 } from "../../utils/upload/uploader.object.js";
+import { parseImagePaths } from "../../utils/upload/uploader.object.js";
 
 export const createCommunity = async ({ communityName }) => {
   // 게시판 생성
@@ -130,9 +131,9 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     return {
       authorInfo: status === "deleted" ? null : author,
       isLikedByUser: isCommentLikedByUser,
-      commentLikesCount: status === "deleted" ? 0 : commentLikesCount, 
+      commentLikesCount: status === "deleted" ? 0 : commentLikesCount,
       content: processedContent,
-        status, // 상태 정보도 포함해 응답
+      status, // 상태 정보도 포함해 응답
       ...commentData,
     };
   });
@@ -162,7 +163,7 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     });
   }
 
-  const ret = {
+  const article = {
     authorInfo: transformedAuthorInfo,
     isLikedByUser: isArticleLikedByUser,
     articleLikesCount,
@@ -172,7 +173,7 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     articleImages: transformedImages,
   };
 
-  return ret;
+  return { article };
 };
 
 /**
@@ -181,27 +182,26 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
 export const createArticle = async ({
   communityId,
   authorId,
-  title,
-  content,
-  isAnonymous = true,
-  imagePaths,
+  requestBody,
+  uploadedFiles,
 }) => {
+  const { title, content, isAnonymous } = JSON.parse(requestBody);
   // 게시판 검색
   const community = await models.Communities.findOne({
     where: {
       communityId,
     },
   });
-
   // 테스트 코드에서 Mock으로 처리하는 부분은 DB의 FK 제약을 테스트하기 어려우므로 이 부분 다시 추가
   if (!community) {
     throw new NotExistsError("존재하지 않는 게시판입니다.");
   }
+  // 이미지 경로 파싱
+  const imagePaths = parseImagePaths(uploadedFiles);
 
   // 게시글 생성
   let article;
   let articleImageData;
-
   /*
     try-catch 블록 외부에서 article 선언
     try-catch 블록 내부에서 article을 생성하고 반환하면

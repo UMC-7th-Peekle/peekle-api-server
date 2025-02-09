@@ -13,7 +13,8 @@ export const reportArticle = async (req, res, next) => {
       throw new InvalidInputError("신고 사유를 입력해주세요.");
     }
 
-    const { articleReport } = await reportService.reportArticle({
+    const { newReport } = await reportService.reportTarget({
+      targetType: "article",
       communityId,
       articleId,
       reportedUserId,
@@ -22,7 +23,6 @@ export const reportArticle = async (req, res, next) => {
 
     res.status(201).success({
       message: "게시글 신고 성공",
-      articleReport,
     });
   } catch (error) {
     logError(error);
@@ -39,7 +39,8 @@ export const reportComment = async (req, res, next) => {
       throw new InvalidInputError("신고 사유를 입력해주세요.");
     }
 
-    const { commentReport } = await reportService.reportComment({
+    const { newReport } = await reportService.reportTarget({
+      targetType: "comment",
       communityId,
       articleId,
       commentId,
@@ -49,7 +50,6 @@ export const reportComment = async (req, res, next) => {
 
     res.status(201).success({
       message: "댓글 신고 성공",
-      commentReport,
     });
   } catch (error) {
     logError(error);

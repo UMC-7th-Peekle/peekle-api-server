@@ -32,6 +32,38 @@ export const validateArticleQuery = (queries) => {
 };
 
 /**
+ *  게시글의 썸네일 정보를 가공합니다.
+ */
+const getThumbnail = (articleImages) => {
+  if (articleImages.length > 0) {
+    const thumbnail = addBaseUrl(articleImages[0].dataValues.imageUrl);
+    return thumbnail;
+  }
+  return null;
+};
+
+/**
+ *  게시글의 작성자 정보를 가공하고 불필요한 필드를 제거합니다.
+ */
+const getAuthorInfo = (article, isAnonymous) => {
+  if (isAnonymous) {
+    delete article.author.dataValues;
+    return { nickname: null, profileImage: null, authorId: null };
+  }
+
+  const author = article.author.dataValues;
+  const authorInfo = {
+    nickname: author.nickname,
+    profileImage: addBaseUrl(author.profileImage),
+    authorId: author.userId,
+  };
+
+  // 불필요한 필드 제거
+  delete article.author.dataValues;
+
+  return authorInfo;
+};
+/**
  * communityId에 해당하는 게시판의 게시글들을 가져옵니다
  */
 export const getArticles = async (
@@ -137,40 +169,9 @@ export const getArticles = async (
 
     article.articleComments = article.articleComments.length; // 댓글 개수만 추출
     article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
-    
-    if (article.articleImages.length > 0) {
-      article.articleImages = addBaseUrl(
-        article.articleImages[0].dataValues.imageUrl
-      ); // 대표 이미지 URL
-      // dataValues가 빠져 있어서 오류 발생했었음
-    } else {
-      article.articleImages = null;
-    }
-    article.thumbnail = article.articleImages;
-    delete article.articleImages;
-
-    // 작성자 정보 처리
-    if (article.isAnonymous === true) {
-      // 익명 상태면 모든 작성자 정보를 null로 설정
-      // test 코드를 위해서 authorInfo 자체를 null로 보내는 것이 아닌 각각을 null로 설정
-      article.authorInfo = {
-        nickname: null,
-        profileImage: null,
-        authorId: null,
-      };
-      
-    } else {
-      article.author = article.author.dataValues;
-      article.author.profileImage = addBaseUrl(article.author.profileImage);
-
-      // author.userId를 authorId로 변경
-      article.author.authorId = article.author.userId;
-      delete article.author.userId;
-
-      // author를 authorInfo로 변경
-      article.authorInfo = article.author;
-    }
-    delete article.author;
+    article.thumbnail = getThumbnail(article.articleImages); // 썸네일 정보 추출
+    delete article.articleImages; // 불필요한 필드 제거
+    article.authorInfo = getAuthorInfo(article, article.isAnonymous); // 작성자 정보 추출
   });
 
   // 다음 커서 설정
@@ -255,39 +256,9 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
     article = article.dataValues;
     article.articleComments = article.articleComments.length; // 댓글 개수만 추출
     article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
-    if (article.articleImages.length > 0) {
-      article.articleImages = addBaseUrl(
-        article.articleImages[0].dataValues.imageUrl
-      ); // 대표 이미지 URL
-      // dataValues가 빠져 있어서 오류 발생했었음
-    } else {
-      article.articleImages = null;
-    }
-    article.thumbnail = article.articleImages;
-    delete article.articleImages;
-
-    // 작성자 정보 처리
-    if (article.isAnonymous === true) {
-      // 익명 상태면 모든 작성자 정보를 null로 설정
-      // test 코드를 위해서 authorInfo 자체를 null로 보내는 것이 아닌 각각을 null로 설정
-      article.authorInfo = {
-        nickname: null,
-        profileImage: null,
-        authorId: null,
-      };
-      
-    } else {
-      article.author = article.author.dataValues;
-      article.author.profileImage = addBaseUrl(article.author.profileImage);
-
-      // author.userId를 authorId로 변경
-      article.author.authorId = article.author.userId;
-      delete article.author.userId;
-
-      // author를 authorInfo로 변경
-      article.authorInfo = article.author;
-    }
-    delete article.author;
+    article.thumbnail = getThumbnail(article.articleImages); // 썸네일 정보 추출
+    delete article.articleImages; // 불필요한 필드 제거
+    article.authorInfo = getAuthorInfo(article, article.isAnonymous); // 작성자 정보 추출
   });
 
   // 다음 커서 설정

@@ -82,10 +82,8 @@ describe("Comment Like Service", () => {
       const mockLike = { destroy: jest.fn() };
 
       // 댓글과 좋아요 정보를 Mock으로 설정
-      models.ArticleComments.findOne.mockResolvedValue({
-        commentId: 1,
-        articleCommentLikes: [mockLike],
-      });
+      models.ArticleComments.findOne.mockResolvedValue({ commentId: 1 });
+      models.ArticleCommentLikes.findOne.mockResolvedValue(mockLike);
 
       await commentLikeService.unlikeComment({
         communityId: 4,
@@ -97,14 +95,9 @@ describe("Comment Like Service", () => {
       // 댓글 및 좋아요가 정상적으로 조회되었는지 확인
       expect(models.ArticleComments.findOne).toHaveBeenCalledWith({
         where: { articleId: 1, commentId: 1 },
-        include: [
-          {
-            model: models.ArticleCommentLikes,
-            as: "articleCommentLikes",
-            where: { likedUserId: 1001 },
-            required: false,
-          },
-        ],
+      });
+      expect(models.ArticleCommentLikes.findOne).toHaveBeenCalledWith({
+        where: { commentId: 1, likedUserId: 1001 },
       });
 
       // 좋아요가 정상적으로 삭제되었는지 확인
@@ -126,11 +119,9 @@ describe("Comment Like Service", () => {
     });
 
     it("should throw NotExistsError if the like is already removed", async () => {
-      // 댓글에는 좋아요가 없는 상태로 설정
-      models.ArticleComments.findOne.mockResolvedValue({
-        commentId: 1,
-        articleCommentLikes: [],
-      });
+      // 좋아요가 없는 상태로 설정
+      models.ArticleComments.findOne.mockResolvedValue({ commentId: 1 });
+      models.ArticleCommentLikes.findOne.mockResolvedValue(null);
 
       await expect(
         commentLikeService.unlikeComment({
