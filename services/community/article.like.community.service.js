@@ -15,6 +15,7 @@ const checkArticleExists = async (communityId, articleId) => {
   const article = await models.Articles.findOne({
     where: { communityId, articleId },
   });
+  console.log("article:", article);
 
   if (!article) {
     logger.error(
@@ -75,6 +76,8 @@ export const unlikeArticle = async ({
   const like = await models.ArticleLikes.findOne({
     where: { articleId, likedUserId },
   });
+
+  console.log("like:", like);
 
   if (!like) {
     // 이미 좋아요가 취소된 경우
