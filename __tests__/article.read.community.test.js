@@ -5,13 +5,13 @@ import { InvalidQueryError, NotExistsError } from "../utils/errors/errors.js";
 // Mock dependencies
 jest.mock("../models/index.js");
 
-describe("Article Read Service", () => {
+describe("게시글 조회", () => {
   afterEach(() => {
     jest.clearAllMocks(); // 각 테스트 후 Mock 함수 초기화
   });
 
   describe("getArticles()", () => {
-    it("should successfully return articles with pagination", async () => {
+    it("페이지네이션을 적용하여 게시글을 성공적으로 반환해야 함", async () => {
       models.Communities.findOne.mockResolvedValue({
         dataValues: {
           communityId: 4,
@@ -96,7 +96,7 @@ describe("Article Read Service", () => {
       expect(result.articles[1].dataValues.authorInfo.nickname).toBe("User2");
     });
 
-    it("should throw NotExistsError if the community does not exist", async () => {
+    it("커뮤니티가 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.Communities.findOne.mockResolvedValue(null);
 
       await expect(
@@ -106,7 +106,7 @@ describe("Article Read Service", () => {
   });
 
   describe("getLikedArticles()", () => {
-    it("should successfully return liked articles with pagination", async () => {
+    it("페이지네이션을 적용하여 좋아요한 게시글을 성공적으로 반환해야 함", async () => {
       models.ArticleLikes.findAll.mockResolvedValue([
         { articleId: 1, articleLikesId: 1 },
       ]);
@@ -184,7 +184,7 @@ describe("Article Read Service", () => {
 
     });
 
-    it("should return an empty array if no liked articles are found", async () => {
+    it("좋아요한 게시글이 없으면 빈 배열을 반환해야 함", async () => {
       models.ArticleLikes.findAll.mockResolvedValue([]);
 
       const result = await articleReadService.getLikedArticles(1, {
@@ -197,7 +197,7 @@ describe("Article Read Service", () => {
   });
 
   describe("validateArticleQuery()", () => {
-    it("should pass validation for correct query parameters", () => {
+    it("올바른 쿼리 파라미터로 검증을 통과해야 함", () => {
       expect(() => {
         articleReadService.validateArticleQuery({
           limit: "10",
@@ -208,19 +208,19 @@ describe("Article Read Service", () => {
       }).not.toThrow();
     });
 
-    it("should throw InvalidQueryError for incorrect limit", () => {
+    it("잘못된 limit 값일 경우 InvalidQueryError를 발생시켜야 함", () => {
       expect(() => {
         articleReadService.validateArticleQuery({ limit: "invalid" });
       }).toThrow(InvalidQueryError);
     });
 
-    it("should throw InvalidQueryError for incorrect cursor", () => {
+    it("잘못된 cursor 값일 경우 InvalidQueryError를 발생시켜야 함", () => {
       expect(() => {
         articleReadService.validateArticleQuery({ cursor: "invalid" });
       }).toThrow(InvalidQueryError);
     });
 
-    it("should throw InvalidQueryError if query length is less than 2 characters", () => {
+    it("검색어 길이가 2글자 미만이면 InvalidQueryError를 발생시켜야 함", () => {
       expect(() => {
         articleReadService.validateArticleQuery({ query: "a" });
       }).toThrow(InvalidQueryError);

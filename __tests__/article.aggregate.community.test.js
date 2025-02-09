@@ -5,7 +5,7 @@ import { NotExistsError, InvalidQueryError } from "../utils/errors/errors.js";
 // Mock dependencies
 jest.mock("../models/index.js");
 
-describe("Article Aggregate Service", () => {
+describe("게시글 집계", () => {
   // 동적으로 현재 시간과 3일 전 시간 설정
   const currentTime = new Date().toISOString();
   const threeDaysAgo = new Date(
@@ -17,7 +17,7 @@ describe("Article Aggregate Service", () => {
   });
 
   describe("getPopularArticles()", () => {
-    it("should successfully return popular articles", async () => {
+    it("인기 게시글을 성공적으로 반환해야 함", async () => {
       // 커뮤니티 존재 확인
       models.Communities.findOne.mockResolvedValue({ communityId: 4 });
 
@@ -90,7 +90,7 @@ describe("Article Aggregate Service", () => {
       expect(result.articles[1].dataValues.thumbnail).toBeNull();
     });
 
-    it("should throw NotExistsError if the community does not exist", async () => {
+    it("커뮤니티가 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.Communities.findOne.mockResolvedValue(null); // 커뮤니티가 존재하지 않음
 
       await expect(
@@ -102,7 +102,7 @@ describe("Article Aggregate Service", () => {
       ).rejects.toThrow(NotExistsError);
     });
 
-    it("should return an empty array if no articles are found", async () => {
+    it("게시글이 없으면 빈 배열을 반환해야 함", async () => {
       models.Communities.findOne.mockResolvedValue({ communityId: 4 });
       models.Articles.findAll.mockResolvedValue([]); // 게시글이 없는 경우
 
@@ -117,7 +117,7 @@ describe("Article Aggregate Service", () => {
   });
 
   describe("validateStatisticsQuery()", () => {
-    it("should pass validation for dynamic query parameters", () => {
+    it("동적 쿼리 파라미터가 유효하면 검증을 통과해야 함", () => {
       expect(() => {
         articleAggregateService.validateStatisticsQuery({
           startTime: threeDaysAgo,
@@ -126,7 +126,7 @@ describe("Article Aggregate Service", () => {
       }).not.toThrow();
     });
 
-    it("should throw InvalidQueryError for incorrect date format", () => {
+    it("잘못된 날짜 형식이면 InvalidQueryError를 발생시켜야 함", () => {
       expect(() => {
         articleAggregateService.validateStatisticsQuery({
           startTime: "invalid-date",
@@ -135,7 +135,7 @@ describe("Article Aggregate Service", () => {
       }).toThrow(InvalidQueryError);
     });
 
-    it("should throw InvalidQueryError if startTime is after endTime", () => {
+    it("startTime이 endTime보다 이후면 InvalidQueryError를 발생시켜야 함", () => {
       expect(() => {
         articleAggregateService.validateStatisticsQuery({
           startTime: new Date(
