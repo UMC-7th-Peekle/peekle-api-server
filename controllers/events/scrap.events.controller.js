@@ -8,9 +8,9 @@ import { logError } from "../../utils/handlers/error.logger.js";
 export const newScrap = async (req, res, next) => {
   try {
     const { eventId } = req.body;
-    const { userId } = req.user;
+    const userId = req?.user?.userId || null;
 
-    const scrap = await scrapService.newScrap(eventId, userId);
+    const scrap = await scrapService.newScrap({ eventId, userId });
 
     if (scrap) {
       // 201
@@ -29,9 +29,9 @@ export const newScrap = async (req, res, next) => {
 export const deleteScrap = async (req, res, next) => {
   try {
     const { eventId } = req.body;
-    const { userId } = req.user;
+    const userId = req?.user?.userId || null;
 
-    const scrap = await scrapService.deleteScrap(eventId, userId);
+    const scrap = await scrapService.deleteScrap({ eventId, userId });
 
     if (scrap) {
       return res.status(200).success({ message: "이벤트 스크랩 취소 성공" });
@@ -49,7 +49,7 @@ export const deleteScrap = async (req, res, next) => {
 export const listScrap = async (req, res, next) => {
   try {
     const { scrap, limit, cursor } = req.query;
-    const { userId } = req.user;
+    const userId = req?.user?.userId || null;
 
     // 페이지네이션 기본값 설정
     const paginationOptions = {
@@ -58,10 +58,10 @@ export const listScrap = async (req, res, next) => {
       scrap,
     };
 
-    const { events, nextCursor, hasNextPage } = await scrapService.listScrap(
+    const { events, nextCursor, hasNextPage } = await scrapService.listScrap({
       paginationOptions,
-      userId
-    );
+      userId,
+    });
 
     if (!events || events.length === 0) {
       return res.status(204).end();

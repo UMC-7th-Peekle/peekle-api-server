@@ -10,7 +10,7 @@ export const detailEvent = async (req, res, next) => {
   try {
     const { eventId } = req.params;
 
-    const detail = await detailService.detailEvent(eventId);
+    const detail = await detailService.detailEvent({ eventId });
 
     return res.status(200).success({ event: detail });
   } catch (error) {
@@ -25,7 +25,7 @@ export const detailEvent = async (req, res, next) => {
 export const updateEvent = async (req, res, next) => {
   try {
     const { eventId } = req.params;
-    const { userId } = req.user;
+    const userId = req?.user?.userId || null;
     const updateData = JSON.parse(req.body.data || "{}");
     // 업로드된 파일 정보 추출
     const uploadedFiles = req.files?.event_images || [];
@@ -39,7 +39,7 @@ export const updateEvent = async (req, res, next) => {
       data: updateData,
     });
 
-    await detailService.updateEvent(eventId, userId, updateData);
+    await detailService.updateEvent({ eventId, userId, updateData });
 
     return res.status(200).success({ message: "이벤트 수정 완료" });
   } catch (error) {
@@ -55,7 +55,7 @@ export const deleteEvent = async (req, res, next) => {
   try {
     await detailService.deleteEvent({
       eventId: req.body.eventId,
-      userId: req.user.userId,
+      userId: req?.user?.userId || null,
     });
 
     return res.status(200).success({ message: "이벤트 삭제 완료" });

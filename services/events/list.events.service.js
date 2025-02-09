@@ -5,7 +5,7 @@ import logger from "../../utils/logger/logger.js";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
 // 이벤트 목록 조회
-export const listEvent = async (paginationOptions) => {
+export const listEvent = async ({ paginationOptions }) => {
   const {
     limit,
     cursor,
@@ -40,8 +40,6 @@ export const listEvent = async (paginationOptions) => {
       categoryId: category, // 단일 카테고리
     };
   }
-
-  // TODO : category Id로 filtering 해도 되지 않을까 하는 생각
 
   // 검색어 조건 설정
   let queryWhereClause = {};
@@ -197,7 +195,7 @@ export const validateEventQuery = (queries) => {
   }
 
   // 카테고리 검증
-  const categoryPool = [1, 2, 3];
+  const categoryPool = ["1", "2", "3"];
 
   if (!category || (Array.isArray(category) && category.length === 0)) {
     // 카테고리 값 없음. 즉 전체 카테고리 가져오기
@@ -220,7 +218,7 @@ export const validateEventQuery = (queries) => {
   }
 
   // 위치 검증
-  const locationPool = [1, 2, 3, 4, 5, 6, 7, 8];
+  const locationPool = ["1", "2", "3", "4", "5", "6", "7", "8"];
   if (!location || (Array.isArray(location) && location.length === 0)) {
     // location 값 없음. 즉 전체 location 가져오기
   }

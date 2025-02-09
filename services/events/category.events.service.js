@@ -7,7 +7,7 @@ export const eventCategory = async () => {
       attributes: ["categoryId", "name", "description"],
     });
 
-    return category;
+    return { category };
   } catch (error) {
     throw error;
   }
@@ -19,7 +19,7 @@ export const eventLocation = async () => {
       attributes: ["groupId", "name"],
     });
 
-    return location;
+    return { location };
   } catch (error) {
     throw error;
   }
