@@ -8,7 +8,7 @@ import { parseImagePaths } from "../../utils/upload/uploader.object.js";
  */
 export const createEvent = async (req, res, next) => {
   try {
-    const { userId } = req?.user?.userId || null;
+    const userId = req?.user?.userId || null;
     const eventData = JSON.parse(req.body.data);
     const uploadedFiles = req.files?.event_images || [];
     // 이미지 경로 추가

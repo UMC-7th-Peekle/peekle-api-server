@@ -63,7 +63,7 @@ export const updateTicket = async ({ ticketId, userId, updateData }) => {
 // 티켓 삭제하기
 export const deleteTicket = async ({ ticketId, userId }) => {
   try {
-    const ticket = await models.Tickets.findByPk({ ticketId });
+    const ticket = await models.Tickets.findByPk(ticketId);
 
     if (!ticket) {
       throw new NotExistsError("존재하지 않는 티켓입니다.");
@@ -122,6 +122,15 @@ export const detailTicket = async ({ ticketId, userId }) => {
       data: { ticketId },
     });
     throw new NotExistsError("존재하지 않는 티켓입니다.");
+  }
+
+  if (ticket.createdUserId.toString() !== userId) {
+    logger.warn("사용자가 해당 티켓을 조회할 권한이 없습니다.", {
+      action: "ticket:getDetail",
+      actionType: "error",
+      data: { ticketId, userId },
+    });
+    throw new NotAllowedError("해당 티켓을 조회할 권한이 없습니다.");
   }
 
   // 이미지 URL 변환 처리

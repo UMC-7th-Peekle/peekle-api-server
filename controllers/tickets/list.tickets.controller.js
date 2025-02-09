@@ -6,7 +6,7 @@ import * as listService from "../../services/tickets/list.tickets.service.js";
  */
 export const listTicket = async (req, res, next) => {
   try {
-    const userId = req.user.userId;
+    const userId = req?.user?.userId || null;
     const tickets = await listService.listTicket({ userId });
 
     if (!tickets || tickets.length === 0) {
