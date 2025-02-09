@@ -18,16 +18,19 @@ const router = Router();
 router.get(
   "/users/status",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   reportManageController.getPenalizedUsers
 );
 router.post(
   "/users/status",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   reportManageController.penalizeUser
 );
 router.delete(
   "/users/status",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   reportManageController.unpenalizeUser
 );
 
@@ -37,6 +40,7 @@ router.delete(
 router.get(
   "/reports",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   reportListController.getReports
 );
 
@@ -47,18 +51,21 @@ router.get(
 router.patch(
   "/terms/:termId",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   termController.updateTerm
 );
 // 약관을 삭제합니다.
 router.delete(
   "/terms/:termId",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   termController.deleteTerm
 );
 // 약관을 생성합니다.
 router.post(
   "/terms",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   termController.createTerm
 );
 // 약관 내용을 조회합니다.
