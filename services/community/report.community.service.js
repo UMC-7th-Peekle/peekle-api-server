@@ -41,7 +41,7 @@ const checkIfAlreadyReported = async (targetId, reportedUserId, type) => {
     where: { targetId, reportedUserId, type },
   });
 
-  if (isReported) {
+  if (isReported.type === type) {
     throw new AlreadyExistsError(
       `이미 신고한 ${type === "article" ? "게시글" : "댓글"}입니다.`
     );

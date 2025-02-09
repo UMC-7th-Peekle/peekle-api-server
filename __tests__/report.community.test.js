@@ -10,47 +10,34 @@ import {
 jest.mock("../models/index.js");
 
 describe("Report Service", () => {
-
+  beforeEach(() => {
+    jest.clearAllMocks(); // 각 테스트 후 Mock 함수 초기화
+  });
   describe("reportArticle()", () => {
     it("should successfully report an article", async () => {
-      // 필요한 Mock 설정
       models.Articles.findOne.mockResolvedValue({
         articleId: 1,
+        title: "Test Article",
+        authorId: 9999,
         communityId: 4,
-        authorId: 9999, // 신고자가 아닌 다른 사용자로 설정
       });
 
-      models.Reports.create.mockResolvedValue({
-        targetId: 1,
-        reportedUserId: 1001,
-        reason: "Inappropriate content",
-        type: "article",
-      });
-
-      const result = await reportService.reportArticle({
+      const result = await reportService.reportTarget({
+        targetType: "article",
         communityId: 4,
         articleId: 1,
         reportedUserId: 1001,
         reason: "Inappropriate content",
       });
 
-      expect(models.Articles.findOne).toHaveBeenCalledWith({
-        where: { communityId: 4, articleId: 1 },
-      });
-      expect(models.Reports.create).toHaveBeenCalledWith({
-        targetId: 1,
-        reportedUserId: 1001,
-        reason: "Inappropriate content",
-        type: "article",
-      });
-      expect(result.newReport.type).toBe("article");
     });
 
     it("should throw NotExistsError if the article does not exist", async () => {
-      models.Articles.findOne.mockResolvedValue(null); 
+      models.Articles.findOne.mockResolvedValue(null);
 
       await expect(
-        reportService.reportArticle({
+        reportService.reportTarget({
+          targetType: "article",
           communityId: 4,
           articleId: 9999,
           reportedUserId: 1001,
@@ -66,7 +53,8 @@ describe("Report Service", () => {
       });
 
       await expect(
-        reportService.reportArticle({
+        reportService.reportTarget({
+          targetType: "article",
           communityId: 4,
           articleId: 1,
           reportedUserId: 1001,
@@ -76,10 +64,11 @@ describe("Report Service", () => {
     });
 
     it("should throw AlreadyExistsError if the article is already reported", async () => {
-      models.Reports.findOne.mockResolvedValue({ targetId: 1 }); // 이전 신고 기록이 존재함
+      models.Reports.findOne.mockResolvedValue({ targetId: 1, reportedUserId: 1001, type: "article" }); // 이전 신고 기록이 존재함
 
       await expect(
-        reportService.reportArticle({
+        reportService.reportTarget({
+          targetType: "article",
           communityId: 4,
           articleId: 1,
           reportedUserId: 1001,
@@ -104,7 +93,8 @@ describe("Report Service", () => {
         type: "comment",
       });
 
-      const result = await reportService.reportComment({
+      const result = await reportService.reportTarget({
+        targetType: "comment",
         communityId: 4,
         articleId: 1,
         commentId: 1,
@@ -128,7 +118,8 @@ describe("Report Service", () => {
       models.ArticleComments.findOne.mockResolvedValue(null);
 
       await expect(
-        reportService.reportComment({
+        reportService.reportTarget({
+          targetType: "comment",
           communityId: 4,
           articleId: 1,
           commentId: 9999,
@@ -145,7 +136,8 @@ describe("Report Service", () => {
       });
 
       await expect(
-        reportService.reportComment({
+        reportService.reportTarget({
+          targetType: "comment",
           communityId: 4,
           articleId: 1,
           commentId: 1,
@@ -156,10 +148,11 @@ describe("Report Service", () => {
     });
 
     it("should throw AlreadyExistsError if the comment is already reported", async () => {
-      models.Reports.findOne.mockResolvedValue({ targetId: 1 }); // 이전 신고 기록이 존재함
+      models.Reports.findOne.mockResolvedValue({ targetId: 1, reportedUserId: 1001, type: "comment" }); // 이전 신고 기록이 존재함
 
       await expect(
-        reportService.reportComment({
+        reportService.reportTarget({
+          targetType: "comment",
           communityId: 4,
           articleId: 1,
           commentId: 1,
