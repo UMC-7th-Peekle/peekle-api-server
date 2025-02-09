@@ -8,23 +8,28 @@ import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 
 /**
- * 게시글 좋아요를 추가합니다
+ * 게시글이 존재하는지 확인합니다
  */
-export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
+const checkArticleExists = async (communityId, articleId) => {
   // 원래 ForeignKeyConstraintError를 처리하려 했지만, articleId에 대한 확인도 필요하여 이렇게 수정
   const article = await models.Articles.findOne({
-    where: {
-      communityId,
-      articleId,
-    },
+    where: { communityId, articleId },
   });
 
   if (!article) {
     logger.error(
       `[likeArticle] 게시글이 존재하지 않음 - articleId: ${articleId}`
     );
-    throw new NotExistsError("게시글이 존재하지 않습니다");
+    throw new NotExistsError("게시글이 존재하지 않습니다.");
   }
+  return article;
+};
+
+/**
+ * 게시글 좋아요를 추가합니다
+ */
+export const likeArticle = async ({ communityId, articleId, likedUserId }) => {
+  await checkArticleExists(communityId, articleId); // 게시글이 존재하는지 확인
 
   let like;
   /* try-catch 블록 외부에서 like 선언
@@ -64,32 +69,14 @@ export const unlikeArticle = async ({
   likedUserId,
 }) => {
   // 게시글 조회
-  const article = await models.Articles.findOne({
-    where: {
-      communityId,
-      articleId,
-    },
-    include: [
-      {
-        model: models.ArticleLikes,
-        as: "articleLikes",
-        where: {
-          likedUserId,
-        },
-        required: false, // 좋아요가 없는 경우도 조회 가능하도록 설정
-      }, // true로 설정할 경우 좋아요가 없는 경우 조회되지 article 자체가 null이 되어 좋아요만 없어도 404 에러가 발생
-    ],
+  await checkArticleExists(communityId, articleId); // 게시글이 존재하는지 확인
+
+  // 좋아요 여부 확인
+  const like = await models.ArticleLikes.findOne({
+    where: { articleId, likedUserId },
   });
 
-  if (!article) {
-    // 게시글이 존재하지 않는 경우
-    logger.error(
-      `[unlikeArticle] 게시글이 존재하지 않음 - communityId: ${communityId}, articleId: ${articleId}`
-    );
-    throw new NotExistsError("게시글이 존재하지 않습니다"); // 404
-  }
-
-  if (article.articleLikes.length === 0) {
+  if (!like) {
     // 이미 좋아요가 취소된 경우
     logger.error(
       `[unlikeArticle] 이미 좋아요가 취소된 게시글 - articleId: ${articleId}, likedUserId: ${likedUserId}`
@@ -98,7 +85,7 @@ export const unlikeArticle = async ({
   }
 
   // 좋아요 삭제
-  await article.articleLikes[0].destroy();
+  await like.destroy();
 
   return;
 };
