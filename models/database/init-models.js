@@ -23,6 +23,7 @@ import _PeeklingImages from  "./PeeklingImages.js";
 import _Permissions from  "./Permissions.js";
 import _RefreshTokens from  "./RefreshTokens.js";
 import _Reports from  "./Reports.js";
+import _RoleHierarchy from  "./RoleHierarchy.js";
 import _RolePermissions from  "./RolePermissions.js";
 import _Roles from  "./Roles.js";
 import _Terms from  "./Terms.js";
@@ -62,6 +63,7 @@ export default function initModels(sequelize) {
   const Permissions = _Permissions.init(sequelize, DataTypes);
   const RefreshTokens = _RefreshTokens.init(sequelize, DataTypes);
   const Reports = _Reports.init(sequelize, DataTypes);
+  const RoleHierarchy = _RoleHierarchy.init(sequelize, DataTypes);
   const RolePermissions = _RolePermissions.init(sequelize, DataTypes);
   const Roles = _Roles.init(sequelize, DataTypes);
   const Terms = _Terms.init(sequelize, DataTypes);
@@ -79,6 +81,8 @@ export default function initModels(sequelize) {
 
   Permissions.belongsToMany(Roles, { as: 'roleIdRoles', through: RolePermissions, foreignKey: "permissionId", otherKey: "roleId" });
   Roles.belongsToMany(Permissions, { as: 'permissionIdPermissions', through: RolePermissions, foreignKey: "roleId", otherKey: "permissionId" });
+  Roles.belongsToMany(Roles, { as: 'childRoleIdRoles', through: RoleHierarchy, foreignKey: "parentRoleId", otherKey: "childRoleId" });
+  Roles.belongsToMany(Roles, { as: 'parentRoleIdRoles', through: RoleHierarchy, foreignKey: "childRoleId", otherKey: "parentRoleId" });
   Roles.belongsToMany(Users, { as: 'userIdUsers', through: UserRoles, foreignKey: "roleId", otherKey: "userId" });
   Users.belongsToMany(Roles, { as: 'roleIdRolesUserRoles', through: UserRoles, foreignKey: "userId", otherKey: "roleId" });
   ArticleCommentLikes.belongsTo(ArticleComments, { as: "comment", foreignKey: "commentId"});
@@ -115,10 +119,12 @@ export default function initModels(sequelize) {
   PeeklingCategory.hasMany(Peekling, { as: "peeklings", foreignKey: "categoryId"});
   RolePermissions.belongsTo(Permissions, { as: "permission", foreignKey: "permissionId"});
   Permissions.hasMany(RolePermissions, { as: "rolePermissions", foreignKey: "permissionId"});
+  RoleHierarchy.belongsTo(Roles, { as: "parentRole", foreignKey: "parentRoleId"});
+  Roles.hasMany(RoleHierarchy, { as: "roleHierarchies", foreignKey: "parentRoleId"});
+  RoleHierarchy.belongsTo(Roles, { as: "childRole", foreignKey: "childRoleId"});
+  Roles.hasMany(RoleHierarchy, { as: "childRoleRoleHierarchies", foreignKey: "childRoleId"});
   RolePermissions.belongsTo(Roles, { as: "role", foreignKey: "roleId"});
   Roles.hasMany(RolePermissions, { as: "rolePermissions", foreignKey: "roleId"});
-  Roles.belongsTo(Roles, { as: "parentRole", foreignKey: "parentRoleId"});
-  Roles.hasMany(Roles, { as: "roles", foreignKey: "parentRoleId"});
   UserRoles.belongsTo(Roles, { as: "role", foreignKey: "roleId"});
   Roles.hasMany(UserRoles, { as: "userRoles", foreignKey: "roleId"});
   UserTerms.belongsTo(Terms, { as: "term", foreignKey: "termId"});
@@ -194,6 +200,7 @@ export default function initModels(sequelize) {
     Permissions,
     RefreshTokens,
     Reports,
+    RoleHierarchy,
     RolePermissions,
     Roles,
     Terms,

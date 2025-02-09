@@ -27,7 +27,7 @@ const router = Router();
 router.get(
   "/check-perms/admin",
   authenticateAccessToken,
-  checkPermission("admin"),
+  checkPermission("admin:super"),
   (req, res) => {
     res.status(201).success({
       message: "권한이 있습니다.",

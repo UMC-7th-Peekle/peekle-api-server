@@ -8,16 +8,16 @@ import { parseImagePaths } from "../../utils/upload/uploader.object.js";
  */
 export const createTicket = async (req, res, next) => {
   try {
-    const { userId } = req.user;
-    const ticketData = req.body;
+    const userId = req?.user?.userId || null;
+    const ticketTitle = req.body.title;
 
     logger.debug("티켓 생성", {
       action: "ticket:create",
       userId: userId,
-      data: ticketData,
+      data: ticketTitle,
     });
 
-    const ticket = await createService.createTicket({ userId, ticketData });
+    const ticket = await createService.createTicket({ userId, ticketTitle });
 
     if (ticket) {
       // 201
@@ -31,8 +31,7 @@ export const createTicket = async (req, res, next) => {
 
 /**
 {
-	"title": "티켓제목",
-	"status": "open"
+	"title": "티켓제목"
 },
  */
 
@@ -41,7 +40,7 @@ export const createTicket = async (req, res, next) => {
  */
 export const createTicketMessage = async (req, res, next) => {
   try {
-    const { userId } = req.user;
+    const userId = req?.user?.userId || null;
     const ticketMessageData = JSON.parse(req.body.data);
     const uploadedFiles = req.files?.ticket_images || [];
     // 이미지 경로 추가

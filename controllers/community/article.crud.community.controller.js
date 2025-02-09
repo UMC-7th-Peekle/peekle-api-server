@@ -23,8 +23,8 @@ export const createCommunity = async (req, res, next) => {
 export const getArticleById = async (req, res, next) => {
   try {
     const { communityId, articleId } = req.params; // URL에서 communityId, articleId 추출
-    const userId = req.user ? req.user.userId : null;  // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
-    const article = await articleCrudService.getArticleById({
+    const userId = req.user ? req.user.userId : null; // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
+    const { article } = await articleCrudService.getArticleById({
       communityId,
       articleId,
       userId,
@@ -47,20 +47,14 @@ export const createArticle = async (req, res, next) => {
     // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
     // 사용자 인증 검증
     const { communityId } = req.params; // URL에서 communityId 추출
-    const { title, content, isAnonymous } = JSON.parse(req.body.data); // Request body에서 title, content 추출
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
-
-    // 업로드된 파일 정보 추출
-    const uploadedFiles = req.files?.article_images || [];
 
     // 게시글 생성
     await articleCrudService.createArticle({
       communityId,
       authorId,
-      title,
-      content,
-      isAnonymous,
-      imagePaths: parseImagePaths(uploadedFiles),
+      requestBody: req.body.data,
+      uploadedFiles: req.files?.article_images || [],
     });
 
     // TODO: 사진 업로드 안 되었을 시 적용할 transaction 처리

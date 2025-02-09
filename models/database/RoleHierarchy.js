@@ -1,23 +1,28 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Roles extends Model {
+export default class RoleHierarchy extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    roleId: {
-      autoIncrement: true,
+    parentRoleId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
-      field: 'role_id'
+      references: {
+        model: 'roles',
+        key: 'role_id'
+      },
+      field: 'parent_role_id'
     },
-    name: {
-      type: DataTypes.STRING(128),
-      allowNull: false
-    },
-    description: {
-      type: DataTypes.STRING(512),
-      allowNull: true
+    childRoleId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: false,
+      primaryKey: true,
+      references: {
+        model: 'roles',
+        key: 'role_id'
+      },
+      field: 'child_role_id'
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -33,7 +38,7 @@ export default class Roles extends Model {
     }
   }, {
     sequelize,
-    tableName: 'roles',
+    tableName: 'role_hierarchy',
     timestamps: false,
     indexes: [
       {
@@ -41,7 +46,15 @@ export default class Roles extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "role_id" },
+          { name: "parent_role_id" },
+          { name: "child_role_id" },
+        ]
+      },
+      {
+        name: "role_hierarchy_roles_role_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "child_role_id" },
         ]
       },
     ]

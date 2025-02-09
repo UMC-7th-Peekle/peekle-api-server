@@ -9,7 +9,7 @@ import logger from "../../utils/logger/logger.js";
 export const updateTicket = async (req, res, next) => {
   try {
     const { ticketId } = req.params;
-    const { userId } = req.user;
+    const userId = req?.user?.userId || null;
     const updateData = req.body;
 
     logger.debug("티켓 상태 수정", {
@@ -33,19 +33,19 @@ export const updateTicket = async (req, res, next) => {
  * 상태가 open인 경우에만 티켓 삭제가 가능합니다.
  * ticketId는 req에서 body로 받아오는 것으로 수정하였습니다.
  */
-export const deleteTicket = async (req, res, next) => {
-  try {
-    await detailService.deleteTicket({
-      ticketId: req.body.ticketId,
-      userId: req.user.userId,
-    });
+// export const deleteTicket = async (req, res, next) => {
+//   try {
+//     await detailService.deleteTicket({
+//       ticketId: req.body.ticketId,
+//       userId: req?.user?.userId || null,
+//     });
 
-    return res.status(200).success({ message: "티켓 삭제 완료" });
-  } catch (error) {
-    logError(error);
-    next(error);
-  }
-};
+//     return res.status(200).success({ message: "티켓 삭제 완료" });
+//   } catch (error) {
+//     logError(error);
+//     next(error);
+//   }
+// };
 
 /**
  * 해당 티켓 속 메시지들 모두 조회 (본인 티켓에서~)
@@ -53,7 +53,7 @@ export const deleteTicket = async (req, res, next) => {
 export const detailTicket = async (req, res, next) => {
   try {
     const { ticketId } = req.params;
-    const { userId } = req.user;
+    const userId = req?.user?.userId || null;
 
     const ticketData = await detailService.detailTicket({ ticketId, userId });
 

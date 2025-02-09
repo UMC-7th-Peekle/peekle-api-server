@@ -7,6 +7,8 @@ import * as reportListController from "../controllers/admin/report.list.admin.co
 import * as reportManageController from "../controllers/admin/report.manage.admin.controller.js";
 
 import * as authenticatMiddleware from "../middleware/authenticate.jwt.js";
+import * as acController from "../controllers/admin/ac.admin.controller.js";
+import { checkPermission } from "../middleware/check.permission.js";
 
 const router = Router();
 
@@ -16,16 +18,19 @@ const router = Router();
 router.get(
   "/users/status",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   reportManageController.getPenalizedUsers
 );
 router.post(
   "/users/status",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   reportManageController.penalizeUser
 );
 router.delete(
   "/users/status",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   reportManageController.unpenalizeUser
 );
 
@@ -35,6 +40,7 @@ router.delete(
 router.get(
   "/reports",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   reportListController.getReports
 );
 
@@ -45,18 +51,21 @@ router.get(
 router.patch(
   "/terms/:termId",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   termController.updateTerm
 );
 // 약관을 삭제합니다.
 router.delete(
   "/terms/:termId",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   termController.deleteTerm
 );
 // 약관을 생성합니다.
 router.post(
   "/terms",
   authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
   termController.createTerm
 );
 // 약관 내용을 조회합니다.
@@ -72,7 +81,6 @@ router.get(
   termController.getTerms
 );
 
-
 /*
   서비스 통계
 */
@@ -84,21 +92,42 @@ router.get("/statistics/events", notImplementedController);
   관리자 추가, 삭제
 */
 
-// 관리자 현황 가져오기
-router.get("/", notImplementedController);
+// get all permissions
+router.get(
+  "/permissions",
+  authenticatMiddleware.authenticateAccessToken,
+  acController.getPermissions
+);
 
-// 관리자 추가
-router.post("/", notImplementedController);
+// get all roles
+router.get(
+  "/roles",
+  authenticatMiddleware.authenticateAccessToken,
+  acController.getRoles
+);
 
-// 관리자 권한 수정
-router.patch("/", notImplementedController);
+// create roles
+router.post(
+  "/roles",
+  authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
+  acController.createRole
+);
 
-// 관리자 권한 삭제
-router.delete("/", notImplementedController);
+// assign roles to users
+router.post(
+  "/roles/user",
+  authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
+  acController.assignRoleToUser
+);
 
-// 권한 목록 가져오기
-router.get("/role", notImplementedController);
-// 권한 추가
-router.post("/role", notImplementedController);
+// delete roles from users
+router.delete(
+  "/roles/user",
+  authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
+  acController.deleteRoleFromUser
+);
 
 export default router;

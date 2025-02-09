@@ -8,7 +8,7 @@ import { Sequelize } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
 // 새로운 스크랩 생성
-export const newScrap = async (eventId, userId) => {
+export const newScrap = async ({ eventId, userId }) => {
   try {
     // 유니크 키 위반 발생 시 Sequelize가 UniqueConstraintError를 throw
     const newScrap = await models.EventScraps.create({ eventId, userId });
@@ -23,7 +23,7 @@ export const newScrap = async (eventId, userId) => {
   }
 };
 
-export const deleteScrap = async (eventId, userId) => {
+export const deleteScrap = async ({ eventId, userId }) => {
   try {
     const event = await models.Events.findOne({ where: { eventId } });
     if (!event) {
@@ -48,7 +48,7 @@ export const deleteScrap = async (eventId, userId) => {
 /**
  * 스크랩한 이벤트 목록을 조회합니다.
  */
-export const listScrap = async (paginationOptions, userId) => {
+export const listScrap = async ({ paginationOptions, userId }) => {
   const { limit, cursor, scrap } = paginationOptions;
 
   // 커서 기준 조건 설정
@@ -58,9 +58,6 @@ export const listScrap = async (paginationOptions, userId) => {
       eventId: { [Op.lt]: cursor }, // 해당 커서 기준, 더 과거의 값 (더 작은 값)
     };
   }
-
-  // userId 조건 설정
-  const userWhereClause = { userId };
 
   // 스크랩 조건 설정
   let scrapWhereClause = {};
@@ -76,8 +73,8 @@ export const listScrap = async (paginationOptions, userId) => {
   const events = await models.EventScraps.findAll({
     where: {
       ...cursorWhereClause,
-      ...userWhereClause,
       ...scrapWhereClause,
+      userId,
     },
     limit: limit + 1,
     order: [["eventScrapId", "DESC"]],
