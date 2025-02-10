@@ -1,7 +1,39 @@
+import axios from "axios";
 import models from "../../models/index.js";
 import { InvalidInputError } from "../../utils/errors/errors.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
+import config from "../../config.json" with { type: "json" };
+
+// 네이버 API URL
+const NAVER_ADDRESS_URL =
+  "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode";
+// 키
+const NAVER_CLIENT_ID = config.NAVER.VITE_NAVER_MAP_CLIENT_ID;
+const NAVER_CLIENT_SECRET = config.NAVER.VITE_NAVER_MAP_CLIENT_SECRET;
+
+// 주소로 위치 좌표 알기
+const getLocationFromAddress = async (detailAddress) => {
+  try {
+    const location = await axios.get(NAVER_ADDRESS_URL, {
+      params: { query: detailAddress },
+      headers: {
+        "X-NCP-APIGW-API-KEY-ID": NAVER_CLIENT_ID,
+        "X-NCP-APIGW-API-KEY": NAVER_CLIENT_SECRET,
+      },
+    });
+
+    if (location.data.addresses.length === 0) {
+      throw new InvalidInputError("주소에 해당하는 좌표를 찾을 수 없습니다.");
+    }
+
+    const { x, y } = location.data.addresses[0]; // 좌표 가져오기
+    return { latitude: parseFloat(y), longitude: parseFloat(x) };
+  } catch (error) {
+    console.error("주소 검색 실패:", error);
+    throw new InvalidInputError("주소 검색에 실패했습니다.");
+  }
+};
 
 // 새로운 이벤트 생성
 export const createEvent = async ({ userId, eventData }) => {
@@ -51,6 +83,25 @@ export const createEvent = async ({ userId, eventData }) => {
 
     await models.EventSchedules.bulkCreate(eventSchedules, { transaction });
 
+    // 주소로 위치 좌표 계산
+    if (eventData.detailAddress) {
+      const { latitude, longitude } = await getLocationFromAddress(
+        eventData.detailAddress
+      );
+
+      // EventLocation 테이블에 좌표 저장
+      await models.EventLocation.create(
+        {
+          eventId: event.eventId,
+          position: models.Sequelize.fn(
+            "ST_GeomFromText",
+            `POINT(${longitude} ${latitude})`
+          ),
+        },
+        { transaction }
+      );
+    }
+
     await transaction.commit();
 
     logger.debug("이벤트 생성 성공", {
@@ -59,7 +110,7 @@ export const createEvent = async ({ userId, eventData }) => {
       userId: userId,
     });
 
-    return event;
+    return { event };
   } catch (error) {
     logError(error);
     logger.error("이벤트 생성 실패, Rollback 실행됨.", {

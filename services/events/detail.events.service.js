@@ -1,4 +1,4 @@
-import axios from "axios"; // http 요청 보내기(프로미스 기반으로 비동기 작업을 처리)
+// import axios from "axios"; // http 요청 보내기(프로미스 기반으로 비동기 작업을 처리)
 import models from "../../models/index.js";
 import {
   NotExistsError,
@@ -11,57 +11,57 @@ import {
   deleteLocalFile,
   isEditInputCorrect,
 } from "../../utils/upload/uploader.object.js";
-import config from "../../config.json" with { type: "json" };
+// import config from "../../config.json" with { type: "json" };
 
-// 네이버 API URL
-const NAVER_ADDRESS_URL =
-  "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode";
+// // 네이버 API URL
+// const NAVER_ADDRESS_URL =
+//   "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode";
 
-// 키
-const NAVER_CLIENT_ID = config.NAVER.VITE_NAVER_MAP_CLIENT_ID;
-const NAVER_CLIENT_SECRET = config.NAVER.VITE_NAVER_MAP_CLIENT_SECRET;
+// // 키
+// const NAVER_CLIENT_ID = config.NAVER.VITE_NAVER_MAP_CLIENT_ID;
+// const NAVER_CLIENT_SECRET = config.NAVER.VITE_NAVER_MAP_CLIENT_SECRET;
 
-// 주소로 위치 좌표 알기
-const getLocationFromAddress = async (eventId) => {
-  try {
-    const event = await models.Events.findByPk(eventId, {
-      attributes: ["detailAddress"], // detailAddress 가져오기
-    });
+// // 주소로 위치 좌표 알기
+// const getLocationFromAddress = async (eventId) => {
+//   try {
+//     const event = await models.Events.findByPk(eventId, {
+//       attributes: ["detailAddress"], // detailAddress 가져오기
+//     });
 
-    if (!event || !event.detailAddress) {
-      throw new InvalidInputError(
-        "해당 이벤트의 상세 주소가 존재하지 않습니다."
-      );
-    }
+//     if (!event || !event.detailAddress) {
+//       throw new InvalidInputError(
+//         "해당 이벤트의 상세 주소가 존재하지 않습니다."
+//       );
+//     }
 
-    // axios.get(): 외부 API에 get 요청..
-    const location = await axios.get(NAVER_ADDRESS_URL, {
-      params: { query: event.detailAddress }, // 이벤트 상세 주소로 위치 좌표 (URL 뒤에 쿼리로 붙음)
-      headers: {
-        "X-NCP-APIGW-API-KEY-ID": NAVER_CLIENT_ID, // API 키 헤더
-        "X-NCP-APIGW-API-KEY": NAVER_CLIENT_SECRET,
-      }, // 요청 키 (ID랑 KEY 두 개로 나눈 이유....?)
-      // =>  API 키 관리 및 보안을 강화하려고 그랬대
-    });
+//     // axios.get(): 외부 API에 get 요청..
+//     const location = await axios.get(NAVER_ADDRESS_URL, {
+//       params: { query: event.detailAddress }, // 이벤트 상세 주소로 위치 좌표 (URL 뒤에 쿼리로 붙음)
+//       headers: {
+//         "X-NCP-APIGW-API-KEY-ID": NAVER_CLIENT_ID, // API 키 헤더
+//         "X-NCP-APIGW-API-KEY": NAVER_CLIENT_SECRET,
+//       }, // 요청 키 (ID랑 KEY 두 개로 나눈 이유....?)
+//       // =>  API 키 관리 및 보안을 강화하려고 그랬대
+//     });
 
-    if (location.data.addresses.length === 0) {
-      throw new InvalidInputError("주소에 해당하는 좌표를 찾을 수 없습니다.");
-    }
+//     if (location.data.addresses.length === 0) {
+//       throw new InvalidInputError("주소에 해당하는 좌표를 찾을 수 없습니다.");
+//     }
 
-    const { x, y } = location.data.addresses[0]; // 좌표 가져오기
-    return { latitude: parseFloat(y), longitude: parseFloat(x) };
-  } catch (error) {
-    console.error("주소 검색 실패:", error);
-    throw new InvalidInputError("주소 검색에 실패했습니다.");
-  }
-};
+//     const { x, y } = location.data.addresses[0]; // 좌표 가져오기
+//     return { latitude: parseFloat(y), longitude: parseFloat(x) };
+//   } catch (error) {
+//     console.error("주소 검색 실패:", error);
+//     throw new InvalidInputError("주소 검색에 실패했습니다.");
+//   }
+// };
 
-// 전체적으로 이제 좌표랑 장소명 반환
-const getLocationFromEventId = async (eventId) => {
-  const { latitude, longitude } = await getLocationFromAddress(eventId);
+// // 전체적으로 이제 좌표랑 장소명 반환
+// const getLocationFromEventId = async (eventId) => {
+//   const { latitude, longitude } = await getLocationFromAddress(eventId);
 
-  return { position: { latitude, longitude } };
-};
+//   return { position: { latitude, longitude } };
+// };
 
 export const detailEvent = async ({ eventId }) => {
   // eventId가 유효하지 않은 경우 400
@@ -69,30 +69,30 @@ export const detailEvent = async ({ eventId }) => {
    * 아직 Ajv로 유효성 검사 안했어요
    */
 
-  // 주소로 위치 가져오기
-  const { position } = await getLocationFromEventId(eventId);
-  const { latitude, longitude } = position;
+  // // 주소로 위치 가져오기
+  // const { position } = await getLocationFromEventId(eventId);
+  // const { latitude, longitude } = position;
 
-  const isExistLocation = await models.EventLocation.findOne({
-    where: {
-      eventId,
-      position: models.Sequelize.fn(
-        "ST_GeomFromText",
-        `POINT(${longitude} ${latitude})`
-      ),
-    },
-  });
+  // const isExistLocation = await models.EventLocation.findOne({
+  //   where: {
+  //     eventId,
+  //     position: models.Sequelize.fn(
+  //       "ST_GeomFromText",
+  //       `POINT(${longitude} ${latitude})`
+  //     ),
+  //   },
+  // });
 
-  if (!isExistLocation) {
-    // 중복되지 않으면 새로운 위치 데이터 삽입
-    await models.EventLocation.create({
-      eventId,
-      position: models.Sequelize.fn(
-        "ST_GeomFromText",
-        `POINT(${longitude} ${latitude})`
-      ),
-    });
-  }
+  // if (!isExistLocation) {
+  //   // 중복되지 않으면 새로운 위치 데이터 삽입
+  //   await models.EventLocation.create({
+  //     eventId,
+  //     position: models.Sequelize.fn(
+  //       "ST_GeomFromText",
+  //       `POINT(${longitude} ${latitude})`
+  //     ),
+  //   });
+  // }
 
   const data = await models.Events.findOne({
     where: { eventId: eventId },
