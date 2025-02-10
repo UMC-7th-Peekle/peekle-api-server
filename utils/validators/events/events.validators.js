@@ -5,6 +5,8 @@ export const postEventSchema = {
     content: { type: "string" },
     price: { type: "number" },
     categoryId: { type: "number" },
+    detailAddress: { type: "string" },
+    placeName: { type: "string" },
     location: { type: "string" },
     locationGroupId: { type: "number" },
     eventUrl: { type: "string", format: "uri" },

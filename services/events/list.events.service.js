@@ -125,6 +125,12 @@ export const listEvent = async ({ paginationOptions }) => {
           "endTime",
         ],
       },
+      // 상세 주소 관련 위치 및 장소명
+      {
+        model: models.EventLocation,
+        as: "eventLocations",
+        attributes: ["position"],
+      },
     ],
   });
 
