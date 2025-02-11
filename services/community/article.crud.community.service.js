@@ -119,8 +119,14 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
 
   // 댓글 정보에 좋아요 여부, 좋아요 개수 및 작성자 정보 추가
   const transformedComments = data.articleComments.map((comment) => {
-    const { author, articleCommentLikes, status, content, ...commentData } =
-      comment.dataValues;
+    const {
+      author,
+      articleCommentLikes,
+      status,
+      content,
+      isAnonymous,
+      ...commentData
+    } = comment.dataValues;
 
     const isCommentLikedByUser = userId
       ? articleCommentLikes.some(
@@ -132,12 +138,22 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     // status가 'deleted'인 경우 content를 빈 문자열로 설정
     const processedContent = status === "deleted" ? "" : content;
 
+    // 익명 처리 로직: isAnonymous 값에 따라 익명 닉네임 설정
+    let transformedAuthorInfo = author;
+    // isAnonymous가 0이 아닌 양의 정수일 경우 익명이 됨
+    if (isAnonymous !== 0) {
+      transformedAuthorInfo = {
+        nickname: `익명${isAnonymous}`, // isAnonymous 값을 그대로 사용하여 익명 번호 지정
+        profileImage: null,
+        authorId: null,
+      };
+    }
     return {
-      // 댓글에 대한 정보
-      authorInfo: status === "deleted" ? null : author,
+      authorInfo: status === "deleted" ? null : transformedAuthorInfo,
       isLikedByUser: isCommentLikedByUser,
       commentLikesCount: status === "deleted" ? 0 : commentLikesCount,
       content: processedContent,
+      isAnonymous,
       status, // 상태 정보도 포함해 응답
       ...commentData,
     };

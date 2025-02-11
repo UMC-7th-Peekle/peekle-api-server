@@ -31,6 +31,35 @@ export const createComment = async ({
     throw new NotExistsError("해당 게시글이 존재하지 않습니다");
   }
 
+  let assignedAnonymousId = 0;
+
+  if (isAnonymous) {
+    // 현재 사용자의 익명 번호와 전체 최댓값을 가져옴
+    const [result] = await models.sequelize.query(
+      `
+      SELECT 
+        (SELECT is_anonymous 
+         FROM article_comments 
+         WHERE article_id = :articleId 
+           AND author_id = :authorId 
+           AND is_anonymous != 0
+         LIMIT 1) AS existingAnonymousId,
+    
+        MAX(is_anonymous) AS maxAnonymousId
+      FROM article_comments 
+      WHERE article_id = :articleId
+      `,
+      {
+        replacements: { articleId, authorId },
+        type: models.sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    // 기존 익명 댓글이 있는 경우 해당 번호를 사용, 없으면 최댓값 + 1로 설정
+    assignedAnonymousId =
+      result.existingAnonymousId || (result.maxAnonymousId || 0) + 1;
+  }
+
   let comment;
   /* try-catch 블록 외부에서 comment 선언
   try-catch 블록 내부에서 comment를 생성하고 반환하면
@@ -43,7 +72,7 @@ export const createComment = async ({
       authorId,
       content,
       status: "active",
-      isAnonymous,
+      isAnonymous: assignedAnonymousId, // 최종 익명 번호 설정
     });
   } catch (error) {
     if (error instanceof models.Sequelize.ForeignKeyConstraintError) {
@@ -229,9 +258,7 @@ export const deleteReply = async ({
     });
   } else {
     // 대댓글만 삭제
-    await models.ArticleComments.destroy(
-      { where: { commentId: commentId } }
-    );
+    await models.ArticleComments.destroy({ where: { commentId: commentId } });
   }
 };
 
@@ -311,22 +338,41 @@ export const getComments = async ({ communityId, articleId, userId }) => {
   // 댓글 정보에 좋아요 여부, 좋아요 개수 및 작성자 정보 추가
   const transformedComments = articleWithComments.articleComments.map(
     (comment) => {
-      const { author, articleCommentLikes, status, content, ...commentData } =
-        comment.dataValues;
+      const {
+        author,
+        articleCommentLikes,
+        status,
+        content,
+        isAnonymous,
+        ...commentData
+      } = comment.dataValues;
 
       const isCommentLikedByUser = userId
-        ? articleCommentLikes.some((like) => like.likedUserId === userId)
+        ? articleCommentLikes.some(
+            (like) => Number(like.likedUserId) === Number(userId)
+          )
         : false;
       const commentLikesCount = articleCommentLikes.length;
 
       // status가 'deleted'인 경우 content를 빈 문자열로 설정
       const processedContent = status === "deleted" ? "" : content;
 
+      // 익명 처리 로직: isAnonymous 값에 따라 익명 닉네임 설정
+      let transformedAuthorInfo = author;
+      // isAnonymous가 0이 아닌 양의 정수일 경우 익명이 됨
+      if (isAnonymous !== 0) {
+        transformedAuthorInfo = {
+          nickname: `익명${isAnonymous}`, // isAnonymous 값을 그대로 사용하여 익명 번호 지정
+          profileImage: null,
+          authorId: null,
+        };
+      }
       return {
-        authorInfo: status === "deleted" ? null : author, // 삭제된 경우 작성자 정보 숨김
+        authorInfo: status === "deleted" ? null : transformedAuthorInfo,
         isLikedByUser: isCommentLikedByUser,
         commentLikesCount: status === "deleted" ? 0 : commentLikesCount,
         content: processedContent,
+        isAnonymous,
         status, // 상태 정보도 포함해 응답
         ...commentData,
       };
