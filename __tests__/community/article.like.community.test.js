@@ -1,9 +1,12 @@
-import * as articleLikeService from "../services/community/article.like.community.service.js";
-import models from "../models/index.js";
-import { NotExistsError, AlreadyExistsError } from "../utils/errors/errors.js";
+import * as articleLikeService from "../../services/community/article.like.community.service.js";
+import models from "../../models/index.js";
+import {
+  NotExistsError,
+  AlreadyExistsError,
+} from "../../utils/errors/errors.js";
 
 // Mock dependencies
-jest.mock("../models/index.js");
+jest.mock("../../models/index.js");
 
 describe("Article Like Service", () => {
   afterEach(() => {

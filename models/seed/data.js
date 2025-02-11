@@ -1,6 +1,6 @@
 import config from "../../config.json" with { type: "json" };
-
 import { randomUUID } from 'crypto'; // UUID 기반 랜덤 문자열
+
 export const getRandomNumber = (n) => Math.floor(Math.random() * n) + 1;
 export const getRandomArticleContent = () => {
   return articleContentSample[getRandomNumber(articleContentSample.length) - 1];

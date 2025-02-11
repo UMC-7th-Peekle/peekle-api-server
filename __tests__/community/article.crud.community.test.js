@@ -1,13 +1,13 @@
-import * as articleCrudService from "../services/community/article.crud.community.service.js";
-import models from "../models/index.js";
+import * as articleCrudService from "../../services/community/article.crud.community.service.js";
+import models from "../../models/index.js";
 import {
   AlreadyExistsError,
   NotAllowedError,
   NotExistsError,
-} from "../utils/errors/errors.js";
+} from "../../utils/errors/errors.js";
 
 // Mock dependencies
-jest.mock("../models/index.js");
+jest.mock("../../models/index.js");
 
 describe("Article CRUD Service", () => {
   afterEach(() => {

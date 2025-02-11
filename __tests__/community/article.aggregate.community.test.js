@@ -1,9 +1,12 @@
-import * as articleAggregateService from "../services/community/article.aggregate.community.service.js";
-import models from "../models/index.js";
-import { NotExistsError, InvalidQueryError } from "../utils/errors/errors.js";
+import * as articleAggregateService from "../../services/community/article.aggregate.community.service.js";
+import models from "../../models/index.js";
+import {
+  NotExistsError,
+  InvalidQueryError,
+} from "../../utils/errors/errors.js";
 
 // Mock dependencies
-jest.mock("../models/index.js");
+jest.mock("../../models/index.js");
 
 describe("Article Aggregate Service", () => {
   // 동적으로 현재 시간과 3일 전 시간 설정

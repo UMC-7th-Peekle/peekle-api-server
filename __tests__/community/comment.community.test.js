@@ -1,13 +1,13 @@
-import * as commentService from "../services/community/comment.community.service.js";
-import models from "../models/index.js";
+import * as commentService from "../../services/community/comment.community.service.js";
+import models from "../../models/index.js";
 import {
   NotExistsError,
   NotAllowedError,
   InvalidQueryError,
-} from "../utils/errors/errors.js";
+} from "../../utils/errors/errors.js";
 
 // Mock dependencies
-jest.mock("../models/index.js");
+jest.mock("../../models/index.js");
 
 describe("Comment Service", () => {
   afterEach(() => {

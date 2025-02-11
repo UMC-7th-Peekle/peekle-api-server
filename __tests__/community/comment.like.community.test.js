@@ -1,9 +1,12 @@
-import * as commentLikeService from "../services/community/comment.like.community.service.js";
-import models from "../models/index.js";
-import { NotExistsError, AlreadyExistsError } from "../utils/errors/errors.js";
+import * as commentLikeService from "../../services/community/comment.like.community.service.js";
+import models from "../../models/index.js";
+import {
+  NotExistsError,
+  AlreadyExistsError,
+} from "../../utils/errors/errors.js";
 
 // Mock dependencies
-jest.mock("../models/index.js");
+jest.mock("../../models/index.js");
 
 describe("Comment Like Service", () => {
   afterEach(() => {
@@ -14,7 +17,10 @@ describe("Comment Like Service", () => {
     it("should successfully add a like to a comment", async () => {
       // 댓글 조회 및 좋아요 추가 동작을 Mock으로 설정
       models.ArticleComments.findOne.mockResolvedValue({ commentId: 1 });
-      models.ArticleCommentLikes.create.mockResolvedValue({ id: 1, commentId: 1 });
+      models.ArticleCommentLikes.create.mockResolvedValue({
+        id: 1,
+        commentId: 1,
+      });
 
       const response = await commentLikeService.likeComment({
         communityId: 4,

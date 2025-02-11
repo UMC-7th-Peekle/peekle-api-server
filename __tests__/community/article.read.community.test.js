@@ -1,9 +1,12 @@
-import * as articleReadService from "../services/community/article.read.community.service.js";
-import models from "../models/index.js";
-import { InvalidQueryError, NotExistsError } from "../utils/errors/errors.js";
+import * as articleReadService from "../../services/community/article.read.community.service.js";
+import models from "../../models/index.js";
+import {
+  InvalidQueryError,
+  NotExistsError,
+} from "../../utils/errors/errors.js";
 
 // Mock dependencies
-jest.mock("../models/index.js");
+jest.mock("../../models/index.js");
 
 describe("Article Read Service", () => {
   afterEach(() => {
@@ -79,7 +82,6 @@ describe("Article Read Service", () => {
         include: expect.any(Array),
       });
       expect(result.articles).toHaveLength(2);
-
 
       // 첫 번째 게시글 검증
       expect(result.articles[0].dataValues.title).toBe("Test Article 1");
@@ -169,7 +171,7 @@ describe("Article Read Service", () => {
       });
 
       expect(result.articles).toHaveLength(2);
-      
+
       expect(result.articles[0].dataValues.title).toBe("Liked Article 1");
       expect(result.articles[0].dataValues.articleComments).toBe(1);
       expect(result.articles[0].dataValues.articleLikes).toBe(1);
@@ -181,7 +183,6 @@ describe("Article Read Service", () => {
       expect(result.articles[1].dataValues.articleLikes).toBe(1);
       expect(result.articles[1].dataValues.thumbnail).toContain("image2.jpg");
       expect(result.articles[1].dataValues.authorInfo.nickname).toBe("User2");
-
     });
 
     it("should return an empty array if no liked articles are found", async () => {

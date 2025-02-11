@@ -1,13 +1,13 @@
-import * as reportService from "../services/community/report.community.service.js";
-import models from "../models/index.js";
+import * as reportService from "../../services/community/report.community.service.js";
+import models from "../../models/index.js";
 import {
   NotAllowedError,
   AlreadyExistsError,
   NotExistsError,
-} from "../utils/errors/errors.js";
+} from "../../utils/errors/errors.js";
 
 // Mock dependencies
-jest.mock("../models/index.js");
+jest.mock("../../models/index.js");
 
 describe("Report Service", () => {
 
