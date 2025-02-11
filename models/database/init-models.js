@@ -99,8 +99,8 @@ export default function initModels(sequelize) {
   Communities.hasMany(Articles, { as: "articles", foreignKey: "communityId"});
   Events.belongsTo(EventCategory, { as: "category", foreignKey: "categoryId"});
   EventCategory.hasMany(Events, { as: "events", foreignKey: "categoryId"});
-  Events.belongsTo(EventLocationGroups, { as: "locationGroup", foreignKey: "locationGroupId"});
-  EventLocationGroups.hasMany(Events, { as: "events", foreignKey: "locationGroupId"});
+  EventLocation.belongsTo(EventLocationGroups, { as: "locationGroup", foreignKey: "locationGroupId"});
+  EventLocationGroups.hasMany(EventLocation, { as: "eventLocations", foreignKey: "locationGroupId"});
   EventImages.belongsTo(Events, { as: "event", foreignKey: "eventId"});
   Events.hasMany(EventImages, { as: "eventImages", foreignKey: "eventId"});
   EventLocation.belongsTo(Events, { as: "event", foreignKey: "eventId"});
