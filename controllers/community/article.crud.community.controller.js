@@ -91,7 +91,7 @@ export const updateArticle = async (req, res, next) => {
     // 업로드된 파일 정보 추출
     const uploadedFiles = req.files?.article_images || [];
 
-    const article = await articleCrudService.updateArticle({
+    await articleCrudService.updateArticle({
       communityId,
       articleId,
       authorId,

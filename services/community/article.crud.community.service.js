@@ -111,7 +111,9 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
 
   // 게시글 좋아요 여부 및 좋아요 개수
   const isArticleLikedByUser = userId
-    ? data.articleLikes.some((like) => like.likedUserId === userId)
+    ? data.articleLikes.some(
+        (like) => Number(like.likedUserId) === Number(userId)
+      )
     : false;
   const articleLikesCount = data.articleLikes.length;
 
@@ -121,7 +123,9 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
       comment.dataValues;
 
     const isCommentLikedByUser = userId
-      ? articleCommentLikes.some((like) => like.likedUserId === userId)
+      ? articleCommentLikes.some(
+          (like) => Number(like.likedUserId) === Number(userId)
+        )
       : false;
     const commentLikesCount = articleCommentLikes.length;
 
@@ -129,6 +133,7 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     const processedContent = status === "deleted" ? "" : content;
 
     return {
+      // 댓글에 대한 정보
       authorInfo: status === "deleted" ? null : author,
       isLikedByUser: isCommentLikedByUser,
       commentLikesCount: status === "deleted" ? 0 : commentLikesCount,
@@ -302,87 +307,89 @@ export const updateArticle = async ({
 
   // 사진이 새로 들어온 경우에만 사진 업데이트
   // 기존 이미지 삭제
-  if (imagePaths.length > 0) {
-    // DB에서 기존 이미지 경로 가져오기
-    const existingImages = await models.ArticleImages.findAll({
-      where: { articleId },
-      attributes: ["articleImageId", "imageUrl", "sequence"],
-    });
+  console.error(`imagePath: ${imagePaths}`);
+  // if (imagePaths.length > 0) {
+  console.error("article image 변경 요청을 처리하였습니다.");
+  // DB에서 기존 이미지 경로 가져오기
+  const existingImages = await models.ArticleImages.findAll({
+    where: { articleId },
+    attributes: ["articleImageId", "imageUrl", "sequence"],
+  });
 
-    logger.silly({
-      action: "article:image:getCurrent",
-      actionType: "log",
-      data: {
-        requestedUserId: authorId,
-        existingImages,
-      },
-    });
+  logger.silly({
+    action: "article:image:getCurrent",
+    actionType: "log",
+    data: {
+      requestedUserId: authorId,
+      existingImages,
+    },
+  });
 
-    // 이미지 순서 변경
-    isEditInputCorrect({
-      existingImageSequence,
-      newImageSequence,
-      existingImagesLength: existingImages.length,
-      newImageLength: imagePaths.length,
-    });
+  // 이미지 순서 변경
+  isEditInputCorrect({
+    existingImageSequence,
+    newImageSequence,
+    existingImagesLength: existingImages.length,
+    newImageLength: imagePaths.length,
+  });
 
-    // 기존 이미지 순서 변경
-    existingImageSequence.map(async (seq, idx) => {
-      if (seq === -1) {
-        // 삭제할 이미지
-        logger.silly({
-          action: "article:image:update:delete",
-          actionType: "log",
-          data: {
-            requestedUserId: authorId,
-            originalSequence: idx + 1,
-            newSequence: seq,
-          },
-        });
-        await existingImages[idx].destroy();
-        await deleteLocalFile(existingImages[idx].imageUrl);
-      } else {
-        // 이미지 순서 변경
-        logger.silly({
-          action: "article:image:update:modify",
-          actionType: "log",
-          data: {
-            requestedUserId: authorId,
-            originalSequence: existingImages[idx].sequence,
-            newSequence: seq,
-          },
-        });
-        await existingImages[idx].update({ sequence: seq });
-      }
-    });
-
-    // 새로 추가된 이미지
-    newImageSequence.map(async (seq, idx) => {
+  // 기존 이미지 순서 변경
+  existingImageSequence.map(async (seq, idx) => {
+    if (seq === -1) {
+      // 삭제할 이미지
       logger.silly({
-        action: "article:image:update:create",
+        action: "article:image:update:delete",
         actionType: "log",
         data: {
           requestedUserId: authorId,
-          imageUrl: imagePaths[idx],
+          originalSequence: idx + 1,
           newSequence: seq,
         },
       });
-      await models.ArticleImages.create({
-        articleId,
-        imageUrl: imagePaths[idx],
-        sequence: seq,
+      await existingImages[idx].destroy();
+      await deleteLocalFile(existingImages[idx].imageUrl);
+    } else {
+      // 이미지 순서 변경
+      logger.silly({
+        action: "article:image:update:modify",
+        actionType: "log",
+        data: {
+          requestedUserId: authorId,
+          originalSequence: existingImages[idx].sequence,
+          newSequence: seq,
+        },
       });
-    });
+      await existingImages[idx].update({ sequence: seq });
+    }
+  });
 
-    logger.debug({
-      action: "article:image:update",
-      actionType: "success",
-      message: "이미지 업데이트 완료",
+  // 새로 추가된 이미지
+  newImageSequence.map(async (seq, idx) => {
+    logger.silly({
+      action: "article:image:update:create",
+      actionType: "log",
       data: {
         requestedUserId: authorId,
+        imageUrl: imagePaths[idx],
+        newSequence: seq,
       },
     });
-  }
+    await models.ArticleImages.create({
+      articleId,
+      imageUrl: imagePaths[idx],
+      sequence: seq,
+    });
+  });
+
+  logger.debug({
+    action: "article:image:update",
+    actionType: "success",
+    message: "이미지 업데이트 완료",
+    data: {
+      requestedUserId: authorId,
+    },
+  });
+  // }
 
   logger.debug(
     `[updateArticle] [DB 기준] 수정된 게시글 제목: ${article.title} | 수정된 내용: ${article.content}`
