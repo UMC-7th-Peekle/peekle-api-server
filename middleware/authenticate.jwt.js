@@ -118,7 +118,7 @@ export const authenticateRefreshToken = async (req, res, next) => {
  */
 export const autheticateAccessTokenIfExists = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  console.log("Hello!");
+  // console.log("Hello!");
 
   if (!authHeader) {
     logger.debug("Authorization 헤더가 제공되지 않았습니다.");

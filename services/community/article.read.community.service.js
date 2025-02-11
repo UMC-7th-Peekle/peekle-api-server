@@ -157,14 +157,20 @@ export const getArticles = async (
   // 좋아요, 댓글 수 및 썸네일만을 반환하도록 가공
   articles.map((article) => {
     article = article.dataValues;
-    
+
     // 좋아요 여부 확인
     if (userId) {
-      article.isLikedByUser = article.articleLikes.some(
-        (like) => like.likedUserId === userId
-      );
+      article.isLikedByUser = article.articleLikes.some((like) => {
+        logger.silly("좋아요 여부 확인", {
+          like: like,
+          likedUserId: like.likedUserId,
+          userId: userId,
+          return: like.likedUserId === userId,
+        });
+        return Number(like.likedUserId) === Number(userId);
+      });
     } else {
-      article.isLikedByUser = false;  // 비로그인 사용자는 항상 false
+      article.isLikedByUser = false; // 비로그인 사용자는 항상 false
     }
 
     article.articleComments = article.articleComments.length; // 댓글 개수만 추출
