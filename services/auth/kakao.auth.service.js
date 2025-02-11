@@ -11,7 +11,7 @@ import {
 } from "../../utils/tokens/create.jwt.tokens.js";
 import { encrypt62 } from "../../utils/cipher/encrypt.js";
 
-import config from "../../config/config.json" with { type: "json" };
+import config from "../../config/config.js";
 
 const { KAKAO_CLIENT_SECRET, KAKAO_REDIRECT_URI, KAKAO_REST_API_KEY } =
   config.KAKAO;

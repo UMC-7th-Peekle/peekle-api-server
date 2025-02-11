@@ -1,5 +1,5 @@
 import fs from "fs";
-import config from "../../config/config.json" with { type: "json" };
+import config from "../../config/config.js";
 import logger from "../logger/logger.js";
 const { ENV, SERVER_DOMAIN } = config.SERVER;
 

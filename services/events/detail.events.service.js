@@ -11,7 +11,7 @@ import {
   deleteLocalFile,
   isEditInputCorrect,
 } from "../../utils/upload/uploader.object.js";
-// import config from "../../config.json" with { type: "json" };
+// import config from "../../config.js";
 
 // // 네이버 API URL
 // const NAVER_ADDRESS_URL =

@@ -20,7 +20,7 @@ import {
   morgranOptions,
 } from "./utils/options/options.js";
 
-import config from "./config/config.json" with { type: "json" };
+import config from "./config/config.js";
 const PORT = config.SERVER.PORT;
 
 import {
