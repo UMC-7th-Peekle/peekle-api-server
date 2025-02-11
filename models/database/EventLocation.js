@@ -4,16 +4,10 @@ const { Model, Sequelize } = _sequelize;
 export default class EventLocation extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    eventLocationId: {
-      autoIncrement: true,
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
-      primaryKey: true,
-      field: 'event_location_id'
-    },
     eventId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
+      primaryKey: true,
       references: {
         model: 'events',
         key: 'event_id'
@@ -102,7 +96,7 @@ export default class EventLocation extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "event_location_id" },
+          { name: "event_id" },
         ]
       },
       {

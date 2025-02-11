@@ -104,7 +104,7 @@ export default function initModels(sequelize) {
   EventImages.belongsTo(Events, { as: "event", foreignKey: "eventId"});
   Events.hasMany(EventImages, { as: "eventImages", foreignKey: "eventId"});
   EventLocation.belongsTo(Events, { as: "event", foreignKey: "eventId"});
-  Events.hasMany(EventLocation, { as: "eventLocations", foreignKey: "eventId"});
+  Events.hasOne(EventLocation, { as: "eventLocation", foreignKey: "eventId"});
   EventSchedules.belongsTo(Events, { as: "event", foreignKey: "eventId"});
   Events.hasMany(EventSchedules, { as: "eventSchedules", foreignKey: "eventId"});
   EventScraps.belongsTo(Events, { as: "event", foreignKey: "eventId"});

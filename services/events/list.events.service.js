@@ -91,7 +91,7 @@ export const listEvent = async ({ paginationOptions }) => {
     where: {
       ...cursorWhereClause, // 커서 기준 조건 추가
       ...priceWhereClause, // 금액 기준 조건 추가
-      ...locationWhereClause, // 위치 기준 조건 추가
+      // ...locationWhereClause, // 위치 기준 조건 추가 - 25.02.11 event 테이블 구조 변경에 따라 depracated
       ...dateWhereClause, // 날짜 기준 조건 추가
       ...queryWhereClause, // 검색어 기준 조건 추가
     },
@@ -129,7 +129,7 @@ export const listEvent = async ({ paginationOptions }) => {
       {
         model: models.EventLocation,
         as: "eventLocations",
-        attributes: ["position"],
+        where: locationWhereClause,
       },
     ],
   });
