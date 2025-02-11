@@ -3,7 +3,7 @@ import "winston-mongodb"; // winston-mongodb 패키지 임포트
 
 import fs from "fs";
 import path from "path";
-import config from "../../config.json" with { type: "json" };
+import config from "../../config/config.json" with { type: "json" };
 import os from "os";
 
 const {

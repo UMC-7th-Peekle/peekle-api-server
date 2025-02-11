@@ -31,7 +31,7 @@ const path = require("path");
 const Sequelize = require("sequelize");
 
 const logger = require("../logger");
-const dbConfig = require("../config.json").DATABASE;
+const dbConfig = require("./config.json").DATABASE;
 
 const sequelize = new Sequelize(
   dbConfig.MYSQL_DATABASE,

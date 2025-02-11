@@ -1,5 +1,5 @@
-// import fs from "fs";
-import config from "../../config.json" with { type: "json" };
+import fs from "fs";
+import config from "../../config/config.json" with { type: "json" };
 import logger from "../logger/logger.js";
 const { ENV, SERVER_DOMAIN } = config.SERVER;
 
@@ -14,10 +14,10 @@ export const corsOptions = {
 
 // SSL 인증서 로드
 export const sslOptions = {
-  key: config.PEM.KEY, // 개인 키 파일
-  cert: config.PEM.CERT, // 인증서 파일
-  // key: fs.readFileSync("localhost-key.pem"), // 개인 키 파일
-  // cert: fs.readFileSync("localhost-cert.pem"), // 인증서 파일
+  // key: config.PEM.KEY, // 개인 키 파일
+  // cert: config.PEM.CERT, // 인증서 파일
+  key: fs.readFileSync("./config/key.pem"), // 개인 키 파일
+  cert: fs.readFileSync("./config/cert.pem"), // 인증서 파일
 };
 
 export const refreshTokenCookieOptions = {

@@ -3,7 +3,7 @@ import models from "../../models/index.js";
 import { InvalidInputError } from "../../utils/errors/errors.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
-import config from "../../config.json" with { type: "json" };
+import config from "../../config/config.json" with { type: "json" };
 
 // 네이버 API URL
 const NAVER_ADDRESS_URL =
