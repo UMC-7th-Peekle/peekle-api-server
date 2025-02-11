@@ -186,12 +186,28 @@ export const isEditInputCorrect = ({
   newImageLength,
 }) => {
   if (
-    !existingImageSequence ||
-    !newImageSequence ||
-    !existingImagesLength ||
-    !newImageLength
+    !Array.isArray(existingImageSequence) ||
+    !Array.isArray(newImageSequence) ||
+    typeof existingImagesLength !== "number" ||
+    typeof newImageLength !== "number"
   ) {
-    throw new InvalidInputError("요청 제대로 안 보낼래?");
+    if (!Array.isArray(existingImageSequence)) {
+      console.error("existingImageSequence is not an array", {
+        existingImageSequence,
+      });
+    }
+    if (!Array.isArray(newImageSequence)) {
+      console.error("newImageSequence is not an array", { newImageSequence });
+    }
+    if (typeof existingImagesLength !== "number") {
+      console.error("existingImagesLength is not a number", {
+        existingImagesLength,
+      });
+    }
+    if (typeof newImageLength !== "number") {
+      console.error("newImageLength is not a number", { newImageLength });
+    }
+    throw new InvalidInputError("들어있어야 할게 안 들어 있는뎁숑 ?");
   }
   // 사용자가 보낸 이미지 순서가 이상한지 확인
   const filteredExisting = existingImageSequence.filter((seq) => seq !== -1);
@@ -202,11 +218,30 @@ export const isEditInputCorrect = ({
     existingImageSequence.length !== existingImagesLength || // 존재하는 이미지 개수가 다른 경우
     newImageSequence.length !== newImageLength || // 새로 추가된 이미지 개수가 다른 경우
     uniqueSequences.size !== combinedSequences.length || // 중복된 순서가 있는 경우
-    Math.min(...combinedSequences) !== 1 || // 순서가 1부터 시작하지 않는 경우
-    Math.max(...combinedSequences) !== combinedSequences.length // 순서가 중간에 빠진 경우
+    (combinedSequences.length !== 0 && // combinedSequences가 빈 배열이 아닌 경우에만 체크
+      (Math.min(...combinedSequences) !== 1 || // 순서가 1부터 시작하지 않는 경우
+        Math.max(...combinedSequences) !== combinedSequences.length)) // 순서가 중간에 빠진 경우
   ) {
+    logger.error("사진 수정을 시도한 입력이 올바르지 않습니다", {
+      action: "INVALID_IMAGE_EDIT_REQUEST",
+      condition1: existingImageSequence.length !== existingImagesLength,
+      condition2: newImageSequence.length !== newImageLength,
+      condition3: uniqueSequences.size !== combinedSequences.length,
+      condition4: combinedSequences.length !== 0,
+      condition5_1: Math.min(...combinedSequences) !== 1,
+      condition5_2: Math.max(...combinedSequences) !== combinedSequences.length,
+      existingImageSequenceLength: existingImageSequence.length,
+      expectedExistingImagesLength: existingImagesLength,
+      newImageSequenceLength: newImageSequence.length,
+      expectedNewImageLength: newImageLength,
+      uniqueSequencesSize: uniqueSequences.size,
+      combinedSequencesLength: combinedSequences.length,
+      minCombinedSequence: Math.min(...combinedSequences),
+      maxCombinedSequence: Math.max(...combinedSequences),
+      error: "Invalid image sequence input",
+    });
     throw new InvalidInputError(
-      "설명은 못하겠는데 이상한 입력 넣지 말아라 진짜;;"
+      "API Reference에 명시된 요청 방법을 다시 숙지해주세요. 올바르지 않은 사진 수정/추가/삭제 요청입니다."
     );
   }
 
