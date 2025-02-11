@@ -128,8 +128,10 @@ export const listEvent = async ({ paginationOptions }) => {
       // 상세 주소 관련 위치 및 장소명
       {
         model: models.EventLocation,
-        as: "eventLocations",
+        as: "eventLocation",
         where: locationWhereClause,
+        attributes: { exclude: ["eventId", "createdAt", "updatedAt"] },
+        required: false,
       },
     ],
   });
@@ -146,15 +148,24 @@ export const listEvent = async ({ paginationOptions }) => {
   const nextCursor = hasNextPage ? events[events.length - 1].eventId : null;
 
   // 이미지 링크 첨부하도록 변환
-  const modifiedEvents = events.map((event) => {
+  let modifiedEvents = events.map((event) => {
     const transformedImages = event.eventImages.map((image) => ({
       imageUrl: addBaseUrl(image.imageUrl),
       sequence: image.sequence,
     }));
 
+    const parsedLocation = {
+      coordinates: event.eventLocation.position.coordinates,
+      ...event.eventLocation.dataValues,
+    };
+    delete parsedLocation.position;
+
+    console.log(transformedImages);
+
     return {
       ...event.dataValues,
       eventImages: transformedImages,
+      eventLocation: parsedLocation,
     };
   });
 

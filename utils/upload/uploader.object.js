@@ -163,7 +163,8 @@ export const parseImagePaths = (files) => {
   let imagePaths = [];
   if (files.length > 0) {
     imagePaths = files.map((file) => {
-      const filePath = file.path.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
+      let normalizedPath = path.normalize(file.path); // 경로를 표준화
+      let filePath = normalizedPath.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
 
       // 디버깅용
       logger.debug({

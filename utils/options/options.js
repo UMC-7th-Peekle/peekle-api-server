@@ -1,8 +1,7 @@
 // import fs from "fs";
 import config from "../../config.json" with { type: "json" };
 import logger from "../logger/logger.js";
-const { SERVER_DOMAIN } = config.SERVER;
-const { ENV } = config.SERVER;
+const { ENV, SERVER_DOMAIN } = config.SERVER;
 
 export const corsOptions = {
   origin: config.SERVER.CORS.ORIGIN, // CORS domain 설정
