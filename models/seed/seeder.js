@@ -14,6 +14,7 @@ import {
   community,
   getRandomNumber,
   getRandomArticleContent,
+  getRandomImageUrl,
   getRandomCommentContent,
   gacha,
   userSample,
@@ -89,8 +90,10 @@ export const seedTerms = async () => {
 
 export const seedCommunity = async () => {
   const CREATE_ARTICLE_COUNT = 1000;
+  const CREATE_ARITCLE_IMAGE_COUNT = 5;
   const CREATE_COMMENT_COUNT = 100;
   const ANONYMOUS_ARTICLE_RATE = 50;
+  const ANONYMOUS_ARTICLE_IMAGE_RATE = 50;
   const ANONYMOUS_COMMENT_RATE = 30;
   const REPLY_RATE = 90;
   const ANONYMOUS_REPLY_RATE = 30;
@@ -127,6 +130,9 @@ export const seedCommunity = async () => {
     await models.ArticleLikes.destroy({
       where: {},
     });
+    await models.ArticleImages.destroy({
+      where: {},
+    });
     await models.ArticleComments.destroy({
       where: {},
     });
@@ -138,6 +144,7 @@ export const seedCommunity = async () => {
     await models.sequelize.query("TRUNCATE TABLE communities;");
     await models.sequelize.query("TRUNCATE TABLE articles;");
     await models.sequelize.query("TRUNCATE TABLE article_likes;");
+    await models.sequelize.query("TRUNCATE TABLE article_images;");
     await models.sequelize.query("TRUNCATE TABLE article_comments;");
     await models.sequelize.query("TRUNCATE TABLE article_comment_likes;");
     await models.sequelize.query("SET foreign_key_checks = 1;");
@@ -299,6 +306,61 @@ export const seedCommunity = async () => {
         },
       }
     );
+
+    let articleImages = [];
+    let CREATED_ARTICLE_IMAGE_COUNT = 0;
+    for (let i = 1; i <= CREATE_ARTICLE_COUNT; i++) {
+      // 각 게시글 당 최대 N개의 이미지를 랜덤하게 생성함
+      let articleImageCount = getRandomNumber(CREATE_ARITCLE_IMAGE_COUNT);
+      // N% 확률로 이미지 생성
+      if (gacha(ANONYMOUS_ARTICLE_IMAGE_RATE)) {
+        for(let j = 0; j < articleImageCount; j++) {
+          articleImages.push({
+            articleId: i,
+            imageUrl: `/articles${getRandomImageUrl()}`,
+            sequence: j+1,
+
+          });
+        }
+      }
+      if (articleImages.length >= BATCH_SIZE) {
+        logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+          action: "seed:community",
+          data: {
+            size: articleImages.length,
+            target: "articleImages",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.ArticleImages.bulkCreate(articleImages, { logging: false });
+        CREATED_ARTICLE_IMAGE_COUNT += articleImages.length;
+        articleImages = [];
+      } else if (i === CREATE_ARTICLE_COUNT) {
+        logger.warn("해당 테이블 작업을 마무리합니다.", {
+          action: "seed:community",
+          data: {
+            size: articleImages.length,
+            target: "articleImages",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.ArticleImages.bulkCreate(articleImages, { logging: false });
+        CREATED_ARTICLE_IMAGE_COUNT += articleImages.length;
+        articleImages = [];
+      }
+    }
+
+      // TODO: 다음 작업에 따라 수정 필요
+      logger.warn(
+        "ArticleImage에 대한 Seeding이 완료되었습니다. 다음 작업을 진행합니다.",
+        {
+          action: "seed:community",
+          data: {
+            size: CREATED_ARTICLE_IMAGE_COUNT,
+            queryCount: QUERY_COUNT,
+          },
+        }
+      ); 
 
     // let replys = [];
     // for (let i = 1; i <= CREATED_COMMENT_COUNT; i++) {

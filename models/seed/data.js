@@ -1,9 +1,15 @@
 import config from "../../config.json" with { type: "json" };
 
+import { randomUUID } from 'crypto'; // UUID 기반 랜덤 문자열
 export const getRandomNumber = (n) => Math.floor(Math.random() * n) + 1;
 export const getRandomArticleContent = () => {
   return articleContentSample[getRandomNumber(articleContentSample.length) - 1];
 };
+export const getRandomImageUrl = () => {
+  const baseName = `image_${randomUUID()}`; // 랜덤 고유 파일명 생성
+  const randomFormat = imageFormatSample[getRandomNumber(imageFormatSample.length) - 1]; // 랜덤 확장자 선택
+  return `/${baseName}.${randomFormat}`;
+}
 export const getRandomCommentContent = () => {
   return commentContentSample[getRandomNumber(commentContentSample.length) - 1];
 };
@@ -82,6 +88,15 @@ export const articleContentSample = [
   "이다은은 최고의 PM입니다",
   "우리 디자이너 우주최고짱짱맨임",
   "댓글도 맛있어라 얍",
+];
+
+export const imageFormatSample = [
+  "jpg",
+  "png",
+  "jpeg",
+  "gif",
+  "webp",
+  "bmp",
 ];
 
 export const commentContentSample = [
