@@ -24,8 +24,8 @@ export const validateRequestBody = (schema, isParsedFormData = false) => {
     const isValid = validator(data);
 
     if (!isValid) {
-      console.log(localize.ko(validator.errors));
-      const errorDetails = formatErrors(localize.ko(validator.errors));
+      console.log(validator.errors);
+      const errorDetails = formatErrors(validator.errors);
       return next(new AjvError("올바르지 않은 요청 형식입니다.", errorDetails));
     }
 

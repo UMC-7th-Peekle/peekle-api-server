@@ -5,8 +5,6 @@ export const postEventSchema = {
     content: { type: "string" },
     price: { type: "number" },
     categoryId: { type: "number" },
-    detailAddress: { type: "string" },
-    placeName: { type: "string" },
     location: {
       type: "object",
       properties: {
@@ -72,7 +70,6 @@ export const postEventSchema = {
     "price",
     "categoryId",
     "location",
-    "locationGroupId",
     "eventUrl",
     "applicationStart",
     "applicationEnd",
@@ -80,50 +77,15 @@ export const postEventSchema = {
   ],
   additionalProperties: false,
 };
+
 export const patchEventSchema = {
-  type: "object",
+  ...postEventSchema,
   properties: {
-    title: { type: "string" },
-    content: { type: "string" },
-    price: { type: "number" },
-    categoryId: { type: "number" },
-    location: { type: "string" },
-    eventUrl: { type: "string", format: "uri" },
-    applicationStart: { type: "string", format: "date" },
-    applicationEnd: { type: "string", format: "date" },
-    schedules: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          repeatType: {
-            type: "string",
-            enum: ["daily", "weekly", "monthly", "yearly"],
-          },
-          repeatEndDate: { type: ["string", "null"], format: "date" },
-          isAllDay: { type: "boolean" },
-          customText: { type: "string" },
-          startDate: { type: "string", format: "date" },
-          endDate: { type: "string", format: "date" },
-          startTime: { type: "string", format: "time" },
-          endTime: { type: "string", format: "time" },
-        },
-        required: [
-          "repeatType",
-          "isAllDay",
-          "customText",
-          "startDate",
-          "endDate",
-          "startTime",
-          "endTime",
-        ],
-      },
-    },
+    ...postEventSchema.properties,
     existingImageSequence: { type: "array", items: { type: "number" } },
     newImageSequence: { type: "array", items: { type: "number" } },
   },
   required: [],
-  additionalProperties: false,
 };
 
 export const scrapEventSchema = {

@@ -24,14 +24,18 @@ const getLocationFromAddress = async (detailAddress) => {
     });
 
     if (location.data.addresses.length === 0) {
-      throw new InvalidInputError("주소에 해당하는 좌표를 찾을 수 없습니다.");
+      throw new InvalidInputError(
+        `주소 (${detailAddress}) 에 해당하는 좌표를 찾을 수 없습니다.`
+      );
     }
 
     const { x, y } = location.data.addresses[0]; // 좌표 가져오기
     return { latitude: parseFloat(y), longitude: parseFloat(x) };
   } catch (error) {
     console.error("주소 검색 실패:", error);
-    throw new InvalidInputError("주소 검색에 실패했습니다.");
+    throw new InvalidInputError(
+      `주소 (${detailAddress}) 에 대한 검색에 실패했습니다. 다른 주소를 입력해 주세요.`
+    );
   }
 };
 
@@ -84,14 +88,16 @@ export const createEvent = async ({ userId, eventData }) => {
     await models.EventSchedules.bulkCreate(eventSchedules, { transaction });
 
     // 주소로 위치 좌표 계산
-    if (eventData.detailAddress) {
-      const { latitude, longitude } = await getLocationFromAddress(
-        eventData.detailAddress
-      );
+    const locs = eventData.location;
+    const detailAddress = `${locs.roadAddress || locs.jibunAdress} ${locs.detail}`;
+    if (locs) {
+      const { latitude, longitude } =
+        await getLocationFromAddress(detailAddress);
 
       // EventLocation 테이블에 좌표 저장
       await models.EventLocation.create(
         {
+          ...locs,
           eventId: event.eventId,
           position: models.Sequelize.fn(
             "ST_GeomFromText",
