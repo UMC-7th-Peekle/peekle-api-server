@@ -15,7 +15,6 @@ const checkArticleExists = async (communityId, articleId) => {
   const article = await models.Articles.findOne({
     where: { communityId, articleId },
   });
-
   if (!article) {
     logger.error(
       `[likeArticle] 게시글이 존재하지 않음 - articleId: ${articleId}`

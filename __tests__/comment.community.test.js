@@ -9,13 +9,13 @@ import {
 // Mock dependencies
 jest.mock("../models/index.js");
 
-describe("Comment Service", () => {
+describe("댓글 CRUD", () => {
   afterEach(() => {
     jest.clearAllMocks(); // 각 테스트 후 Mock 함수 초기화
   });
 
   describe("createComment()", () => {
-    it("should successfully create a comment", async () => {
+    it("댓글을 성공적으로 생성해야 함", async () => {
       models.Articles.findOne.mockResolvedValue({ articleId: 1 });
       models.ArticleComments.create.mockResolvedValue({ commentId: 1 });
 
@@ -40,7 +40,7 @@ describe("Comment Service", () => {
       expect(result.comment.commentId).toBe(1);
     });
 
-    it("should throw NotExistsError if the article does not exist", async () => {
+    it("게시글이 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.Articles.findOne.mockResolvedValue(null);
 
       await expect(
@@ -56,7 +56,7 @@ describe("Comment Service", () => {
   });
 
   describe("updateComment()", () => {
-    it("should successfully update a comment", async () => {
+    it("댓글을 성공적으로 수정해야 함", async () => {
       // 메서드가 잘 호출되었는지 확인하기 위해 mockUpdate 함수 생성
       const mockUpdate = jest.fn().mockResolvedValue(true); // mockUpdate 메서드 반환값 설정
 
@@ -86,7 +86,7 @@ describe("Comment Service", () => {
       });
     });
 
-    it("should throw NotExistsError if the comment does not exist", async () => {
+    it("댓글이 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.ArticleComments.findOne.mockResolvedValue(null); // 댓글이 없는 경우
 
       await expect(
@@ -101,7 +101,7 @@ describe("Comment Service", () => {
       ).rejects.toThrow(NotExistsError);
     });
 
-    it("should throw NotAllowedError if the user is not the comment author", async () => {
+    it("작성자가 아니면 NotAllowedError를 발생시켜야 함", async () => {
       models.ArticleComments.findOne.mockResolvedValue({
         commentId: 1,
         authorId: 9999, // 다른 사용자 ID
@@ -121,7 +121,7 @@ describe("Comment Service", () => {
   });
 
   describe("deleteComment()", () => {
-    it("should successfully delete a comment without replies", async () => {
+    it("대댓글이 없는 경우 댓글을 성공적으로 삭제해야 함", async () => {
       // destroy 메서드에는 반환값이 없으므로 이를 추적하기 위해 mockDestroy 함수를 생성
       const mockDestroy = jest.fn().mockResolvedValue(true);
       models.ArticleComments.findOne.mockResolvedValue({
@@ -145,7 +145,7 @@ describe("Comment Service", () => {
       expect(mockDestroy).toHaveBeenCalled();
     });
 
-    it("should soft delete a comment with replies", async () => {
+    it("대댓글이 있는 경우 상태만 'deleted'로 변경해야 함", async () => {
       models.ArticleComments.findOne.mockResolvedValue({
         commentId: 1,
         authorId: 1001,
@@ -170,7 +170,7 @@ describe("Comment Service", () => {
       );
     });
 
-    it("should delete a parent comment if it is soft-deleted and only has one reply", async () => {
+    it("부모 댓글이 대댓글 1개만 있으면 부모 댓글도 삭제해야 함", async () => {
       models.ArticleComments.findOne
         .mockResolvedValueOnce({
           commentId: 2,
@@ -200,7 +200,7 @@ describe("Comment Service", () => {
       });
     });
 
-    it("should throw NotExistsError if the comment does not exist", async () => {
+    it("댓글이 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.ArticleComments.findOne.mockResolvedValue(null);
 
       await expect(
@@ -213,7 +213,7 @@ describe("Comment Service", () => {
       ).rejects.toThrow(NotExistsError);
     });
 
-    it("should throw NotAllowedError if the user is not the comment author", async () => {
+    it("작성자가 아니면 NotAllowedError를 발생시켜야 함", async () => {
       models.ArticleComments.findOne.mockResolvedValue({
         commentId: 1,
         authorId: 9999, // 다른 사용자 ID
@@ -231,7 +231,7 @@ describe("Comment Service", () => {
   });
 
   describe("createCommentReply()", () => {
-    it("should successfully create a comment reply", async () => {
+    it("대댓글을 성공적으로 생성해야 함", async () => {
       models.ArticleComments.create.mockResolvedValue({ commentId: 10 });
 
       const result = await commentService.createCommentReply({
@@ -253,7 +253,7 @@ describe("Comment Service", () => {
       expect(result.comment.commentId).toBe(10);
     });
 
-    it("should throw NotExistsError if the parent comment does not exist", async () => {
+    it("부모 댓글이 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.ArticleComments.create.mockRejectedValue(
         new models.Sequelize.ForeignKeyConstraintError()
       );
@@ -271,7 +271,7 @@ describe("Comment Service", () => {
   });
 
   describe("getComments()", () => {
-    it("should successfully return comments for an article with likes and author info", async () => {
+    it("좋아요 수와 작성자 정보를 포함한 댓글 목록을 성공적으로 반환해야 함", async () => {
       models.Articles.findOne.mockResolvedValue({
         dataValues: {
           articleId: 1,
@@ -370,7 +370,7 @@ describe("Comment Service", () => {
       expect(result.comments[2].commentLikesCount).toBe(0); // 좋아요 개수 검증
     });
 
-    it("should throw NotExistsError if the article does not exist", async () => {
+    it("게시글이 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.Articles.findOne.mockResolvedValue(null);
 
       await expect(

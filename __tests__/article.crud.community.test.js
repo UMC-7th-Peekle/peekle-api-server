@@ -9,13 +9,13 @@ import {
 // Mock dependencies
 jest.mock("../models/index.js");
 
-describe("Article CRUD Service", () => {
+describe("게시글 CRUD", () => {
   afterEach(() => {
     jest.clearAllMocks(); // 각 테스트 후 Mock 함수 초기화
   });
 
   describe("createCommunity()", () => {
-    it("should successfully create a new community", async () => {
+    it("새로운 커뮤니티를 성공적으로 생성해야 함", async () => {
       models.Communities.create.mockResolvedValue({ title: "Test Community" });
 
       await expect(
@@ -27,7 +27,7 @@ describe("Article CRUD Service", () => {
       });
     });
 
-    it("should throw AlreadyExistsError if community name already exists", async () => {
+    it("중복된 커뮤니티 이름일 경우 AlreadyExistsError를 발생시켜야 함", async () => {
       models.Communities.create.mockRejectedValue(
         new models.Sequelize.UniqueConstraintError()
       );
@@ -41,7 +41,7 @@ describe("Article CRUD Service", () => {
   });
 
   describe("getArticleById()", () => {
-    it("should return article with comments and images", async () => {
+    it("댓글 및 이미지를 포함한 게시글을 반환해야 함", async () => {
       // Mock된 article 데이터 설정
       models.Articles.findOne.mockResolvedValue({
         dataValues: {
@@ -95,7 +95,7 @@ describe("Article CRUD Service", () => {
         ],
       });
 
-      const article = await articleCrudService.getArticleById({
+      const { article } = await articleCrudService.getArticleById({
         communityId: 4,
         articleId: 1,
       });
@@ -133,7 +133,7 @@ describe("Article CRUD Service", () => {
       expect(article.commentsCount).toBe(2); // 댓글 개수 확인
     });
 
-    it("should throw NotExistsError if the article does not exist", async () => {
+    it("게시글이 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.Articles.findOne.mockResolvedValue(null);
 
       await expect(
@@ -146,7 +146,7 @@ describe("Article CRUD Service", () => {
   });
 
   describe("createArticle()", () => {
-    it("should successfully create a new article with images", async () => {
+    it("이미지를 포함한 새로운 게시글을 성공적으로 생성해야 함", async () => {
       models.Communities.findOne.mockResolvedValue({ communityId: 4 });
       models.Articles.create.mockResolvedValue({
         articleId: 1,
@@ -156,9 +156,15 @@ describe("Article CRUD Service", () => {
       const result = await articleCrudService.createArticle({
         communityId: 4,
         authorId: 1001,
-        title: "New Article",
-        content: "Article Content",
-        imagePaths: ["path/to/image1.jpg"],
+        requestBody: JSON.stringify({
+          title: "New Article",
+          content: "Article Content",
+          isAnonymous: true,
+        }),
+        uploadedFiles: [
+          { path: "uploads/path/to/image1.jpg" },
+          { path: "uploads/path/to/image2.jpg" },
+        ],
       });
 
       expect(models.Communities.findOne).toHaveBeenCalledWith({
@@ -174,23 +180,26 @@ describe("Article CRUD Service", () => {
       expect(result.article.title).toBe("New Article");
     });
 
-    it("should throw NotExistsError if the community does not exist", async () => {
+    it("커뮤니티가 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.Communities.findOne.mockResolvedValue(null);
 
       await expect(
         articleCrudService.createArticle({
           communityId: 9999,
           authorId: 1001,
-          title: "New Article",
-          content: "Article Content",
-          imagePaths: [],
+          requestBody: JSON.stringify({
+            title: "New Article",
+            content: "Article Content",
+            isAnonymous: true,
+          }),
+          uploadedFiles: [],
         })
       ).rejects.toThrow(NotExistsError);
     });
   });
 
   describe("updateArticle()", () => {
-    it("should successfully update the article", async () => {
+    it("게시글을 성공적으로 수정해야 함", async () => {
       models.Articles.findOne.mockResolvedValue({
         articleId: 1,
         authorId: 1001,
@@ -213,7 +222,7 @@ describe("Article CRUD Service", () => {
       });
     });
 
-    it("should throw NotExistsError if the article does not exist", async () => {
+    it("게시글이 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.Articles.findOne.mockResolvedValue(null);
 
       await expect(
@@ -228,7 +237,7 @@ describe("Article CRUD Service", () => {
       ).rejects.toThrow(NotExistsError);
     });
 
-    it("should throw NotAllowedError if the user is not the author", async () => {
+    it("작성자가 아니면 NotAllowedError를 발생시켜야 함", async () => {
       models.Articles.findOne.mockResolvedValue({
         articleId: 1,
         authorId: 9999, // 다른 사용자 ID로 설정
@@ -248,7 +257,7 @@ describe("Article CRUD Service", () => {
   });
 
   describe("deleteArticle()", () => {
-    it("should successfully delete the article", async () => {
+    it("게시글을 성공적으로 삭제해야 함", async () => {
       models.Articles.findOne.mockResolvedValue({
         articleId: 1,
         authorId: 1001,
@@ -273,7 +282,7 @@ describe("Article CRUD Service", () => {
       });
     });
 
-    it("should throw NotExistsError if the article does not exist", async () => {
+    it("게시글이 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.Articles.findOne.mockResolvedValue(null);
 
       await expect(
@@ -285,7 +294,7 @@ describe("Article CRUD Service", () => {
       ).rejects.toThrow(NotExistsError);
     });
 
-    it("should throw NotAllowedError if the user is not the author", async () => {
+    it("작성자가 아니면 NotAllowedError를 발생시켜야 함", async () => {
       models.Articles.findOne.mockResolvedValue({
         articleId: 1,
         authorId: 9999, // 다른 사용자 ID로 설정

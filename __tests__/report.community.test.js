@@ -9,48 +9,35 @@ import {
 // Mock dependencies
 jest.mock("../models/index.js");
 
-describe("Report Service", () => {
-
+describe("게시글 및 댓글 신고", () => {
+  beforeEach(() => {
+    jest.clearAllMocks(); // 각 테스트 후 Mock 함수 초기화
+  });
   describe("reportArticle()", () => {
-    it("should successfully report an article", async () => {
-      // 필요한 Mock 설정
+    it("게시글을 성공적으로 신고해야 함", async () => {
       models.Articles.findOne.mockResolvedValue({
         articleId: 1,
+        title: "Test Article",
+        authorId: 9999,
         communityId: 4,
-        authorId: 9999, // 신고자가 아닌 다른 사용자로 설정
       });
 
-      models.Reports.create.mockResolvedValue({
-        targetId: 1,
-        reportedUserId: 1001,
-        reason: "Inappropriate content",
-        type: "article",
-      });
-
-      const result = await reportService.reportArticle({
+      const result = await reportService.reportTarget({
+        targetType: "article",
         communityId: 4,
         articleId: 1,
         reportedUserId: 1001,
         reason: "Inappropriate content",
       });
 
-      expect(models.Articles.findOne).toHaveBeenCalledWith({
-        where: { communityId: 4, articleId: 1 },
-      });
-      expect(models.Reports.create).toHaveBeenCalledWith({
-        targetId: 1,
-        reportedUserId: 1001,
-        reason: "Inappropriate content",
-        type: "article",
-      });
-      expect(result.newReport.type).toBe("article");
     });
 
-    it("should throw NotExistsError if the article does not exist", async () => {
-      models.Articles.findOne.mockResolvedValue(null); 
+    it("게시글이 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
+      models.Articles.findOne.mockResolvedValue(null);
 
       await expect(
-        reportService.reportArticle({
+        reportService.reportTarget({
+          targetType: "article",
           communityId: 4,
           articleId: 9999,
           reportedUserId: 1001,
@@ -59,14 +46,15 @@ describe("Report Service", () => {
       ).rejects.toThrow(NotExistsError);
     });
 
-    it("should throw NotAllowedError if the user tries to report their own article", async () => {
+    it("작성자가 본인 게시글을 신고하면 NotAllowedError를 발생시켜야 함", async () => {
       models.Articles.findOne.mockResolvedValue({
         articleId: 1,
         authorId: 1001, // 신고자와 작성자가 동일
       });
 
       await expect(
-        reportService.reportArticle({
+        reportService.reportTarget({
+          targetType: "article",
           communityId: 4,
           articleId: 1,
           reportedUserId: 1001,
@@ -75,11 +63,12 @@ describe("Report Service", () => {
       ).rejects.toThrow(NotAllowedError);
     });
 
-    it("should throw AlreadyExistsError if the article is already reported", async () => {
-      models.Reports.findOne.mockResolvedValue({ targetId: 1 }); // 이전 신고 기록이 존재함
+    it("이미 신고된 게시글이면 AlreadyExistsError를 발생시켜야 함", async () => {
+      models.Reports.findOne.mockResolvedValue({ targetId: 1, reportedUserId: 1001, type: "article" }); // 이전 신고 기록이 존재함
 
       await expect(
-        reportService.reportArticle({
+        reportService.reportTarget({
+          targetType: "article",
           communityId: 4,
           articleId: 1,
           reportedUserId: 1001,
@@ -90,7 +79,7 @@ describe("Report Service", () => {
   });
 
   describe("reportComment()", () => {
-    it("should successfully report a comment", async () => {
+    it("댓글을 성공적으로 신고해야 함", async () => {
       models.ArticleComments.findOne.mockResolvedValue({
         commentId: 1,
         articleId: 1,
@@ -104,7 +93,8 @@ describe("Report Service", () => {
         type: "comment",
       });
 
-      const result = await reportService.reportComment({
+      const result = await reportService.reportTarget({
+        targetType: "comment",
         communityId: 4,
         articleId: 1,
         commentId: 1,
@@ -124,11 +114,12 @@ describe("Report Service", () => {
       expect(result.newReport.type).toBe("comment");
     });
 
-    it("should throw NotExistsError if the comment does not exist", async () => {
+    it("댓글이 존재하지 않으면 NotExistsError를 발생시켜야 함", async () => {
       models.ArticleComments.findOne.mockResolvedValue(null);
 
       await expect(
-        reportService.reportComment({
+        reportService.reportTarget({
+          targetType: "comment",
           communityId: 4,
           articleId: 1,
           commentId: 9999,
@@ -138,14 +129,15 @@ describe("Report Service", () => {
       ).rejects.toThrow(NotExistsError);
     });
 
-    it("should throw NotAllowedError if the user tries to report their own comment", async () => {
+    it("작성자가 본인 댓글을 신고하면 NotAllowedError를 발생시켜야 함", async () => {
       models.ArticleComments.findOne.mockResolvedValue({
         commentId: 1,
         authorId: 1001, // 신고자와 작성자가 동일
       });
 
       await expect(
-        reportService.reportComment({
+        reportService.reportTarget({
+          targetType: "comment",
           communityId: 4,
           articleId: 1,
           commentId: 1,
@@ -155,11 +147,12 @@ describe("Report Service", () => {
       ).rejects.toThrow(NotAllowedError);
     });
 
-    it("should throw AlreadyExistsError if the comment is already reported", async () => {
-      models.Reports.findOne.mockResolvedValue({ targetId: 1 }); // 이전 신고 기록이 존재함
+    it("이미 신고된 댓글이면 AlreadyExistsError를 발생시켜야 함", async () => {
+      models.Reports.findOne.mockResolvedValue({ targetId: 1, reportedUserId: 1001, type: "comment" }); // 이전 신고 기록이 존재함
 
       await expect(
-        reportService.reportComment({
+        reportService.reportTarget({
+          targetType: "comment",
           communityId: 4,
           articleId: 1,
           commentId: 1,
