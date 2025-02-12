@@ -120,7 +120,7 @@ export const restoreUser = async (req, res, next) => {
     });
 
     return res.status(200).success({
-      message: "탈퇴 처리를 취소합니다.",
+      message: "계정을 활성화 합니다.",
     });
   } catch (err) {
     logError(err);

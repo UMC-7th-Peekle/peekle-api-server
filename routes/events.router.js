@@ -1,4 +1,4 @@
-import { request, Router } from "express";
+import { Router } from "express";
 import * as authMiddleware from "../middleware/authenticate.jwt.js";
 import * as scrapEventController from "../controllers/events/scrap.events.controller.js";
 import * as reportEventController from "../controllers/events/report.events.controller.js";

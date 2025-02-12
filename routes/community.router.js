@@ -16,7 +16,6 @@ import {
 } from "../middleware/authenticate.jwt.js";
 import * as fileUploadMiddleware from "../middleware/uploader.js"; // 사진 업로드 미들웨어
 import { validateRequestBody } from "../middleware/validate.js";
-import * as aritcleSchema from "../utils/validators/community/article.validators.js";
 
 const router = Router();
 

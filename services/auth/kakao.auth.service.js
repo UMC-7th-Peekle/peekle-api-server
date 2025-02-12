@@ -107,6 +107,9 @@ export const checkAuthorizationCode = (authorizationCode) => {
 export const checkIfUserExists = async (data) => {
   const info = await models.Users.findOne({
     attributes: ["userId", "name", "nickname"],
+    where: {
+      status: "active",
+    },
     include: [
       {
         model: models.UserOauth,
