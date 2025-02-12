@@ -4,25 +4,75 @@ const { Model, Sequelize } = _sequelize;
 export default class EventLocation extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    eventLocationId: {
-      autoIncrement: true,
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
-      primaryKey: true,
-      field: 'event_location_id'
-    },
     eventId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
+      primaryKey: true,
       references: {
         model: 'events',
         key: 'event_id'
       },
       field: 'event_id'
     },
+    locationGroupId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: false,
+      references: {
+        model: 'event_location_groups',
+        key: 'group_id'
+      },
+      field: 'location_group_id'
+    },
     position: {
       type: DataTypes.GEOMETRY,
       allowNull: false
+    },
+    roadAddress: {
+      type: DataTypes.STRING(1024),
+      allowNull: true,
+      field: 'road_address'
+    },
+    jibunAddress: {
+      type: DataTypes.STRING(1024),
+      allowNull: true,
+      field: 'jibun_address'
+    },
+    buildingCode: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      field: 'building_code'
+    },
+    buildingName: {
+      type: DataTypes.STRING(1024),
+      allowNull: true,
+      field: 'building_name'
+    },
+    sido: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
+    sigungu: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
+    sigunguCode: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      field: 'sigungu_code'
+    },
+    roadnameCode: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      field: 'roadname_code'
+    },
+    zoneCode: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      field: 'zone_code'
+    },
+    detail: {
+      type: DataTypes.STRING(200),
+      allowNull: true
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -46,7 +96,7 @@ export default class EventLocation extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "event_location_id" },
+          { name: "event_id" },
         ]
       },
       {
@@ -54,6 +104,13 @@ export default class EventLocation extends Model {
         using: "BTREE",
         fields: [
           { name: "event_id" },
+        ]
+      },
+      {
+        name: "event_location_event_location_groups_group_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "location_group_id" },
         ]
       },
     ]

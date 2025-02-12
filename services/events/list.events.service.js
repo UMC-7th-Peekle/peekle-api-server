@@ -91,14 +91,14 @@ export const listEvent = async ({ paginationOptions }) => {
     where: {
       ...cursorWhereClause, // 커서 기준 조건 추가
       ...priceWhereClause, // 금액 기준 조건 추가
-      ...locationWhereClause, // 위치 기준 조건 추가
+      // ...locationWhereClause, // 위치 기준 조건 추가 - 25.02.11 event 테이블 구조 변경에 따라 depracated
       ...dateWhereClause, // 날짜 기준 조건 추가
       ...queryWhereClause, // 검색어 기준 조건 추가
     },
     limit: limit + 1, // 다음 페이지 존재 여부 확인을 위해 하나 더 조회
     order: [["eventId", "DESC"]],
 
-    attributes: { exclude: ["categoryId", "createdUserId"] },
+    attributes: ["eventId", "title", "price", "categoryId", "createdUserId"],
     include: [
       {
         model: models.EventCategory,
@@ -125,6 +125,14 @@ export const listEvent = async ({ paginationOptions }) => {
           "endTime",
         ],
       },
+      // 상세 주소 관련 위치 및 장소명
+      {
+        model: models.EventLocation,
+        as: "eventLocation",
+        where: locationWhereClause,
+        attributes: { exclude: ["eventId", "createdAt", "updatedAt"] },
+        required: false,
+      },
     ],
   });
 
@@ -139,17 +147,30 @@ export const listEvent = async ({ paginationOptions }) => {
   // 더 과거의 이벤트가 있으면 nextCursor를 설정
   const nextCursor = hasNextPage ? events[events.length - 1].eventId : null;
 
-  const modifiedEvents = events.map((event) => {
+  // 이미지 링크 첨부하도록 변환
+  let modifiedEvents = events.map((event) => {
     const transformedImages = event.eventImages.map((image) => ({
       imageUrl: addBaseUrl(image.imageUrl),
       sequence: image.sequence,
     }));
 
+    const parsedLocation = {
+      coordinates: event.eventLocation.position.coordinates,
+      ...event.eventLocation.dataValues,
+    };
+    delete parsedLocation.position;
+
+    console.log(transformedImages);
+
     return {
       ...event.dataValues,
       eventImages: transformedImages,
+      eventLocation: parsedLocation,
     };
   });
+
+  // BE에서 sort 해서 준다는 전제 하에
+  // 제목, location infos, 금액, images (thumbnail), category
 
   logger.debug("이벤트 조회 완료", {
     action: "events:getEvents",
@@ -158,7 +179,7 @@ export const listEvent = async ({ paginationOptions }) => {
 
   return { events: modifiedEvents, nextCursor, hasNextPage };
 };
-// --------------------------------------------------------------------------------------------------
+
 export const validateEventQuery = (queries) => {
   const {
     limit,

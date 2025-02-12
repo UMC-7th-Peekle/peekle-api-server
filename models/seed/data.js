@@ -1,6 +1,7 @@
 import config from "../../config.json" with { type: "json" };
 import { randomUUID } from 'crypto'; // UUID 기반 랜덤 문자열
 import { addMonths, format } from "date-fns";
+const seederConfig = config.SEEDER;
 
 export const getRandomNumber = (n) => Math.floor(Math.random() * n) + 1;
 // Event 관련 랜덤 데이터 생성 함수
@@ -232,7 +233,7 @@ export const commentContentSample = [
   "비오는 날에는 코딩을",
 ];
 
-export const userSample = config.SEEDER.USER.map((user) => ({
+export const userSample = seederConfig.SEEDER.USER.map((user) => ({
   ...user,
   profileImage: config.PEEKLE.DEFAULT_PROFILE_IMAGE,
 }));

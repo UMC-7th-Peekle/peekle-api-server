@@ -32,27 +32,9 @@ export default class Events extends Model {
       },
       field: 'category_id'
     },
-    detailAddress: {
-      type: DataTypes.STRING(512),
-      allowNull: false,
-      field: 'detail_address'
-    },
-    placeName: {
-      type: DataTypes.STRING(225),
-      allowNull: true,
-      field: 'place_name'
-    },
-    location: {
-      type: DataTypes.STRING(512),
-      allowNull: false
-    },
     locationGroupId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
-      references: {
-        model: 'event_location_groups',
-        key: 'group_id'
-      },
       field: 'location_group_id'
     },
     eventUrl: {

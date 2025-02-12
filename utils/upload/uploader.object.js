@@ -8,7 +8,7 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { InvalidInputError, NotAllowedError } from "../errors/errors.js";
 import logger from "../logger/logger.js";
 
-import config from "../../config.json" with { type: "json" };
+import config from "../../config/config.js";
 const { REGION, ACCESS_KEY_ID, SECRET_ACCESS_KEY, BUCKET_NAME } = config.AWS;
 const { STATIC_FILE_BASE_URL } = config.SERVER;
 
@@ -163,7 +163,8 @@ export const parseImagePaths = (files) => {
   let imagePaths = [];
   if (files.length > 0) {
     imagePaths = files.map((file) => {
-      const filePath = file.path.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
+      let normalizedPath = path.normalize(file.path); // 경로를 표준화
+      let filePath = normalizedPath.replace(/^uploads/, ""); // 경로에서 'uploads/' 제거
 
       // 디버깅용
       logger.debug({

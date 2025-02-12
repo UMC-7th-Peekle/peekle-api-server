@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import config from "./config.json" with { type: "json" };
+import config from "./config.js";
 import logger from "../logger/logger.js";
 
 const { JWT_SECRET } = config.SERVER;
