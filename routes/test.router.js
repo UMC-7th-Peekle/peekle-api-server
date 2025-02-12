@@ -16,6 +16,7 @@ import {
   seedCommunity,
   seedEventCategory,
   seedEventLocationGroup,
+  seedEvents,
   seedPermissions,
   seedTerms,
   seedUsers,
@@ -48,7 +49,6 @@ router.get("/seed/:type", authenticateAccessToken, async (req, res, next) => {
         await seedEventLocationGroup();
         await seedEventCategory();
         await seedEvents();
-        // TODO: Event 관련 추가
         break;
       case "terms":
         await seedTerms();

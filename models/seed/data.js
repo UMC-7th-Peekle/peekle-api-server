@@ -1,6 +1,6 @@
-import config from "../../config.json" with { type: "json" };
-import { randomUUID } from 'crypto'; // UUID 기반 랜덤 문자열
-import { addMonths, format } from "date-fns";
+import config from "../../config/config.js";
+import { randomUUID } from "crypto"; // UUID 기반 랜덤 문자열
+import { addMonths, addYears, setMinutes, setHours, format } from "date-fns";
 const seederConfig = config.SEEDER;
 
 export const getRandomNumber = (n) => Math.floor(Math.random() * n) + 1;
@@ -26,12 +26,19 @@ export const getRandomApplicationDates = () => {
   };
 };
 export const getRandomRepeatType = () => {
-  const repeatTypes = ["none", "daily", "weekly", "monthly", "yearly", "custom"];
+  const repeatTypes = [
+    "none",
+    "daily",
+    "weekly",
+    "monthly",
+    "yearly",
+    "custom",
+  ];
   const probabilities = [50, 15, 15, 10, 5, 5]; // none(50%), daily/weekly(15%), monthly(10%), yearly/custom(5%)
 
   const randomValue = Math.random() * 100;
   let cumulativeProbability = 0;
-  
+
   for (let i = 0; i < repeatTypes.length; i++) {
     cumulativeProbability += probabilities[i];
     if (randomValue < cumulativeProbability) {
@@ -40,7 +47,7 @@ export const getRandomRepeatType = () => {
   }
 
   return "none"; // 기본값
-}
+};
 export const getRepeatEndDate = (startDate, repeatType) => {
   if (repeatType === "none") return null;
 
@@ -58,11 +65,27 @@ export const getRepeatEndDate = (startDate, repeatType) => {
     default:
       return null;
   }
-}
-export const getRandomStartTime = () => {
+};
+export const getRandomStartAndEndTime = () => {
   const hour = Math.floor(Math.random() * 9) + 9; // 9 ~ 17시
   const minute = Math.floor(Math.random() * 60); // 0 ~ 59분
-  return format(setMinutes(setHours(new Date(), hour), minute), "HH:mm:ss");
+  return {
+    startTime: format(setMinutes(setHours(new Date(), hour), minute), "HH:mm"),
+    endTime: format(setMinutes(setHours(new Date(), hour + 6), minute), "HH:mm"),
+  };
+};
+// 서울 내 적절한 위경도 범위 (대략적 값)
+const LAT_MIN = 37.4;
+const LAT_MAX = 37.7;
+const LON_MIN = 126.8;
+const LON_MAX = 127.2;
+
+export const getRandomLatitude = () => {
+  return (Math.random() * (LAT_MAX - LAT_MIN) + LAT_MIN).toFixed(6);
+}
+
+export const getRandomLongitude = () => {
+  return (Math.random() * (LON_MAX - LON_MIN) + LON_MIN).toFixed(6);
 }
 
 // Article 관련 랜덤 데이터 생성 함수
@@ -74,9 +97,10 @@ export const getRandomCommentContent = () => {
 };
 export const getRandomImageUrl = () => {
   const baseName = `image_${randomUUID()}`; // 랜덤 고유 파일명 생성
-  const randomFormat = imageFormatSample[getRandomNumber(imageFormatSample.length) - 1]; // 랜덤 확장자 선택
+  const randomFormat =
+    imageFormatSample[getRandomNumber(imageFormatSample.length) - 1]; // 랜덤 확장자 선택
   return `/${baseName}.${randomFormat}`;
-}
+};
 
 export const gacha = (rate) => Math.random() < rate / 100;
 
@@ -96,7 +120,7 @@ export const eventCategories = [
   { name: "문화", description: "전시회, 공연, 영화 상영 및 예술 관련 행사" },
   { name: "활동", description: "스포츠, 야외 활동, 봉사 및 커뮤니티 모임" },
   { name: "기타", description: "그 외 특정 분류에 속하지 않는 다양한 이벤트" },
-  ];
+];
 
 export const terms = [
   {
@@ -185,6 +209,39 @@ export const eventUrlSample = [
   "https://tastekorea.net/korean-traditional-alcohol", // 전통주 시음회
 ];
 
+export const roadAddressSample = [
+  "서울특별시 송파구 올림픽로 240",
+  "서울특별시 마포구 양화로 156",
+  "서울특별시 강서구 공항대로 123",
+  "서울특별시 성동구 왕십리로 87",
+  "서울특별시 강남구 테헤란로 456",
+  "서울특별시 관악구 남부순환로 789",
+  "서울특별시 종로구 세종대로 12",
+  "서울특별시 영등포구 영중로 321",
+];
+
+export const jibunAddressSample = [
+  "서울특별시 송파구 잠실동 40-1",
+  "서울특별시 마포구 서교동 22-5",
+  "서울특별시 강서구 화곡동 135-8",
+  "서울특별시 성동구 행당동 98-2",
+  "서울특별시 강남구 역삼동 750-10",
+  "서울특별시 관악구 봉천동 503-7",
+  "서울특별시 종로구 종로1가 2-3",
+  "서울특별시 영등포구 영등포동 88-6",
+];  
+
+export const sigunguSample = [
+  "송파구",
+  "마포구",
+  "강서구",
+  "성동구",
+  "강남구",
+  "관악구",
+  "종로구",
+  "영등포구",
+];
+
 export const articleContentSample = [
   "게시글이 맛있네요",
   "이거 먹어보신 분 계신가요?",
@@ -198,14 +255,7 @@ export const articleContentSample = [
   "댓글도 맛있어라 얍",
 ];
 
-export const imageFormatSample = [
-  "jpg",
-  "png",
-  "jpeg",
-  "gif",
-  "webp",
-  "bmp",
-];
+export const imageFormatSample = ["jpg", "png", "jpeg", "gif", "webp", "bmp"];
 
 export const commentContentSample = [
   "댓글이 맛있네요",

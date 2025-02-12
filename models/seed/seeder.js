@@ -1,5 +1,7 @@
 import logger from "../../utils/logger/logger.js";
 import models from "../index.js";
+import { addDays, addHours, addMonths, format } from "date-fns";
+import * as Sequelize from "sequelize";
 
 /*
   // truncate: true,
@@ -19,7 +21,12 @@ import {
   getRandomApplicationDates,
   getRandomRepeatType,
   getRepeatEndDate,
-  getRandomStartTime,
+  getRandomStartAndEndTime,
+  roadAddressSample,
+  jibunAddressSample,
+  sigunguSample,
+  getRandomLongitude,
+  getRandomLatitude,
   getRandomArticleContent,
   getRandomImageUrl,
   getRandomCommentContent,
@@ -121,20 +128,48 @@ export const seedEvents = async () => {
 
     // N개의 이벤트를 생성함
     let events = [];
+    let CREATED_EVENT_COUNT = 0;
 
     for (let i = 0; i < CREATE_EVENT_COUNT; i++) {
       const randomCategoryId = getRandomNumber(eventCategories.length);
-      const { applicationStart, applicationEnd } = getRandomApplicationDates();
+      const applicationDates = getRandomApplicationDates();
       events.push({
+        eventId: i + 1,
         title: `${randomCategoryId}-${i + 1} 이벤트`,
-        description: `이벤트 ${randomCategoryId}-${i + 1} 설명 | ${getRandomEventContent()}`,
+        content: `이벤트 ${randomCategoryId}-${i + 1} 설명 | ${getRandomEventContent()}`,
+        price: Math.floor(Math.random() * 100000) + 1000, // 1000~100000원 랜덤
         categoryId: randomCategoryId,
         locationGroupId: (i % groups.length) + 1,
         eventUrl: getRandomEventUrl(),
-        applicationStart,
-        applicationEnd,
+        applicationStart: applicationDates.applicationStart,
+        applicationEnd: applicationDates.applicationEnd,
         createdUserId: users[getRandomNumber(users.length) - 1].userId,
       });
+    }
+    if (events.length >= BATCH_SIZE) {
+      logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+        action: "seed:events",
+        data: {
+          size: events.length,
+          target: "events",
+          queryCount: QUERY_COUNT,
+        },
+      });
+      await models.Events.bulkCreate(events, { logging: false });
+      CREATED_EVENT_COUNT += events.length;
+      events = [];
+    } else if (events.length === CREATE_EVENT_COUNT) {
+      logger.warn("해당 테이블 작업을 마무리합니다.", {
+        action: "seed:events",
+        data: {
+          size: events.length,
+          target: "events",
+          queryCount: QUERY_COUNT,
+        },
+      });
+      await models.Events.bulkCreate(events, { logging: false });
+      CREATED_EVENT_COUNT += events.length;
+      events = [];
     }
 
     logger.warn(
@@ -142,15 +177,197 @@ export const seedEvents = async () => {
       {
         action: "seed:events",
         data: {
-          size: events.length,
+          size: CREATED_EVENT_COUNT,
           queryCount: QUERY_COUNT,
         },
       }
     );
 
+    let eventScraps = [];
+    let CREATED_EVENT_SCRAP_COUNT = 0;
+    for (let i = 1; i <= CREATE_EVENT_COUNT; i++) {
+      if (gacha(EVENT_SCRAP_RATE)) {
+        eventScraps.push({
+          eventId: i,
+          userId: users[i % users.length].userId,
+        });
+      }
+      if (eventScraps.length >= BATCH_SIZE) {
+        logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+          action: "seed:events",
+          data: {
+            size: eventScraps.length,
+            target: "eventScraps",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.EventScraps.bulkCreate(eventScraps, { logging: false });
+        CREATED_EVENT_SCRAP_COUNT += eventScraps.length;
+        eventScraps = [];
+      } else if (i === CREATE_EVENT_COUNT) {
+        logger.warn("해당 테이블 작업을 마무리합니다.", {
+          action: "seed:events",
+          data: {
+            size: eventScraps.length,
+            target: "eventScraps",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.EventScraps.bulkCreate(eventScraps, { logging: false });
+        CREATED_EVENT_SCRAP_COUNT += eventScraps.length;
+        eventScraps = [];
+      }
+    }
+
+    logger.warn(
+      "EventScraps에 대한 Seeding이 완료되었습니다. EventSchedules Seeding을 시작합니다.",
+      {
+        action: "seed:events",
+        data: {
+          size: CREATED_EVENT_SCRAP_COUNT,
+          queryCount: QUERY_COUNT,
+        },
+      }
+    );
+
+    let eventLocations = [];
+    let CREATED_EVENT_LOCATION_COUNT = 0;
+
+    for (let i = 1; i <= CREATE_EVENT_COUNT; i++) {
+      const addressIndex = getRandomNumber(groups.length) - 1;
+      eventLocations.push({
+        eventId: i,
+        locationGroupId: addressIndex + 1,
+        position: Sequelize.fn(
+          "ST_GeomFromText",
+          `POINT(${getRandomLongitude()} ${getRandomLatitude()})`
+        ),
+        roadAddress: roadAddressSample[addressIndex],
+        jibunAddress: jibunAddressSample[addressIndex],
+        buildingCode: `B${addressIndex + 1000}`,
+        buildingName: `건물 ${addressIndex + 1}`,
+        sido: "서울특별시", // 모든 그룹이 서울에 위치
+        sigungu: sigunguSample[addressIndex],
+        sigunguCode: `11${addressIndex + 100}`,
+        roadnameCode: `${addressIndex + 20}`,
+        zoneCode: `03${addressIndex + 300}`,
+        detail: `${getRandomNumber(999)}동 ${getRandomNumber(999)}호`,
+      });
+      if (eventLocations.length >= BATCH_SIZE) {
+        logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+          action: "seed:events",
+          data: {
+            size: eventLocations.length,
+            target: "eventLocations",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.EventLocation.bulkCreate(eventLocations, {
+          logging: false,
+        });
+        CREATED_EVENT_LOCATION_COUNT += eventLocations.length;
+        eventLocations = [];
+      } else if (i === CREATE_EVENT_COUNT) {
+        logger.warn("해당 테이블 작업을 마무리합니다.", {
+          action: "seed:events",
+          data: {
+            size: eventLocations.length,
+            target: "eventLocations",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.EventLocation.bulkCreate(eventLocations, {
+          logging: false,
+        });
+        CREATED_EVENT_LOCATION_COUNT += eventLocations.length;
+        eventLocations = [];
+      }
+    }
+
+    logger.warn("EventLocation Seeding이 완료되었습니다.", {
+      action: "seed:events",
+      data: {
+        size: CREATED_EVENT_LOCATION_COUNT,
+        queryCount: QUERY_COUNT,
+      },
+    });
+
+    let eventSchedules = [];
+    let CREATED_EVENT_SCHEDULE_COUNT = 0;
+
+    for (let i = 1; i <= CREATE_EVENT_COUNT; i++) {
+      const applicationDates = getRandomApplicationDates();
+      const applicationEndDate = new Date(applicationDates.applicationEnd);
+      const startDate = addDays(applicationEndDate, 7); // applicationEnd보다 1주일 뒤
+      const repeatType = getRandomRepeatType();
+      const repeatEndDate = getRepeatEndDate(startDate, repeatType);
+      // endDate는 repeatEndDate거나 그 이후로 설정
+      let endDate;
+      if (repeatEndDate) {
+        endDate = addDays(new Date(repeatEndDate), 7);
+      } else {
+        endDate = addMonths(startDate, 3);
+      }
+      const isAllDay = gacha(10);
+    
+      const { startTime, endTime } = getRandomStartAndEndTime();
+      
+      eventSchedules.push({
+        eventId: i,
+        repeatType,
+        repeatEndDate,
+        isAllDay,
+        customText: "야호",
+        startDate: startDate,
+        endDate: repeatType === "none" ? startDate : endDate, // 일회성 이벤트
+        startTime,
+        endTime,
+      });
+      if (eventSchedules.length >= BATCH_SIZE) {
+        logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+          action: "seed:events",
+          data: {
+            size: eventSchedules.length,
+            target: "eventSchedules",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.EventSchedules.bulkCreate(eventSchedules, {
+          logging: false,
+        });
+        CREATED_EVENT_SCHEDULE_COUNT += eventSchedules.length;
+        eventSchedules = [];
+      } else if (i === CREATE_EVENT_COUNT) {
+        logger.warn("해당 테이블 작업을 마무리합니다.", {
+          action: "seed:events",
+          data: {
+            size: eventSchedules.length,
+            target: "eventSchedules",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.EventSchedules.bulkCreate(eventSchedules, {
+          logging: false,
+        });
+        CREATED_EVENT_SCHEDULE_COUNT += eventSchedules.length;
+        eventSchedules = [];
+      }
+
+      logger.warn(
+        "EventSchedules에 대한 Seeding이 완료되었습니다. EventLocation Seeding을 시작합니다.",
+        {
+          action: "seed:events",
+          data: {
+            size: CREATED_EVENT_SCHEDULE_COUNT,
+            queryCount: QUERY_COUNT,
+          },
+        }
+      );
+    }
+
     let eventImages = [];
     let CREATED_EVENT_IMAGE_COUNT = 0;
-    for (let i = i; i <= CREATE_EVENT_COUNT; i++) {
+    for (let i = 1; i <= CREATE_EVENT_COUNT; i++) {
       // 각 이벤트 당 최대 N개의 이미지를 랜덤하게 생성함
       let eventImageCount = getRandomNumber(CREATE_EVENT_IMAGE_COUNT);
       // N% 확률로 이미지 생성
@@ -201,128 +418,12 @@ export const seedEvents = async () => {
       );
     }
 
-    let eventScraps = [];
-    let CREATED_EVENT_SCRAP_COUNT = 0;
-    for (let i = 1; i <= CREATE_EVENT_COUNT; i++) {
-      if (gacha(EVENT_SCRAP_RATE)) {
-        eventScraps.push({
-          eventId: i,
-          userId: users[i % users.length].userId,
-        });
-      }
-      if (eventScraps.length >= BATCH_SIZE) {
-        logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
-          action: "seed:events",
-          data: {
-            size: eventScraps.length,
-            target: "eventScraps",
-            queryCount: QUERY_COUNT,
-          },
-        });
-        await models.EventScraps.bulkCreate(eventScraps, { logging: false });
-        CREATED_EVENT_SCRAP_COUNT += eventScraps.length;
-        eventScraps = [];
-      } else if (i === CREATE_EVENT_COUNT) {
-        logger.warn("해당 테이블 작업을 마무리합니다.", {
-          action: "seed:events",
-          data: {
-            size: eventScraps.length,
-            target: "eventScraps",
-            queryCount: QUERY_COUNT,
-          },
-        });
-        await models.EventScraps.bulkCreate(eventScraps, { logging: false });
-        CREATED_EVENT_SCRAP_COUNT += eventScraps.length;
-        eventScraps = [];
-      }
-    }
-
-    logger.warn(
-      "EventScraps에 대한 Seeding이 완료되었습니다. EventSchedules Seeding을 시작합니다.",
-      {
-        action: "seed:events",
-        data: {
-          size: CREATED_EVENT_SCRAP_COUNT,
-          queryCount: QUERY_COUNT,
-        },
-      }
-    );
-
-    let eventSchedules = [];
-    let CREATED_EVENT_SCHEDULE_COUNT = 0;
-
-    for (let i = 1; i <= CREATE_EVENT_COUNT; i++) {
-      const event = events[i - 1];
-      const applicationEndDate = new Date(event.applicationEnd); // Event의 applicationEnd
-
-      const startDate = addDays(applicationEndDate, 7); // applicationEnd보다 1주일 뒤
-      const repeatType = getRandomRepeatType();
-      const repeatEndDate = getRepeatEndDate(startDate, repeatType);
-      
-      const endDate =
-        repeatEndDate && new Date(repeatEndDate) > startDate
-          ? repeatEndDate
-          : addDays(startDate, Math.floor(Math.random() * 7) + 1); // repeatEndDate 또는 최소 1~7일 후
-
-      let startTime = null;
-      let endTime = null;
-      const isAllDay = gacha(10);
-      if (!isAllDay) {
-        startTime = getRandomStartTime();
-        endTime = addHours(startTime, Math.floor(Math.random() * 6) + 1); // startTime에서 1~6시간 후
-      }
-      eventSchedules.push({
-        eventId: i,
-        repeatType,
-        repeatEndDate,
-        isAllDay,
-        startDate: format(startDate, "yyyy-MM-dd"),
-        endDate:
-          repeatType === null ? startDate : format(endDate, "yyyy-MM-dd"),
-        startTime: isAllDay ? null : format(startTime, "HH:mm:ss"),
-        endTime: isAllDay ? null : format(endTime, "HH:mm:ss"),
-      });
-    }
-    if (eventSchedules.length >= BATCH_SIZE) {
-      logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
-        action: "seed:events",
-        data: {
-          size: eventSchedules.length,
-          target: "eventSchedules",
-          queryCount: QUERY_COUNT,
-        },
-      });
-      await models.EventSchedules.bulkCreate(eventSchedules, {
-        logging: false,
-      });
-      CREATED_EVENT_SCHEDULE_COUNT += eventSchedules.length;
-      eventSchedules = [];
-    } else if (i === CREATE_EVENT_COUNT) {
-      logger.warn("해당 테이블 작업을 마무리합니다.", {
-        action: "seed:events",
-        data: {
-          size: eventSchedules.length,
-          target: "eventSchedules",
-          queryCount: QUERY_COUNT,
-        },
-      });
-      await models.EventSchedules.bulkCreate(eventSchedules, {
-        logging: false,
-      });
-      CREATED_EVENT_SCHEDULE_COUNT += eventSchedules.length;
-      eventSchedules = [];
-    }
-
-    logger.warn(
-      "EventSchedules에 대한 Seeding이 완료되었습니다. EventLocation Seeding을 시작합니다.",
-      {
-        action: "seed:events",
-        data: {
-          size: CREATED_EVENT_SCHEDULE_COUNT,
-          queryCount: QUERY_COUNT,
-        },
-      }
-    );
+    logger.warn("Event Seeding이 완료되었습니다.", {
+      action: "seed:events",
+      data: {
+        queryCount: QUERY_COUNT,
+      },
+    });
   } catch (error) {
     throw error;
   }
