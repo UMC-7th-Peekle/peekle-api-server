@@ -1,18 +1,82 @@
 import config from "../../config.json" with { type: "json" };
 import { randomUUID } from 'crypto'; // UUID 기반 랜덤 문자열
+import { addMonths, format } from "date-fns";
 
 export const getRandomNumber = (n) => Math.floor(Math.random() * n) + 1;
+// Event 관련 랜덤 데이터 생성 함수
+export const getRandomEventContent = () => {
+  return eventContentSample[getRandomNumber(eventContentSample.length) - 1];
+};
+export const getRandomEventUrl = () => {
+  return eventUrlSample[getRandomNumber(eventUrlSample.length) - 1];
+};
+export const getRandomApplicationDates = () => {
+  const startDate = new Date(
+    2024 + Math.floor(Math.random() * 2), // 2024~2025년 랜덤
+    Math.floor(Math.random() * 12), // 1월~12월 랜덤
+    Math.floor(Math.random() * 28) + 1 // 1일~28일 랜덤
+  );
+
+  const endDate = addMonths(startDate, Math.floor(Math.random() * 6) + 1); // 최소 1개월 ~ 최대 6개월 후
+
+  return {
+    applicationStart: format(startDate, "yyyy-MM-dd 00:00:00"),
+    applicationEnd: format(endDate, "yyyy-MM-dd 00:00:00"),
+  };
+};
+export const getRandomRepeatType = () => {
+  const repeatTypes = ["none", "daily", "weekly", "monthly", "yearly", "custom"];
+  const probabilities = [50, 15, 15, 10, 5, 5]; // none(50%), daily/weekly(15%), monthly(10%), yearly/custom(5%)
+
+  const randomValue = Math.random() * 100;
+  let cumulativeProbability = 0;
+  
+  for (let i = 0; i < repeatTypes.length; i++) {
+    cumulativeProbability += probabilities[i];
+    if (randomValue < cumulativeProbability) {
+      return repeatTypes[i];
+    }
+  }
+
+  return "none"; // 기본값
+}
+export const getRepeatEndDate = (startDate, repeatType) => {
+  if (repeatType === "none") return null;
+
+  switch (repeatType) {
+    case "daily":
+      return format(addMonths(startDate, 7), "yyyy-MM-dd");
+    case "weekly":
+      return format(addMonths(startDate, 2), "yyyy-MM-dd");
+    case "monthly":
+      return format(addMonths(startDate, 6), "yyyy-MM-dd");
+    case "yearly":
+      return format(addYears(startDate, 3), "yyyy-MM-dd");
+    case "custom":
+      return format(addYears(startDate, 1), "yyyy-MM-dd");
+    default:
+      return null;
+  }
+}
+export const getRandomStartTime = () => {
+  const hour = Math.floor(Math.random() * 9) + 9; // 9 ~ 17시
+  const minute = Math.floor(Math.random() * 60); // 0 ~ 59분
+  return format(setMinutes(setHours(new Date(), hour), minute), "HH:mm:ss");
+}
+
+// Article 관련 랜덤 데이터 생성 함수
 export const getRandomArticleContent = () => {
   return articleContentSample[getRandomNumber(articleContentSample.length) - 1];
+};
+export const getRandomCommentContent = () => {
+  return commentContentSample[getRandomNumber(commentContentSample.length) - 1];
 };
 export const getRandomImageUrl = () => {
   const baseName = `image_${randomUUID()}`; // 랜덤 고유 파일명 생성
   const randomFormat = imageFormatSample[getRandomNumber(imageFormatSample.length) - 1]; // 랜덤 확장자 선택
   return `/${baseName}.${randomFormat}`;
 }
-export const getRandomCommentContent = () => {
-  return commentContentSample[getRandomNumber(commentContentSample.length) - 1];
-};
+
 export const gacha = (rate) => Math.random() < rate / 100;
 
 export const groups = [
@@ -25,6 +89,13 @@ export const groups = [
   "종로 / 중구 / 용산",
   "영등포 / 구로 / 신도림",
 ];
+
+export const eventCategories = [
+  { name: "교육", description: "세미나, 워크숍, 강연 및 학습 관련 이벤트" },
+  { name: "문화", description: "전시회, 공연, 영화 상영 및 예술 관련 행사" },
+  { name: "활동", description: "스포츠, 야외 활동, 봉사 및 커뮤니티 모임" },
+  { name: "기타", description: "그 외 특정 분류에 속하지 않는 다양한 이벤트" },
+  ];
 
 export const terms = [
   {
@@ -75,6 +146,42 @@ export const community = [
   {
     title: "이다은 칭찬 게시판",
   },
+];
+
+export const eventContentSample = [
+  "이번 주말, 자연 속에서 힐링하는 요가 클래스에 참여해보세요!",
+  "미술관에서 열리는 특별 전시회, 전문가와 함께 작품을 감상하는 기회를 놓치지 마세요!",
+  "도심 속에서 즐기는 쿠킹 클래스! 셰프와 함께 요리를 배우고 맛있는 한 끼를 만들어보세요.",
+  "환경 보호를 위한 비치 클린업 활동, 뜻깊은 하루를 함께 만들어봐요!",
+  "여행 작가와 함께하는 감성 글쓰기 워크숍, 글을 통해 당신의 이야기를 들려주세요.",
+  "스타트업 창업자를 위한 네트워킹 행사, 비즈니스 아이디어를 공유하고 멘토링을 받아보세요.",
+  "도시 속에서 즐기는 별빛 캠핑, 밤하늘 아래 특별한 시간을 가져보세요.",
+  "뮤지컬 배우와 함께하는 연기 워크숍, 무대 위에서 나만의 캐릭터를 만들어봐요!",
+  "AI와 미래 기술에 대한 무료 강연, 최신 IT 트렌드를 만나보세요!",
+  "전문 바리스타와 함께하는 커피 테이스팅 클래스, 커피의 다양한 맛과 향을 경험하세요.",
+  "도서관에서 열리는 북클럽 모임, 함께 책을 읽고 다양한 의견을 나눠보세요.",
+  "댄스 클래스에서 에너지를 발산하세요! 힙합, 살사, 재즈댄스까지 모두 준비되어 있습니다.",
+  "건강한 라이프스타일을 위한 러닝 클럽! 함께 뛰면서 목표를 만들어봐요.",
+  "실전 투자 스터디 모임, 경제 전문가와 함께 투자 전략을 배우세요!",
+  "친환경 제품 만들기 워크숍, 직접 제작한 제품을 가져갈 수 있어요!",
+];
+
+export const eventUrlSample = [
+  "https://eventnow.com/ai-seminar", // 인공지능 세미나
+  "https://culturehub.net/les-miserables", // 뮤지컬 공연
+  "https://activezone.org/hanriver-running", // 한강 러닝 클럽
+  "https://craftspace.io/pottery-class", // 도예 공방 원데이 클래스
+  "https://greenearth.org/beach-cleanup", // 비치 클린업 캠페인
+  "https://wellnesslife.com/yoga-workshop", // 요가 & 명상 워크숍
+  "https://talktogether.net/language-exchange", // 글로벌 네트워킹 데이
+  "https://brewmaster.io/coffee-brewing", // 브루잉 클래스
+  "https://bookcircle.net/book-club", // 독서 토론 모임
+  "https://gamefest.io/boardgame-festival", // 보드게임 페스티벌
+  "https://pitcharena.com/startup-pitch", // 창업 아이디어 피칭 대회
+  "https://marketguru.net/marketing-seminar", // 온라인 마케팅 전략 세미나
+  "https://photogeek.io/photo-workshop", // 사진 촬영 워크숍
+  "https://devcamp.io/coding-bootcamp", // 코딩 부트캠프
+  "https://tastekorea.net/korean-traditional-alcohol", // 전통주 시음회
 ];
 
 export const articleContentSample = [

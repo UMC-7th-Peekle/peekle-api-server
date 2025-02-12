@@ -10,9 +10,16 @@ import models from "../index.js";
 */
 import {
   groups,
+  eventCategories,
   terms,
   community,
   getRandomNumber,
+  getRandomEventContent,
+  getRandomEventUrl,
+  getRandomApplicationDates,
+  getRandomRepeatType,
+  getRepeatEndDate,
+  getRandomStartTime,
   getRandomArticleContent,
   getRandomImageUrl,
   getRandomCommentContent,
@@ -38,6 +45,284 @@ export const seedEventLocationGroup = async () => {
     logger.warn("[Seeding] EventLocationGroups Seeding", {
       action: "seed:eventLocationGroups",
     });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const seedEventCategory = async () => {
+  try {
+    // await models.Events.destroy({ where: {} }); ???
+    await models.EventCategory.destroy({ where: {} });
+
+    await models.sequelize.query("SET foreign_key_checks = 0;");
+    await models.sequelize.query("TRUNCATE TABLE event_category;");
+    await models.sequelize.query("SET foreign_key_checks = 1;");
+
+    await models.EventCategory.bulkCreate(eventCategories, { logging: false });
+
+    logger.warn("Event Category Seeding 완료", {
+      action: "seed:eventCategory",
+      actionType: "success",
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const seedEvents = async () => {
+  const CREATE_EVENT_COUNT = 1000;
+  const CREATE_EVENT_IMAGE_COUNT = 5;
+  const EVENT_IMAGE_CREATION_RATE = 50;
+  const EVENT_SCRAP_RATE = 70;
+  const BATCH_SIZE = 10000;
+  let QUERY_COUNT = 0;
+
+  logger.warn("다음과 같은 크기의 Seeding이 실행됩니다.", {
+    action: "seed:events",
+    data: {
+      event: CREATE_EVENT_COUNT,
+      eventImage: CREATE_EVENT_COUNT * CREATE_EVENT_IMAGE_COUNT,
+      total: CREATE_EVENT_COUNT + CREATE_EVENT_COUNT * CREATE_EVENT_IMAGE_COUNT,
+    },
+  });
+  try {
+    logger.warn("작업을 시작합니다. DELETE 및 TRUNCATE를 실행합니다.");
+
+    await models.Events.destroy({
+      where: {},
+    });
+    await models.EventImages.destroy({
+      where: {},
+    });
+    await models.EventScraps.destroy({
+      where: {},
+    });
+    await models.EventSchedules.destroy({
+      where: {},
+    });
+    await models.EventLocation.destroy({
+      where: {},
+    });
+
+    await models.sequelize.query("SET foreign_key_checks = 0;");
+    await models.sequelize.query("TRUNCATE TABLE events;");
+    await models.sequelize.query("TRUNCATE TABLE event_images;");
+    await models.sequelize.query("TRUNCATE TABLE event_scraps;");
+    await models.sequelize.query("TRUNCATE TABLE event_schedules;");
+    await models.sequelize.query("TRUNCATE TABLE event_location;");
+    await models.sequelize.query("SET foreign_key_checks = 1;");
+
+    logger.warn("DELETE 및 TRUNCATE가 완료되었습니다.");
+
+    const users = await models.Users.findAll({
+      attributes: ["userId"],
+    });
+
+    // N개의 이벤트를 생성함
+    let events = [];
+
+    for (let i = 0; i < CREATE_EVENT_COUNT; i++) {
+      const randomCategoryId = getRandomNumber(eventCategories.length);
+      const { applicationStart, applicationEnd } = getRandomApplicationDates();
+      events.push({
+        title: `${randomCategoryId}-${i + 1} 이벤트`,
+        description: `이벤트 ${randomCategoryId}-${i + 1} 설명 | ${getRandomEventContent()}`,
+        categoryId: randomCategoryId,
+        locationGroupId: (i % groups.length) + 1,
+        eventUrl: getRandomEventUrl(),
+        applicationStart,
+        applicationEnd,
+        createdUserId: users[getRandomNumber(users.length) - 1].userId,
+      });
+    }
+
+    logger.warn(
+      "Event에 대한 Seeding이 완료되었습니다. EventImages Seeding을 시작합니다.",
+      {
+        action: "seed:events",
+        data: {
+          size: events.length,
+          queryCount: QUERY_COUNT,
+        },
+      }
+    );
+
+    let eventImages = [];
+    let CREATED_EVENT_IMAGE_COUNT = 0;
+    for (let i = i; i <= CREATE_EVENT_COUNT; i++) {
+      // 각 이벤트 당 최대 N개의 이미지를 랜덤하게 생성함
+      let eventImageCount = getRandomNumber(CREATE_EVENT_IMAGE_COUNT);
+      // N% 확률로 이미지 생성
+      if (gacha(EVENT_IMAGE_CREATION_RATE)) {
+        for (let j = 0; j < eventImageCount; j++) {
+          eventImages.push({
+            eventId: i,
+            imageUrl: `/events${getRandomImageUrl()}`,
+            sequence: j + 1,
+          });
+        }
+      }
+      if (eventImages.length >= BATCH_SIZE) {
+        logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+          action: "seed:events",
+          data: {
+            size: eventImages.length,
+            target: "eventImages",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.EventImages.bulkCreate(eventImages, { logging: false });
+        CREATED_EVENT_IMAGE_COUNT += eventImages.length;
+        eventImages = [];
+      } else if (i === CREATE_EVENT_COUNT) {
+        logger.warn("해당 테이블 작업을 마무리합니다.", {
+          action: "seed:events",
+          data: {
+            size: eventImages.length,
+            target: "eventImages",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.EventImages.bulkCreate(eventImages, { logging: false });
+        CREATED_EVENT_IMAGE_COUNT += eventImages.length;
+        eventImages = [];
+      }
+
+      logger.warn(
+        "EventImage에 대한 Seeding이 완료되었습니다. EventScraps Seeding을 시작합니다.",
+        {
+          action: "seed:events",
+          data: {
+            size: CREATED_EVENT_IMAGE_COUNT,
+            queryCount: QUERY_COUNT,
+          },
+        }
+      );
+    }
+
+    let eventScraps = [];
+    let CREATED_EVENT_SCRAP_COUNT = 0;
+    for (let i = 1; i <= CREATE_EVENT_COUNT; i++) {
+      if (gacha(EVENT_SCRAP_RATE)) {
+        eventScraps.push({
+          eventId: i,
+          userId: users[i % users.length].userId,
+        });
+      }
+      if (eventScraps.length >= BATCH_SIZE) {
+        logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+          action: "seed:events",
+          data: {
+            size: eventScraps.length,
+            target: "eventScraps",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.EventScraps.bulkCreate(eventScraps, { logging: false });
+        CREATED_EVENT_SCRAP_COUNT += eventScraps.length;
+        eventScraps = [];
+      } else if (i === CREATE_EVENT_COUNT) {
+        logger.warn("해당 테이블 작업을 마무리합니다.", {
+          action: "seed:events",
+          data: {
+            size: eventScraps.length,
+            target: "eventScraps",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.EventScraps.bulkCreate(eventScraps, { logging: false });
+        CREATED_EVENT_SCRAP_COUNT += eventScraps.length;
+        eventScraps = [];
+      }
+    }
+
+    logger.warn(
+      "EventScraps에 대한 Seeding이 완료되었습니다. EventSchedules Seeding을 시작합니다.",
+      {
+        action: "seed:events",
+        data: {
+          size: CREATED_EVENT_SCRAP_COUNT,
+          queryCount: QUERY_COUNT,
+        },
+      }
+    );
+
+    let eventSchedules = [];
+    let CREATED_EVENT_SCHEDULE_COUNT = 0;
+
+    for (let i = 1; i <= CREATE_EVENT_COUNT; i++) {
+      const event = events[i - 1];
+      const applicationEndDate = new Date(event.applicationEnd); // Event의 applicationEnd
+
+      const startDate = addDays(applicationEndDate, 7); // applicationEnd보다 1주일 뒤
+      const repeatType = getRandomRepeatType();
+      const repeatEndDate = getRepeatEndDate(startDate, repeatType);
+      
+      const endDate =
+        repeatEndDate && new Date(repeatEndDate) > startDate
+          ? repeatEndDate
+          : addDays(startDate, Math.floor(Math.random() * 7) + 1); // repeatEndDate 또는 최소 1~7일 후
+
+      let startTime = null;
+      let endTime = null;
+      const isAllDay = gacha(10);
+      if (!isAllDay) {
+        startTime = getRandomStartTime();
+        endTime = addHours(startTime, Math.floor(Math.random() * 6) + 1); // startTime에서 1~6시간 후
+      }
+      eventSchedules.push({
+        eventId: i,
+        repeatType,
+        repeatEndDate,
+        isAllDay,
+        startDate: format(startDate, "yyyy-MM-dd"),
+        endDate:
+          repeatType === null ? startDate : format(endDate, "yyyy-MM-dd"),
+        startTime: isAllDay ? null : format(startTime, "HH:mm:ss"),
+        endTime: isAllDay ? null : format(endTime, "HH:mm:ss"),
+      });
+    }
+    if (eventSchedules.length >= BATCH_SIZE) {
+      logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+        action: "seed:events",
+        data: {
+          size: eventSchedules.length,
+          target: "eventSchedules",
+          queryCount: QUERY_COUNT,
+        },
+      });
+      await models.EventSchedules.bulkCreate(eventSchedules, {
+        logging: false,
+      });
+      CREATED_EVENT_SCHEDULE_COUNT += eventSchedules.length;
+      eventSchedules = [];
+    } else if (i === CREATE_EVENT_COUNT) {
+      logger.warn("해당 테이블 작업을 마무리합니다.", {
+        action: "seed:events",
+        data: {
+          size: eventSchedules.length,
+          target: "eventSchedules",
+          queryCount: QUERY_COUNT,
+        },
+      });
+      await models.EventSchedules.bulkCreate(eventSchedules, {
+        logging: false,
+      });
+      CREATED_EVENT_SCHEDULE_COUNT += eventSchedules.length;
+      eventSchedules = [];
+    }
+
+    logger.warn(
+      "EventSchedules에 대한 Seeding이 완료되었습니다. EventLocation Seeding을 시작합니다.",
+      {
+        action: "seed:events",
+        data: {
+          size: CREATED_EVENT_SCHEDULE_COUNT,
+          queryCount: QUERY_COUNT,
+        },
+      }
+    );
   } catch (error) {
     throw error;
   }
@@ -89,11 +374,11 @@ export const seedTerms = async () => {
 };
 
 export const seedCommunity = async () => {
-  const CREATE_ARTICLE_COUNT = 1000;
-  const CREATE_ARITCLE_IMAGE_COUNT = 5;
-  const CREATE_COMMENT_COUNT = 100;
+  const CREATE_ARTICLE_COUNT = 1000; // 전체 게시글 수
+  const CREATE_ARITCLE_IMAGE_COUNT = 5; // 게시글 당 최대 이미지 개수
+  const CREATE_COMMENT_COUNT = 100; // 게시글 당 최대 댓글 수
   const ANONYMOUS_ARTICLE_RATE = 50;
-  const ANONYMOUS_ARTICLE_IMAGE_RATE = 50;
+  const ARTICLE_IMAGE_CREATION_RATE = 50;
   const ANONYMOUS_COMMENT_RATE = 30;
   const REPLY_RATE = 90;
   const ANONYMOUS_REPLY_RATE = 30;
@@ -313,13 +598,12 @@ export const seedCommunity = async () => {
       // 각 게시글 당 최대 N개의 이미지를 랜덤하게 생성함
       let articleImageCount = getRandomNumber(CREATE_ARITCLE_IMAGE_COUNT);
       // N% 확률로 이미지 생성
-      if (gacha(ANONYMOUS_ARTICLE_IMAGE_RATE)) {
-        for(let j = 0; j < articleImageCount; j++) {
+      if (gacha(ARTICLE_IMAGE_CREATION_RATE)) {
+        for (let j = 0; j < articleImageCount; j++) {
           articleImages.push({
             articleId: i,
             imageUrl: `/articles${getRandomImageUrl()}`,
-            sequence: j+1,
-
+            sequence: j + 1,
           });
         }
       }
@@ -332,7 +616,9 @@ export const seedCommunity = async () => {
             queryCount: QUERY_COUNT,
           },
         });
-        await models.ArticleImages.bulkCreate(articleImages, { logging: false });
+        await models.ArticleImages.bulkCreate(articleImages, {
+          logging: false,
+        });
         CREATED_ARTICLE_IMAGE_COUNT += articleImages.length;
         articleImages = [];
       } else if (i === CREATE_ARTICLE_COUNT) {
@@ -344,23 +630,25 @@ export const seedCommunity = async () => {
             queryCount: QUERY_COUNT,
           },
         });
-        await models.ArticleImages.bulkCreate(articleImages, { logging: false });
+        await models.ArticleImages.bulkCreate(articleImages, {
+          logging: false,
+        });
         CREATED_ARTICLE_IMAGE_COUNT += articleImages.length;
         articleImages = [];
       }
     }
 
-      // TODO: 다음 작업에 따라 수정 필요
-      logger.warn(
-        "ArticleImage에 대한 Seeding이 완료되었습니다. 다음 작업을 진행합니다.",
-        {
-          action: "seed:community",
-          data: {
-            size: CREATED_ARTICLE_IMAGE_COUNT,
-            queryCount: QUERY_COUNT,
-          },
-        }
-      ); 
+    // TODO: 다음 작업에 따라 수정 필요
+    logger.warn(
+      "ArticleImage에 대한 Seeding이 완료되었습니다. 다음 작업을 진행합니다.",
+      {
+        action: "seed:community",
+        data: {
+          size: CREATED_ARTICLE_IMAGE_COUNT,
+          queryCount: QUERY_COUNT,
+        },
+      }
+    );
 
     // let replys = [];
     // for (let i = 1; i <= CREATED_COMMENT_COUNT; i++) {

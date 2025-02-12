@@ -14,6 +14,7 @@ import { oauthRegisterSchema } from "../utils/validators/auth/auth.validators.js
 import logger from "../utils/logger/logger.js";
 import {
   seedCommunity,
+  seedEventCategory,
   seedEventLocationGroup,
   seedPermissions,
   seedTerms,
@@ -43,8 +44,11 @@ router.get("/seed/:type", authenticateAccessToken, async (req, res, next) => {
       case "permissions":
         await seedPermissions();
         break;
-      case "eventLocation":
+      case "event":
         await seedEventLocationGroup();
+        await seedEventCategory();
+        await seedEvents();
+        // TODO: Event 관련 추가
         break;
       case "terms":
         await seedTerms();
