@@ -4,6 +4,7 @@ import {
   InvalidQueryError,
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
+import { Op } from "sequelize";
 import { Sequelize } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
@@ -49,7 +50,7 @@ export const deleteScrap = async ({ eventId, userId }) => {
  * 스크랩한 이벤트 목록을 조회합니다.
  */
 export const listScrap = async ({ paginationOptions, userId }) => {
-  const { limit, cursor, scrap } = paginationOptions;
+  const { limit, cursor, scrap, category } = paginationOptions;
 
   // 커서 기준 조건 설정
   let cursorWhereClause = {};
@@ -67,6 +68,22 @@ export const listScrap = async ({ paginationOptions, userId }) => {
     throw new InvalidQueryError(
       "올바르지 않은 입력입니다. scrap 값은 'true'만 가능합니다."
     );
+  }
+
+  // 카테고리 조건 설정
+  let categoryWhereClause = {};
+  if (!category || category.length === 0) {
+    categoryWhereClause = {};
+  } else if (Array.isArray(category)) {
+    categoryWhereClause = {
+      categoryId: {
+        [Op.in]: category, // 배열인 카테고리로
+      },
+    };
+  } else {
+    categoryWhereClause = {
+      categoryId: category, // 단일 카테고리
+    };
   }
 
   // 이벤트 불러오기
@@ -88,12 +105,13 @@ export const listScrap = async ({ paginationOptions, userId }) => {
           "title",
           "content",
           "price",
-          "location",
+          "categoryId",
           "locationGroupId",
           "eventUrl",
           "applicationStart",
           "applicationEnd",
         ],
+        where: categoryWhereClause,
         include: [
           {
             model: models.EventCategory,
@@ -137,21 +155,57 @@ export const listScrap = async ({ paginationOptions, userId }) => {
     ? events[events.length - 1].eventScrapId
     : null;
 
+  // 이미지 링크 첨부하도록 변환
   const modifiedEvents = events.map((event) => {
     // event.eventImages에서 eventImages 가져오기 (EventScraps에서 Events, Events에서 EventImage)
-    const transformedImages = event.event.eventImages.map((image) => ({
+    const transformedImages = event?.event?.eventImages.map((image) => ({
       imageUrl: addBaseUrl(image.imageUrl),
       sequence: image.sequence,
     }));
 
     return {
-      ...event.dataValues, // 스크랩 관련 데이터 가져오기
+      ...event?.dataValues, // 스크랩 관련 데이터 가져오기
       event: {
-        ...event.event.dataValues, // 이벤트 관련 데이터
+        ...event?.event?.dataValues, // 이벤트 관련 데이터
         eventImages: transformedImages, // event 안에 eventImage 포함해서 가져오기
       },
     };
   });
 
   return { events: modifiedEvents, nextCursor, hasNextPage };
+};
+
+export const validateScrapEventQuery = (queries) => {
+  const { limit, cursor, scrap, category } = queries;
+
+  const isInteger = (value) => /^\d+$/.test(value); // 정수만 허용
+  if (limit !== undefined && !isInteger(limit)) {
+    throw new InvalidQueryError("limit는 정수여야 합니다.");
+  }
+  if (cursor !== undefined && !isInteger(cursor)) {
+    throw new InvalidQueryError("cursor는 정수여야 합니다.");
+  }
+
+  // 카테고리 검증
+  const categoryPool = ["1", "2", "3"];
+
+  if (!category || (Array.isArray(category) && category.length === 0)) {
+    // 카테고리 값 없음. 즉 전체 카테고리 가져오기
+  }
+  // 중복인 경우와 중복이 아닌 경우 나누기
+  else if (Array.isArray(category)) {
+    category.forEach((cate) => {
+      if (!categoryPool.includes(cate)) {
+        throw new InvalidQueryError(
+          "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
+          categoryPool
+        );
+      }
+    });
+  } else if (!categoryPool.includes(category)) {
+    throw new InvalidQueryError(
+      "올바르지 않은 카테고리입니다. 허용되는 값은 다음과 같습니다.",
+      categoryPool
+    );
+  }
 };
