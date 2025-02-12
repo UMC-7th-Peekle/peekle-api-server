@@ -14,6 +14,9 @@ export const createEvent = async (req, res, next) => {
     // 이미지 경로 추가
     eventData.imagePaths = parseImagePaths(uploadedFiles);
 
+    // 위치 정보 (주소)
+    // eventData.detailAddress = req.body.detailAddress;
+
     logger.debug({
       action: "event:create",
       userId: userId,

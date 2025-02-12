@@ -1,8 +1,7 @@
-// import fs from "fs";
-import config from "../../config.json" with { type: "json" };
+import fs from "fs";
+import config from "../../config/config.js";
 import logger from "../logger/logger.js";
-const { SERVER_DOMAIN } = config.SERVER;
-const { ENV } = config.SERVER;
+const { ENV, SERVER_DOMAIN } = config.SERVER;
 
 export const corsOptions = {
   origin: config.SERVER.CORS.ORIGIN, // CORS domain 설정
@@ -15,10 +14,10 @@ export const corsOptions = {
 
 // SSL 인증서 로드
 export const sslOptions = {
-  key: config.PEM.KEY, // 개인 키 파일
-  cert: config.PEM.CERT, // 인증서 파일
-  // key: fs.readFileSync("localhost-key.pem"), // 개인 키 파일
-  // cert: fs.readFileSync("localhost-cert.pem"), // 인증서 파일
+  // key: config.PEM.KEY, // 개인 키 파일
+  // cert: config.PEM.CERT, // 인증서 파일
+  key: fs.readFileSync("./config/key.pem"), // 개인 키 파일
+  cert: fs.readFileSync("./config/cert.pem"), // 인증서 파일
 };
 
 export const refreshTokenCookieOptions = {

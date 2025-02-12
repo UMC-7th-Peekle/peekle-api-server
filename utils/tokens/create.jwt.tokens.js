@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import config from "../../config.json" with { type: "json" };
+import config from "../../config/config.js";
 import models from "../../models/index.js";
 const { JWT_SECRET } = config.SERVER;
 
@@ -29,15 +29,17 @@ export const createTestToken = ({ userId }) => {
  * @returns {string} - Refresh Token
  */
 export const createRefreshToken = async ({ userId }) => {
+  // https://localhost:7777/auth/login/kakao
+
   // 해당 세션의 JWT 하나만 지우는 방법?
   const token = jwt.sign({ userId }, JWT_SECRET, {
     expiresIn: "7d",
   });
 
-  return await models.RefreshTokens.create({
+  await models.RefreshTokens.create({
     userId,
     token,
   });
 
-  return db.token;
+  return token;
 };

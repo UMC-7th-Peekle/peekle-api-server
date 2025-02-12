@@ -1,4 +1,4 @@
-import config from "../../config.json" with { type: "json" };
+import config from "../../config/config.js";
 
 export const tags = [
   // {

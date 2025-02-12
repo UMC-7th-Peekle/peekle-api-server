@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 import initModels from "./database/init-models.js";
 import logger from "../utils/logger/logger.js";
-import config from "../config.json" with { type: "json" };
+import config from "../config/config.js";
 import { format } from "sql-formatter";
 
 const DATABASE = config.DATABASE;
