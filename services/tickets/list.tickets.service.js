@@ -17,7 +17,7 @@ export const listTicket = async ({ paginationOptions, userId }) => {
   const tickets = await models.Tickets.findAll({
     where: { ...cursorWhereClause, createdUserId: userId },
     limit: limit + 1,
-    order: [["ticketId", "DESC"]],
+    order: [["ticketId", "ASC"]],
     attributes: ["ticketId", "title", "status", "createdUserId"],
   });
 

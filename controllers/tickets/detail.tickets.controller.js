@@ -52,14 +52,35 @@ export const updateTicket = async (req, res, next) => {
  */
 export const detailTicket = async (req, res, next) => {
   try {
+    const { limit, cursor } = req.query;
     const { ticketId } = req.params;
     const userId = req?.user?.userId || null;
 
-    const ticketData = await detailService.detailTicket({ ticketId, userId });
+    // 페이지네이션 기본값 설정
+    const paginationOptions = {
+      limit: limit ? parseInt(limit, 10) : 10, // 기본 limit은 10
+      cursor: cursor ? parseInt(cursor, 10) : null, // cursor가 없으면 null
+    };
 
-    if (ticketData) {
-      return res.status(200).success({ ticketData });
+    const { ticketData, nextCursor, hasNextPage } =
+      await detailService.detailTicket({
+        paginationOptions,
+        ticketId,
+        userId,
+      });
+
+    if (!ticketData || ticketData.length === 0) {
+      return res.status(204).end();
     }
+
+    return res
+      .status(200)
+      .success({
+        ticketId,
+        ticketMessages: ticketData,
+        nextCursor,
+        hasNextPage,
+      });
   } catch (error) {
     logError(error);
     next(error);
