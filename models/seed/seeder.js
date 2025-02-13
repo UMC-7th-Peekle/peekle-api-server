@@ -14,6 +14,7 @@ import {
   groups,
   eventCategories,
   noticeCategories,
+  noticeContentSample,
   terms,
   community,
   getRandomNumber,
@@ -91,7 +92,15 @@ export const seedEvents = async () => {
     data: {
       event: CREATE_EVENT_COUNT,
       eventImage: CREATE_EVENT_COUNT * CREATE_EVENT_IMAGE_COUNT,
-      total: CREATE_EVENT_COUNT + CREATE_EVENT_COUNT * CREATE_EVENT_IMAGE_COUNT,
+      eventScrap: (CREATE_EVENT_COUNT * EVENT_SCRAP_RATE) / 100,
+      eventLocation: CREATE_EVENT_COUNT,
+      eventSchedule: CREATE_EVENT_COUNT,
+      total:
+        CREATE_EVENT_COUNT +
+        CREATE_EVENT_COUNT * CREATE_EVENT_IMAGE_COUNT +
+        (CREATE_EVENT_COUNT * EVENT_SCRAP_RATE) / 100 +
+        CREATE_EVENT_COUNT +
+        CREATE_EVENT_COUNT,
     },
   });
   try {
@@ -451,7 +460,155 @@ export const seedNoticeCategory = async () => {
   }
 };
 
-export const seedNotices = async () => {};
+export const seedNotices = async () => {
+  const CREATE_NOTICE_COUNT = 100;
+  const CREATE_NOTICE_IMAGE_COUNT = 3;
+  const NOTICE_IMAGE_CREATION_RATE = 70;
+
+  const BATCH_SIZE = 10000;
+  let QUERY_COUNT = 0;
+
+  logger.warn("다음과 같은 크기의 Seeding이 실행됩니다.", {
+    action: "seed:notices",
+    data: {
+      notice: CREATE_NOTICE_COUNT,
+      noticeImage: CREATE_NOTICE_COUNT * CREATE_NOTICE_IMAGE_COUNT,
+      total:
+        CREATE_NOTICE_COUNT + CREATE_NOTICE_COUNT * CREATE_NOTICE_IMAGE_COUNT,
+    },
+  });
+  try {
+    logger.warn("작업을 시작합니다. DELETE 및 TRUNCATE를 실행합니다.");
+
+    await models.Notices.destroy({
+      where: {},
+    });
+    await models.NoticeImages.destroy({
+      where: {},
+    });
+
+    await models.sequelize.query("SET foreign_key_checks = 0;");
+    await models.sequelize.query("TRUNCATE TABLE notices;");
+    await models.sequelize.query("TRUNCATE TABLE notice_images;");
+    await models.sequelize.query("SET foreign_key_checks = 1;");
+
+    logger.warn("DELETE 및 TRUNCATE가 완료되었습니다.");
+
+    const users = await models.Users.findAll({
+      attributes: ["userId"],
+    });
+
+    // N개의 공지사항을 생성함
+    let notices = [];
+    let CREATED_NOTICE_COUNT = 0;
+
+    for (let i = 0; i < CREATE_NOTICE_COUNT; i++) {
+      const randomCategoryId = getRandomNumber(noticeCategories.length);
+      notices.push({
+        title: `${noticeCategories[randomCategoryId-1].name}-${i + 1} 공지사항`,
+        content: `공지사항 ${randomCategoryId}-${i + 1} 내용 | ${noticeContentSample[randomCategoryId-1].items[i % 3].content}`,
+        categoryId: randomCategoryId,
+        authorId: users[getRandomNumber(users.length) - 1].userId,
+        isNotice: gacha(50), // N% 확률로 공지사항임
+      });
+    }
+    if (notices.length >= BATCH_SIZE) {
+      logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+        action: "seed:notices",
+        data: {
+          size: notices.length,
+          target: "notices",
+          queryCount: QUERY_COUNT,
+        },
+      });
+      await models.Notices.bulkCreate(notices, { logging: false });
+      CREATED_NOTICE_COUNT += notices.length;
+      notices = [];
+    } else if (notices.length === CREATE_NOTICE_COUNT) {
+      logger.warn("해당 테이블 작업을 마무리합니다.", {
+        action: "seed:notices",
+        data: {
+          size: notices.length,
+          target: "notices",
+          queryCount: QUERY_COUNT,
+        },
+      });
+      await models.Notices.bulkCreate(notices, { logging: false });
+      CREATED_NOTICE_COUNT += notices.length;
+      notices = [];
+    }
+
+    logger.warn(
+      "Notice에 대한 Seeding이 완료되었습니다. NoticeImages Seeding을 시작합니다.",
+      {
+        action: "seed:notices",
+        data: {
+          size: CREATED_NOTICE_COUNT,
+          queryCount: QUERY_COUNT,
+        },
+      }
+    );
+
+    let noticeImages = [];
+    let CREATED_NOTICE_IMAGE_COUNT = 0;
+    for (let i = 1; i <= CREATE_NOTICE_COUNT; i++) {
+      // 각 공지사항 당 최대 N개의 이미지를 랜덤하게 생성함
+      let noticeImageCount = getRandomNumber(CREATE_NOTICE_IMAGE_COUNT);
+      // N% 확률로 이미지 생성
+      if (gacha(NOTICE_IMAGE_CREATION_RATE)) {
+        for (let j = 0; j < noticeImageCount; j++) {
+          noticeImages.push({
+            noticeId: i,
+            imageUrl: `/notices${getRandomImageUrl()}`,
+            sequence: j + 1,
+          });
+        }
+      }
+      if (noticeImages.length >= BATCH_SIZE) {
+        logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+          action: "seed:notices",
+          data: {
+            size: noticeImages.length,
+            target: "noticeImages",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.NoticeImages.bulkCreate(noticeImages, { logging: false });
+        CREATED_NOTICE_IMAGE_COUNT += noticeImages.length;
+        noticeImages = [];
+      } else if (i === CREATE_NOTICE_COUNT) {
+        logger.warn("해당 테이블 작업을 마무리합니다.", {
+          action: "seed:notices",
+          data: {
+            size: noticeImages.length,
+            target: "noticeImages",
+            queryCount: QUERY_COUNT,
+          },
+        });
+        await models.NoticeImages.bulkCreate(noticeImages, { logging: false });
+        CREATED_NOTICE_IMAGE_COUNT += noticeImages.length;
+        noticeImages = [];
+      }
+    }
+
+    logger.warn("NoticeImage에 대한 Seeding이 완료되었습니다.", {
+      action: "seed:notices",
+      data: {
+        size: CREATED_NOTICE_IMAGE_COUNT,
+        queryCount: QUERY_COUNT,
+      },
+    });
+
+    logger.warn("Notice에 대한 Seeding이 완료되었습니다.", {
+      action: "seed:notices",
+      data: {
+        queryCount: QUERY_COUNT,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const seedTerms = async () => {
   try {
