@@ -122,6 +122,13 @@ export const eventCategories = [
   { name: "기타", description: "그 외 특정 분류에 속하지 않는 다양한 이벤트" },
 ];
 
+export const noticeCategories = [
+  { name: "공지사항", description: "서비스 이용에 대한 공지사항 및 업데이트" },
+  { name: "이벤트", description: "다양한 이벤트 및 프로모션에 대한 소식" },
+  { name: "업데이트", description: "서비스 업데이트나 점검 및 버전 정보 안내" },
+  { name: "기타", description: "그 외 특정 분류에 속하지 않는 다양한 소식" },
+];
+
 export const terms = [
   {
     title: "서비스 이용 약관",

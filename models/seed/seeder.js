@@ -13,6 +13,7 @@ import * as Sequelize from "sequelize";
 import {
   groups,
   eventCategories,
+  noticeCategories,
   terms,
   community,
   getRandomNumber,
@@ -309,9 +310,9 @@ export const seedEvents = async () => {
         endDate = addMonths(startDate, 3);
       }
       const isAllDay = gacha(10);
-    
+
       const { startTime, endTime } = getRandomStartAndEndTime();
-      
+
       eventSchedules.push({
         eventId: i,
         repeatType,
@@ -428,6 +429,29 @@ export const seedEvents = async () => {
     throw error;
   }
 };
+
+export const seedNoticeCategory = async () => {
+  try {
+    await models.NoticeCategory.destroy({ where: {} });
+
+    await models.sequelize.query("SET foreign_key_checks = 0;");
+    await models.sequelize.query("TRUNCATE TABLE notice_category;");
+    await models.sequelize.query("SET foreign_key_checks = 1;");
+
+    await models.NoticeCategory.bulkCreate(noticeCategories, {
+      logging: false,
+    });
+
+    logger.warn("Notice Category Seeding 완료", {
+      action: "seed:noticeCategory",
+      actionType: "success",
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const seedNotices = async () => {};
 
 export const seedTerms = async () => {
   try {

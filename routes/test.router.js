@@ -17,6 +17,7 @@ import {
   seedEventCategory,
   seedEventLocationGroup,
   seedEvents,
+  seedNoticeCategory,
   seedPermissions,
   seedTerms,
   seedUsers,
@@ -55,6 +56,10 @@ router.get("/seed/:type", authenticateAccessToken, async (req, res, next) => {
         break;
       case "community":
         await seedCommunity();
+        break;
+      case "notices":
+        await seedNoticeCategory();
+        // await seedNotices();
         break;
       case "users":
         await seedUsers();
