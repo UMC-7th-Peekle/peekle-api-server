@@ -67,7 +67,7 @@ export const listEvent = async ({ paginationOptions }) => {
       },
     };
   } else {
-    categoryWhereClause = {
+    locationWhereClause = {
       locationGroupId: location, // 단일 location
     };
   }
@@ -129,7 +129,9 @@ export const listEvent = async ({ paginationOptions }) => {
       {
         model: models.EventLocation,
         as: "eventLocation",
-        where: locationWhereClause,
+        where: {
+          locationGroupId: location,
+        },
         attributes: { exclude: ["eventId", "createdAt", "updatedAt"] },
         required: false,
       },
@@ -155,8 +157,8 @@ export const listEvent = async ({ paginationOptions }) => {
     }));
 
     const parsedLocation = {
-      coordinates: event.eventLocation.position.coordinates,
-      ...event.eventLocation.dataValues,
+      coordinates: event.eventLocation?.position.coordinates,
+      ...event.eventLocation?.dataValues,
     };
     delete parsedLocation.position;
 

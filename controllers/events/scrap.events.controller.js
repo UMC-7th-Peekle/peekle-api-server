@@ -48,14 +48,22 @@ export const deleteScrap = async (req, res, next) => {
  */
 export const listScrap = async (req, res, next) => {
   try {
-    const { scrap, limit, cursor } = req.query;
+    const { scrap, category, limit, cursor } = req.query;
     const userId = req?.user?.userId || null;
+
+    // 중복 선택 받아오는 배열로
+    const categories = Array.isArray(category)
+      ? category
+      : category
+        ? [category]
+        : [];
 
     // 페이지네이션 기본값 설정
     const paginationOptions = {
       limit: limit ? parseInt(limit, 10) : 10, // 기본 limit은 10
       cursor: cursor ? parseInt(cursor, 10) : null, // cursor가 없으면 null
       scrap,
+      category: categories,
     };
 
     const { events, nextCursor, hasNextPage } = await scrapService.listScrap({
