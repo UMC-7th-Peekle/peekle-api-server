@@ -1047,7 +1047,7 @@ export const seedCommunity = async () => {
 };
 
 export const seedReports = async () => {
-  const CREATE_REPORT_COUNT = 50; // Unique 제약으로 인 해 숫자가 커지면 VALIDATION_ERROR 발생할 확률 높음
+  const CREATE_REPORT_COUNT = 1000; // Unique 제약으로 인 해 숫자가 커지면 VALIDATION_ERROR 발생할 확률 높음
 
   const BATCH_SIZE = 10000; // 당장 필요하진 않지만 추후에 데이터를 늘렸을 때를 위해
   let QUERY_COUNT = 0;
@@ -1091,6 +1091,8 @@ export const seedReports = async () => {
     let reports = [];
     let CREATED_REPORT_COUNT = 0;
 
+    const existingReports = new Set(); // 중복 방지용 Set
+
     for (let i = 0; i < CREATE_REPORT_COUNT; i++) {
       const randomReportTypeId = getRandomNumber(reportTypes.length);
       // randomReportType에 따라 targetId를 랜덤하게 생성함
@@ -1105,10 +1107,22 @@ export const seedReports = async () => {
         targetId = events[getRandomNumber(events.length) - 1].eventId;
       }
 
+      let reportedUserId = users[getRandomNumber(users.length) - 1].userId;
+
+      const reportKey = `${targetId}-${randomReportTypeId}-${reportedUserId}`;
+
+      // 중복 체크
+      if (existingReports.has(reportKey)) {
+        i--; // 중복이므로 다시 생성
+        continue;
+      }
+
+      existingReports.add(reportKey);
+
       reports.push({
         type: reportTypes[randomReportTypeId - 1],
         targetId,
-        reportedUserId: users[getRandomNumber(users.length) - 1].userId,
+        reportedUserId,
         reason: `신고 ${i + 1} 사유 | ${reportContentSample[randomReportTypeId - 1].content[i % 3]}`,
         status: reportStatus[getRandomNumber(reportStatus.length) - 1],
       });
