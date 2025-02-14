@@ -288,9 +288,10 @@ export const updateArticle = async ({
   authorId,
   title,
   content,
-  imagePaths,
+  isAnonymous,
   existingImageSequence,
   newImageSequence,
+  imagePaths,
 }) => {
   // 게시글 검색
   const article = await models.Articles.findOne({
@@ -323,6 +324,7 @@ export const updateArticle = async ({
   await article.update({
     title,
     content,
+    isAnonymous,
   });
 
   // 사진이 새로 들어온 경우에만 사진 업데이트
