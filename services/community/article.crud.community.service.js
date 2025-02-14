@@ -109,6 +109,10 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     sequence: image.sequence,
   }));
 
+  const transformedProfileImages = data.articleComments.map((comment) => {
+    comment.author.profileImage = addBaseUrl(author.profileImage);
+  });
+
   // 게시글 좋아요 여부 및 좋아요 개수
   const isArticleLikedByUser = userId
     ? data.articleLikes.some(

@@ -107,6 +107,9 @@ export const checkAuthorizationCode = (authorizationCode) => {
 export const checkIfUserExists = async (data) => {
   const info = await models.Users.findOne({
     attributes: ["userId", "name", "nickname"],
+    // where: {
+    //   status: "active",
+    // },
     include: [
       {
         model: models.UserOauth,
@@ -123,6 +126,16 @@ export const checkIfUserExists = async (data) => {
   if (!info) {
     logger.error("[checkIfUserExist] 가입되어 있지 않은 사용자입니다.");
     return false;
+  }
+
+  if (info.status === "dormant") {
+    logger.error("휴면 사용자가 로그인을 시도했습니다.");
+    return "dormant";
+  }
+
+  if (info.status === "terminated") {
+    logger.error("탈퇴한 사용자가 7일 이내에 로그인을 시도했습니다.");
+    return "terminated";
   }
 
   return {
