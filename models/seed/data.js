@@ -361,6 +361,53 @@ export const commentContentSample = [
   "비오는 날에는 코딩을",
 ];
 
+export const reportTypes = [
+  "user", 
+  "article",
+  "comment",
+  "event",
+]
+
+export const reportContentSample = [
+  {
+    type: "user",
+    content: [
+      "유저가 불쾌한 행동을 했습니다.",
+      "유저가 불쾌한 내용을 포함한 프로필을 가지고 있습니다.",
+      "유저가 불쾌한 프로필 이미지를 사용하고 있습니다.",
+    ],
+  },
+  {
+    type: "article",
+    content: [
+    "게시글이 불쾌한 내용을 포함하고 있습니다.",
+    "게시글이 저작권을 침해하고 있습니다.",
+    "게시글이 광고성 내용을 포함하고 있습니다.",
+    ],
+  },
+  {
+    type: "comment",
+    content: [
+      "댓글이 불쾌한 내용을 포함하고 있습니다.",
+    "댓글이 저작권을 침해하고 있습니다.",
+    "댓글이 광고성 내용을 포함하고 있습니다.",
+    ],
+  },
+  {
+    type: "event",
+    content: [
+      "이벤트가 불쾌한 내용을 포함하고 있습니다.",
+    "이벤트가 저작권을 침해하고 있습니다.",
+    "이벤트가 광고성 내용을 포함하고 있습니다.",
+    ],
+  }
+];
+
+export const reportStatus = [
+  "open",
+  "pending",
+  "closed",
+];
 export const userSample = seederConfig.SEEDER.USER.map((user) => ({
   ...user,
   profileImage: config.PEEKLE.DEFAULT_PROFILE_IMAGE,

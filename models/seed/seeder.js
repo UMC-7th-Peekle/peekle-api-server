@@ -17,6 +17,9 @@ import {
   noticeContentSample,
   terms,
   community,
+  reportTypes,
+  reportContentSample,
+  reportStatus,
   getRandomNumber,
   getRandomEventContent,
   getRandomEventUrl,
@@ -35,6 +38,7 @@ import {
   gacha,
   userSample,
 } from "./data.js";
+import { report } from "process";
 
 export const seedEventLocationGroup = async () => {
   try {
@@ -505,8 +509,8 @@ export const seedNotices = async () => {
     for (let i = 0; i < CREATE_NOTICE_COUNT; i++) {
       const randomCategoryId = getRandomNumber(noticeCategories.length);
       notices.push({
-        title: `${noticeCategories[randomCategoryId-1].name}-${i + 1} 공지사항`,
-        content: `공지사항 ${randomCategoryId}-${i + 1} 내용 | ${noticeContentSample[randomCategoryId-1].items[i % 3].content}`,
+        title: `${noticeCategories[randomCategoryId - 1].name}-${i + 1} 공지사항`,
+        content: `공지사항 ${randomCategoryId}-${i + 1} 내용 | ${noticeContentSample[randomCategoryId - 1].items[i % 3].content}`,
         categoryId: randomCategoryId,
         authorId: users[getRandomNumber(users.length) - 1].userId,
         isNotice: gacha(50), // N% 확률로 공지사항임
@@ -1033,6 +1037,110 @@ export const seedCommunity = async () => {
 
     logger.warn("Community Seeding이 완료되었습니다.", {
       action: "seed:community",
+      data: {
+        queryCount: QUERY_COUNT,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const seedReports = async () => {
+  const CREATE_REPORT_COUNT = 50; // Unique 제약으로 인 해 숫자가 커지면 VALIDATION_ERROR 발생할 확률 높음
+
+  const BATCH_SIZE = 10000; // 당장 필요하진 않지만 추후에 데이터를 늘렸을 때를 위해
+  let QUERY_COUNT = 0;
+
+  logger.warn("다음과 같은 크기의 Seeding이 실행됩니다.", {
+    action: "seed:reports",
+    data: {
+      report: CREATE_REPORT_COUNT,
+    },
+  });
+  try {
+    logger.warn("작업을 시작합니다. DELETE 및 TRUNCATE를 실행합니다.");
+
+    await models.Reports.destroy({
+      where: {},
+    });
+
+    await models.sequelize.query("SET foreign_key_checks = 0;");
+    await models.sequelize.query("TRUNCATE TABLE reports;");
+    await models.sequelize.query("SET foreign_key_checks = 1;");
+
+    logger.warn("DELETE 및 TRUNCATE가 완료되었습니다.");
+
+    const users = await models.Users.findAll({
+      attributes: ["userId"],
+    });
+
+    const articles = await models.Articles.findAll({
+      attributes: ["articleId"],
+    });
+
+    const comments = await models.ArticleComments.findAll({
+      attributes: ["commentId"],
+    });
+
+    const events = await models.Events.findAll({
+      attributes: ["eventId"],
+    });
+
+    // N개의 신고를 생성함
+    let reports = [];
+    let CREATED_REPORT_COUNT = 0;
+
+    for (let i = 0; i < CREATE_REPORT_COUNT; i++) {
+      const randomReportTypeId = getRandomNumber(reportTypes.length);
+      // randomReportType에 따라 targetId를 랜덤하게 생성함
+      let targetId;
+      if (randomReportTypeId === 1) {
+        targetId = users[getRandomNumber(users.length) - 1].userId;
+      } else if (randomReportTypeId === 2) {
+        targetId = articles[getRandomNumber(articles.length) - 1].articleId;
+      } else if (randomReportTypeId === 3) {
+        targetId = comments[getRandomNumber(comments.length) - 1].commentId;
+      } else if (randomReportTypeId === 4) {
+        targetId = events[getRandomNumber(events.length) - 1].eventId;
+      }
+
+      reports.push({
+        type: reportTypes[randomReportTypeId - 1],
+        targetId,
+        reportedUserId: users[getRandomNumber(users.length) - 1].userId,
+        reason: `신고 ${i + 1} 사유 | ${reportContentSample[randomReportTypeId - 1].content[i % 3]}`,
+        status: reportStatus[getRandomNumber(reportStatus.length) - 1],
+      });
+    }
+    if (reports.length >= BATCH_SIZE) {
+      logger.warn("Batch Size를 초과하여 쿼리를 실행합니다.", {
+        action: "seed:reports",
+        data: {
+          size: reports.length,
+          target: "reports",
+          queryCount: QUERY_COUNT,
+        },
+      });
+      await models.Reports.bulkCreate(reports, { logging: false });
+      CREATED_REPORT_COUNT += reports.length;
+      reports = [];
+    } else if (reports.length === CREATE_REPORT_COUNT) {
+      logger.warn("해당 테이블 작업을 마무리합니다.", {
+        action: "seed:reports",
+        data: {
+          size: reports.length,
+          target: "reports",
+          queryCount: QUERY_COUNT,
+        },
+      });
+      await models.Reports.bulkCreate(reports, { logging: false });
+      CREATED_REPORT_COUNT += reports.length;
+      reports = [];
+    }
+
+    logger.warn("Report에 대한 Seeding이 완료되었습니다.", {
+      action: "seed:reports",
       data: {
         queryCount: QUERY_COUNT,
       },

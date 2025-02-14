@@ -19,6 +19,7 @@ import {
   seedEvents,
   seedNoticeCategory,
   seedNotices,
+  seedReports,
   seedPermissions,
   seedTerms,
   seedUsers,
@@ -61,6 +62,9 @@ router.get("/seed/:type", authenticateAccessToken, async (req, res, next) => {
       case "notices":
         await seedNoticeCategory();
         await seedNotices();
+        break;
+      case "reports":
+        await seedReports();
         break;
       case "users":
         await seedUsers();
