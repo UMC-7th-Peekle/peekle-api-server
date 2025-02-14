@@ -1,4 +1,4 @@
-import config from "../../config/config.js";
+import config from "../../config.js";
 const seederConfig = config.SEEDER;
 
 export const getRandomNumber = (n) => Math.floor(Math.random() * n) + 1;

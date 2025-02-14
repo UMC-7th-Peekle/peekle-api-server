@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import config from "../../config/config.js";
+import config from "../../config.js";
 import models from "../../models/index.js";
 const { JWT_SECRET } = config.SERVER;
 
