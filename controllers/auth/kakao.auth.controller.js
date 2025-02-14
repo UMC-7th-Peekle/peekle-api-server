@@ -56,6 +56,29 @@ export const kakaoCallback = async (req, res, next) => {
       return res.status(202).send(
         kakaoService.createScript({
           isRegistered: false,
+          userStatus: "NOT_REGISTERED",
+          userInfo: {
+            id: kakaoUserInfo.oauthId,
+            email: kakaoUserInfo.email,
+          },
+        })
+      );
+    } else if (peekleUser === "dormant") {
+      return res.status(202).send(
+        kakaoService.createScript({
+          isRegistered: true,
+          userStatus: "DORMANT",
+          userInfo: {
+            id: kakaoUserInfo.oauthId,
+            email: kakaoUserInfo.email,
+          },
+        })
+      );
+    } else if (peekleUser === "terminated") {
+      return res.status(202).send(
+        kakaoService.createScript({
+          isRegistered: true,
+          userStatus: "TERMINATED",
           userInfo: {
             id: kakaoUserInfo.oauthId,
             email: kakaoUserInfo.email,
