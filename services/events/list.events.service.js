@@ -137,6 +137,7 @@ export const listEvent = async ({ paginationOptions }) => {
       },
     ],
   });
+  console.log(typeof eventId);
 
   let hasNextPage = false;
 
@@ -218,7 +219,7 @@ export const validateEventQuery = (queries) => {
   }
 
   // 카테고리 검증
-  const categoryPool = ["1", "2", "3"];
+  const categoryPool = ["1", "2", "3", "4"];
 
   if (!category || (Array.isArray(category) && category.length === 0)) {
     // 카테고리 값 없음. 즉 전체 카테고리 가져오기
