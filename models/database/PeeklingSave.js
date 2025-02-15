@@ -1,42 +1,54 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Reports extends Model {
+export default class PeeklingSave extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    reportId: {
+    id: {
       autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
-      primaryKey: true,
-      field: 'report_id'
+      primaryKey: true
     },
-    type: {
-      type: DataTypes.ENUM('user','article','comment','event','peekling'),
-      allowNull: false
+    title: {
+      type: DataTypes.STRING(20),
+      allowNull: true
     },
-    targetId: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
-      field: 'target_id'
+    description: {
+      type: DataTypes.STRING(1000),
+      allowNull: true
     },
-    reportedUserId: {
+    minPeople: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      field: 'min_people'
+    },
+    maxPeople: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      field: 'max_people'
+    },
+    schedule: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    categoryId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
+      references: {
+        model: 'peekling_category',
+        key: 'category_id'
+      },
+      field: 'category_id'
+    },
+    createdUserId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: false,
       references: {
         model: 'users',
         key: 'user_id'
       },
-      field: 'reported_user_id'
-    },
-    reason: {
-      type: DataTypes.STRING(1024),
-      allowNull: false
-    },
-    status: {
-      type: DataTypes.ENUM('open','pending','closed'),
-      allowNull: false,
-      defaultValue: "open"
+      field: 'created_user_id'
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -52,7 +64,7 @@ export default class Reports extends Model {
     }
   }, {
     sequelize,
-    tableName: 'reports',
+    tableName: 'peekling_save',
     timestamps: false,
     indexes: [
       {
@@ -60,24 +72,21 @@ export default class Reports extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "report_id" },
+          { name: "id" },
         ]
       },
       {
-        name: "reports_pk",
-        unique: true,
+        name: "peekling_save_peekling_category_category_id_fk",
         using: "BTREE",
         fields: [
-          { name: "target_id" },
-          { name: "type" },
-          { name: "reported_user_id" },
+          { name: "category_id" },
         ]
       },
       {
-        name: "reports_users_user_id_fk",
+        name: "peekling_save_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "reported_user_id" },
+          { name: "created_user_id" },
         ]
       },
     ]

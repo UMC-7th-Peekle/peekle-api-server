@@ -6,7 +6,7 @@ const util = require("util");
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 
-const config = require("../../config.json").DATABASE;
+const config = require("../config/config.json").DATABASE;
 
 const auto = new SequelizeAuto(
   config.MYSQL_DATABASE,

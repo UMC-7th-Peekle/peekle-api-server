@@ -19,6 +19,11 @@ export default class Peekling extends Model {
       type: DataTypes.STRING(1000),
       allowNull: true
     },
+    status: {
+      type: DataTypes.ENUM('active','canceled','completed'),
+      allowNull: false,
+      defaultValue: "active"
+    },
     minPeople: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -30,7 +35,7 @@ export default class Peekling extends Model {
       field: 'max_people'
     },
     schedule: {
-      type: DataTypes.DATE(6),
+      type: DataTypes.DATE,
       allowNull: false
     },
     categoryId: {
@@ -44,7 +49,7 @@ export default class Peekling extends Model {
     },
     createdUserId: {
       type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'users',
         key: 'user_id'

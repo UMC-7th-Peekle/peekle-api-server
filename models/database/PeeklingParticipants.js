@@ -1,42 +1,49 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Reports extends Model {
+export default class PeeklingParticipants extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    reportId: {
-      autoIncrement: true,
+    peeklingId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
-      field: 'report_id'
+      references: {
+        model: 'peekling',
+        key: 'peekling_id'
+      },
+      field: 'peekling_id'
     },
-    type: {
-      type: DataTypes.ENUM('user','article','comment','event','peekling'),
-      allowNull: false
-    },
-    targetId: {
+    participantId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
-      field: 'target_id'
-    },
-    reportedUserId: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: true,
+      primaryKey: true,
       references: {
         model: 'users',
         key: 'user_id'
       },
-      field: 'reported_user_id'
-    },
-    reason: {
-      type: DataTypes.STRING(1024),
-      allowNull: false
+      field: 'participant_id'
     },
     status: {
-      type: DataTypes.ENUM('open','pending','closed'),
+      type: DataTypes.ENUM('active','canceled','kicked'),
       allowNull: false,
-      defaultValue: "open"
+      defaultValue: "active"
+    },
+    isInChatroom: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: 1,
+      field: 'is_in_chatroom'
+    },
+    cancelReason: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      field: 'cancel_reason'
+    },
+    kickReason: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      field: 'kick_reason'
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -52,7 +59,7 @@ export default class Reports extends Model {
     }
   }, {
     sequelize,
-    tableName: 'reports',
+    tableName: 'peekling_participants',
     timestamps: false,
     indexes: [
       {
@@ -60,24 +67,15 @@ export default class Reports extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "report_id" },
+          { name: "peekling_id" },
+          { name: "participant_id" },
         ]
       },
       {
-        name: "reports_pk",
-        unique: true,
+        name: "peekling_participants_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "target_id" },
-          { name: "type" },
-          { name: "reported_user_id" },
-        ]
-      },
-      {
-        name: "reports_users_user_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "reported_user_id" },
+          { name: "participant_id" },
         ]
       },
     ]
