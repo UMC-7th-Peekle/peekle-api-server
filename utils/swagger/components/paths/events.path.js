@@ -7,10 +7,6 @@ const eventTags = {
   report: "Events: 신고",
 };
 
-const getEventDescription = `##안녕하세요 이건 설명입니다
-그냥 그래요
-\`example\``;
-
 const crudEvent = {
   // 이벤트 조회, 삭제, 생성
   "/": {

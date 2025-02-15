@@ -9,7 +9,7 @@ import cookieParser from "cookie-parser";
 import { v4 as uuidv4 } from "uuid";
 // import http from "http";
 import https from "https"; // https를 사용해야 하는 경우 사용하면 됩니다.
-// import { Server } from "socket.io"; // socket을 사용하려면 주석 해제
+import { getSocketIO, initSocket } from "./socket/index.js"; // socket initialize
 
 // 로컬 module import, 기능별로 구분해주세요.
 import logger from "./utils/logger/logger.js";
@@ -85,6 +85,8 @@ app.use(errorHandler);
 // http, https 사용하실 프로토콜에 맞추어 주석 해제하고 사용하시면 됩니다.
 const server = https.createServer(sslOptions, app);
 // const server = http.createServer(app);
+initSocket(server);
+console.log(`IO INITED : ${getSocketIO()}`);
 
 const serverStartMessage = `
 #############################################
