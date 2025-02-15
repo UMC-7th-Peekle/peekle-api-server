@@ -1,3 +1,4 @@
+// 이벤트 생성 스키마
 export const postEventSchema = {
   type: "object",
   properties: {
@@ -78,6 +79,7 @@ export const postEventSchema = {
   additionalProperties: false,
 };
 
+// 이벤트 수정 스키마
 export const patchEventSchema = {
   ...postEventSchema,
   properties: {

@@ -189,9 +189,42 @@ const noticeParams = {
   },
 };
 
+const ticketParams = {
+  limit: {
+    name: "limit",
+    in: "query",
+    required: false,
+    description: "한 번에 가져올 게시글 수",
+    schema: {
+      type: "integer",
+      example: 5,
+    },
+  },
+  cursor: {
+    name: "cursor",
+    in: "query",
+    required: false,
+    description: "페이지네이션을 위한 커서",
+    schema: {
+      type: "integer",
+    },
+  },
+  ticketId: {
+    name: "ticketId",
+    in: "path",
+    required: true,
+    description: "티켓 ID",
+    schema: {
+      type: "integer",
+      example: 1,
+    },
+  },
+};
+
 export const parameters = {
   auth: authParams,
   community: communityParams,
-  event: eventParams,
+  events: eventParams,
   notice: noticeParams,
+  tickets: ticketParams,
 };
