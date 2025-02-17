@@ -7,8 +7,13 @@ import { logError } from "../../utils/handlers/error.logger.js";
  */
 export const newScrap = async (req, res, next) => {
   try {
-    const { eventId } = req.body;
+    let { eventId } = req.body;
     const userId = req?.user?.userId || null;
+
+    // eventId 변환 전후 출력
+    console.log("eventId 변환 전:", typeof eventId);
+    eventId = BigInt(eventId);
+    console.log("eventId 변환 후:", typeof eventId);
 
     const scrap = await scrapService.newScrap({ eventId, userId });
 

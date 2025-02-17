@@ -1,42 +1,46 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Reports extends Model {
+export default class Chats extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    reportId: {
+    chatId: {
       autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
-      field: 'report_id'
+      field: 'chat_id'
     },
-    type: {
-      type: DataTypes.ENUM('user','article','comment','event','peekling'),
-      allowNull: false
-    },
-    targetId: {
+    parentChatId: {
       type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
-      field: 'target_id'
+      allowNull: true,
+      references: {
+        model: 'chats',
+        key: 'chat_id'
+      },
+      field: 'parent_chat_id'
     },
-    reportedUserId: {
+    status: {
+      type: DataTypes.ENUM('active','edited','deleted'),
+      allowNull: false,
+      defaultValue: "active"
+    },
+    authorId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
         model: 'users',
         key: 'user_id'
       },
-      field: 'reported_user_id'
+      field: 'author_id'
     },
-    reason: {
-      type: DataTypes.STRING(1024),
+    type: {
+      type: DataTypes.BLOB,
       allowNull: false
     },
-    status: {
-      type: DataTypes.ENUM('open','pending','closed'),
-      allowNull: false,
-      defaultValue: "open"
+    content: {
+      type: DataTypes.STRING(1000),
+      allowNull: true
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -52,7 +56,7 @@ export default class Reports extends Model {
     }
   }, {
     sequelize,
-    tableName: 'reports',
+    tableName: 'chats',
     timestamps: false,
     indexes: [
       {
@@ -60,24 +64,21 @@ export default class Reports extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "report_id" },
+          { name: "chat_id" },
         ]
       },
       {
-        name: "reports_pk",
-        unique: true,
+        name: "chats_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "target_id" },
-          { name: "type" },
-          { name: "reported_user_id" },
+          { name: "author_id" },
         ]
       },
       {
-        name: "reports_users_user_id_fk",
+        name: "chats_chats_chat_id_fk",
         using: "BTREE",
         fields: [
-          { name: "reported_user_id" },
+          { name: "parent_chat_id" },
         ]
       },
     ]

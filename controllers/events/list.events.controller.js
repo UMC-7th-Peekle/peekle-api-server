@@ -17,6 +17,7 @@ export const listEvent = async (req, res, next) => {
       price,
       startDate,
       endDate,
+      sort, // '가까운 날짜순', '낮은 금액순', '가까운 거리순'
     } = req.query;
 
     // 중복 선택 받아오는 배열로
@@ -42,6 +43,7 @@ export const listEvent = async (req, res, next) => {
       price,
       startDate,
       endDate,
+      sort,
     });
 
     // 페이지네이션 기본값 설정
@@ -54,6 +56,7 @@ export const listEvent = async (req, res, next) => {
       price,
       startDate,
       endDate,
+      sort,
     };
 
     const { events, nextCursor, hasNextPage } = await listService.listEvent({

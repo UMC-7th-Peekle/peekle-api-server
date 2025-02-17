@@ -15,6 +15,7 @@ export const listEvent = async ({ paginationOptions }) => {
     price,
     startDate,
     endDate,
+    sort,
   } = paginationOptions;
 
   // 커서 기준 조건 설정
@@ -129,15 +130,10 @@ export const listEvent = async ({ paginationOptions }) => {
       {
         model: models.EventLocation,
         as: "eventLocation",
-        where: {
-          locationGroupId: location,
-        },
-        attributes: { exclude: ["eventId", "createdAt", "updatedAt"] },
-        required: false,
+        attributes: ["position"],
       },
     ],
   });
-  console.log(typeof eventId);
 
   let hasNextPage = false;
 
@@ -152,6 +148,37 @@ export const listEvent = async ({ paginationOptions }) => {
 
   // 이미지 링크 첨부하도록 변환
   let modifiedEvents = events.map((event) => {
+    // 각 ID의 타입 출력 (원본 값 확인)
+    console.log(`eventId type (before): ${typeof event.eventId}`);
+    console.log(`categoryId type (before): ${typeof event.categoryId}`);
+    console.log(
+      `locationGroupId type (before): ${typeof event.locationGroupId}`
+    );
+    console.log(`createdUserId type (before): ${typeof event.createdUserId}`);
+
+    // BigInt로 변환
+    const transformedEvent = {
+      ...event.dataValues,
+      eventId: BigInt(event.eventId),
+      categoryId: BigInt(event.categoryId),
+      locationGroupId: event.locationGroupId
+        ? BigInt(event.locationGroupId)
+        : null,
+      createdUserId: event.createdUserId ? BigInt(event.createdUserId) : null,
+    };
+
+    // 변환 후 타입 출력 (BigInt로 바뀌었는지 확인)
+    console.log(`~~eventId type (after): ${typeof transformedEvent.eventId}`);
+    console.log(
+      `~~categoryId type (after): ${typeof transformedEvent.categoryId}`
+    );
+    console.log(
+      `~~locationGroupId type (after): ${typeof transformedEvent.locationGroupId}`
+    );
+    console.log(
+      `~~createdUserId type (after): ${typeof transformedEvent.createdUserId}`
+    );
+
     const transformedImages = event.eventImages.map((image) => ({
       imageUrl: addBaseUrl(image.imageUrl),
       sequence: image.sequence,
@@ -166,10 +193,38 @@ export const listEvent = async ({ paginationOptions }) => {
     console.log(transformedImages);
 
     return {
-      ...event.dataValues,
+      // ...event.dataValues,
+      ...transformedEvent,
       eventImages: transformedImages,
       eventLocation: parsedLocation,
     };
+  });
+
+  // 정렬 로직
+  if (sort) {
+    if (sort === "가까운 날짜순") {
+      // ㅇㅋ 굳
+      modifiedEvents.sort((a, b) => {
+        const startDateA = a.eventSchedules[0]?.startDate;
+        const startDateB = b.eventSchedules[0]?.startDate;
+        return new Date(startDateA) - new Date(startDateB);
+      });
+    } else if (sort === "낮은 금액순") {
+      // ㅇㅋ 굳
+      modifiedEvents.sort((a, b) => a.price - b.price);
+    } else if (sort === "가까운 거리순") {
+      modifiedEvents.sort((a, b) => {
+        // 프론트에서 유저 위치를 받아서 해야하는 것 같아요.
+      });
+    }
+  }
+
+  // 제목으로 가나다순 정렬
+  modifiedEvents.sort((a, b) => {
+    if (a.title === b.title) {
+      return a.title.localeCompare(b.title);
+    }
+    return 0;
   });
 
   // BE에서 sort 해서 준다는 전제 하에
@@ -193,6 +248,7 @@ export const validateEventQuery = (queries) => {
     price,
     startDate,
     endDate,
+    sort,
   } = queries;
 
   if (query !== undefined && query.trim().length < 2) {
@@ -283,6 +339,15 @@ export const validateEventQuery = (queries) => {
     new Date(startDate) > new Date(endDate)
   ) {
     throw new InvalidQueryError("startDate가 endDate보다 미래일 수 없습니다.");
+  }
+
+  // 날짜, 금액, 거리순 정렬 유효성 검증
+  const sortPool = ["가까운 날짜순", "낮은 금액순", "가까운 거리순"];
+  if (sort && !sortPool.includes(sort)) {
+    throw new InvalidQueryError(
+      "올바르지 않은 정렬입니다. 허용되는 값은 다음과 같습니다.",
+      sortPool
+    );
   }
 
   return;

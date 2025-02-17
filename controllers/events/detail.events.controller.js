@@ -9,8 +9,9 @@ import { parseImagePaths } from "../../utils/upload/uploader.object.js";
 export const detailEvent = async (req, res, next) => {
   try {
     const { eventId } = req.params;
+    const userId = req?.user?.userId || null;
 
-    const detail = await detailService.detailEvent({ eventId });
+    const detail = await detailService.detailEvent({ eventId, userId });
 
     return res.status(200).success({ event: detail });
   } catch (error) {
