@@ -11,13 +11,13 @@ export default class PeeklingCategory extends Model {
       primaryKey: true,
       field: 'category_id'
     },
-    name: {
+    category: {
       type: DataTypes.STRING(50),
       allowNull: false
     },
-    description: {
+    subcategory: {
       type: DataTypes.STRING(512),
-      allowNull: true
+      allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE(6),

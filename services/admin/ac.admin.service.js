@@ -90,5 +90,6 @@ export const createRole = async ({
     await transaction.commit();
   } catch (err) {
     await transaction.rollback();
+    throw err;
   }
 };

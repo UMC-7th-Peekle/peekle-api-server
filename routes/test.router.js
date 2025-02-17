@@ -12,13 +12,7 @@ import {
 } from "../middleware/validate.js";
 import { oauthRegisterSchema } from "../utils/validators/auth/auth.validators.js";
 import logger from "../utils/logger/logger.js";
-import {
-  seedCommunity,
-  seedEventLocationGroup,
-  seedPermissions,
-  seedTerms,
-  seedUsers,
-} from "../models/seed/seeder.js";
+import seeder from "../models/seed/index.js";
 import { logError } from "../utils/handlers/error.logger.js";
 import { checkPermission } from "../middleware/check.permission.js";
 
@@ -41,25 +35,28 @@ router.get("/seed/:type", authenticateAccessToken, async (req, res, next) => {
   try {
     switch (type) {
       case "permissions":
-        await seedPermissions();
+        await seeder.seedPermissions();
         break;
       case "eventLocation":
-        await seedEventLocationGroup();
+        await seeder.seedEventLocationGroup();
         break;
       case "terms":
-        await seedTerms();
+        await seeder.seedTerms();
         break;
       case "community":
-        await seedCommunity();
+        await seeder.seedCommunity();
         break;
       case "users":
-        await seedUsers();
+        await seeder.seedUsers();
+        break;
+      case "peeklingCategory":
+        await seeder.seedPeeklingCategory();
         break;
       case "all":
-        await seedEventLocationGroup();
-        await seedTerms();
-        await seedUsers();
-        await seedCommunity();
+        await seeder.seedEventLocationGroup();
+        await seeder.seedTerms();
+        await seeder.seedUsers();
+        await seeder.seedCommunity();
         break;
       default:
         break;
@@ -70,7 +67,7 @@ router.get("/seed/:type", authenticateAccessToken, async (req, res, next) => {
   }
 
   res.status(201).success({
-    message: "Seed 작업이 완료되었습니다.",
+    message: `[${req.params.type}]에 대한 Seed 작업이 완료되었습니다.`,
   });
 });
 

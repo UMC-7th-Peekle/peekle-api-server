@@ -10,18 +10,10 @@ export const initSocket = (server) => {
 
   io.on("connection", (socket) => {
     console.log(`🔗 User connected: ${socket.id}`);
-
-    socket.on("connect", () => {
-      console.log(`✅ Connected to server: ${socket.id}`);
-    });
-
+    handleMessage(socket);
     socket.on("disconnect", () =>
       console.log(`❌ User disconnected: ${socket.id}`)
     );
-  });
-
-  io.of("/chat").on("connection", (socket) => {
-    handleMessage(socket);
   });
 };
 

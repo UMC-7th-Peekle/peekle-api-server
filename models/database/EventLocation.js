@@ -29,45 +29,45 @@ export default class EventLocation extends Model {
     },
     roadAddress: {
       type: DataTypes.STRING(1024),
-      allowNull: true,
+      allowNull: false,
       field: 'road_address'
     },
     jibunAddress: {
       type: DataTypes.STRING(1024),
-      allowNull: true,
+      allowNull: false,
       field: 'jibun_address'
     },
     buildingCode: {
       type: DataTypes.STRING(100),
-      allowNull: true,
+      allowNull: false,
       field: 'building_code'
     },
     buildingName: {
       type: DataTypes.STRING(1024),
-      allowNull: true,
+      allowNull: false,
       field: 'building_name'
     },
     sido: {
       type: DataTypes.STRING(100),
-      allowNull: true
+      allowNull: false
     },
     sigungu: {
       type: DataTypes.STRING(100),
-      allowNull: true
+      allowNull: false
     },
     sigunguCode: {
       type: DataTypes.STRING(100),
-      allowNull: true,
+      allowNull: false,
       field: 'sigungu_code'
     },
     roadnameCode: {
       type: DataTypes.STRING(100),
-      allowNull: true,
+      allowNull: false,
       field: 'roadname_code'
     },
     zoneCode: {
       type: DataTypes.STRING(100),
-      allowNull: true,
+      allowNull: false,
       field: 'zone_code'
     },
     detail: {
