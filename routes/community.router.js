@@ -30,7 +30,14 @@ router.post(
   articleCrudController.createCommunity
 );
 
-// 여기에 get"/"를 넣을 예정
+/*
+ 게시판 목록 조회 (게시판별로 게시판 이름과 최신 글 하나만 가져옵니다)
+*/
+router.get(
+  "/",
+  articleReadController.getCommunities
+);
+
 
 /*
   게시판 조회

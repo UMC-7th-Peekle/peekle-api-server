@@ -32,6 +32,34 @@ export const validateArticleQuery = (queries) => {
 };
 
 /**
+ * 전체 게시판 목록 조회
+ */
+export const getCommunities = async () => {
+  const communities = await models.Communities.findAll({
+    attributes: ["communityId", "title"],
+    include: [
+      {
+        model: models.Articles,
+        as: "articles",
+        attributes: ["content"],
+        order: [["createdAt", "DESC"]],
+        limit: 1,
+      },
+    ],
+  });
+
+  if (!communities) {
+    logger.error("게시판이 존재하지 않습니다.", {
+      action: "community:getCommunities",
+      actionType: "error",
+    });
+    throw new NotExistsError("게시판이 존재하지 않습니다.");
+  }
+
+  return { communities };
+};
+
+/**
  *  게시글의 썸네일 정보를 가공합니다.
  */
 const getThumbnail = (articleImages) => {
