@@ -129,15 +129,15 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
   if (articleData.isAnonymous === true) {
     transformedAuthorInfo = {
       nickname: null,
-      profileImage: null,
+      profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE),
       authorId: null,
     };
-  } else if (transformedAuthorInfo.profileImage === config.PEEKLE.DEFAULT_PROFILE_IMAGE) {
-    // 기본 이미지인 경우 null로 전송
-    transformedAuthorInfo.profileImage = null;
   } else {
-    transformedAuthorInfo.profileImage = addBaseUrl(transformedAuthorInfo.profileImage);
+    transformedAuthorInfo.profileImage = addBaseUrl(
+      transformedAuthorInfo.profileImage
+    );
   }
+
   const article = {
     authorInfo: transformedAuthorInfo,
     isLikedByUser: isArticleLikedByUser,

@@ -49,14 +49,14 @@ const getThumbnail = (articleImages) => {
 const getAuthorInfo = (article, isAnonymous) => {
   if (isAnonymous) {
     delete article.author.dataValues;
-    return { nickname: null, profileImage: null, authorId: null };
+    return { nickname: null, profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE), authorId: null };
   }
 
   const author = article.author.dataValues;
   const authorInfo = {
     nickname: author.nickname,
     // 기본 이미지인 경우 null로 전송
-    profileImage: author.profileImage === config.PEEKLE.DEFAULT_PROFILE_IMAGE ? null : addBaseUrl(author.profileImage),
+    profileImage: addBaseUrl(author.profileImage),
     authorId: author.userId,
   };
 

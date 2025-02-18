@@ -141,14 +141,12 @@ export const getPopularArticles = async (communityId, startTime, endTime) => {
     if (article.isAnonymous === true) {
       article.authorInfo = {
         nickname: null,
-        profileImage: null, // 익명인 경우 기본 이미지 대신 null 반환
+        profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE), // 익명인 경우 기본 이미지 대신 null 반환
         authorId: null,
       };
     } else {
-      article.author = article.author.dataValues;
-      // 기본 이미지인 경우 null로 전송
-      
-      article.author.profileImage = article.author.profileImage === config.PEEKLE.DEFAULT_PROFILE_IMAGE ? null : addBaseUrl(article.author.profileImage),
+      article.author = article.author.dataValues;      
+      article.author.profileImage = addBaseUrl(article.author.profileImage),
       article.author.authorId = article.author.userId;
       delete article.author.userId;
 
