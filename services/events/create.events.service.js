@@ -75,6 +75,19 @@ export const createEvent = async ({ userId, eventData }) => {
       }));
 
       await models.EventImages.bulkCreate(eventImageData, { transaction });
+    } else if (eventData.imagePaths.length == 0) {
+      // 이미지가 새로 들어오지 않은 경우, 기본 이미지 처리
+      const defaultEventImageData = [
+        {
+          eventId: event.eventId,
+          imageUrl: "uploads/default/profile/v1.png", // 기본 이미지 URL 설정 => 일단 임의로 default에 있는 이미지 파일이고요, 추후 기본 이미지로 수정해야합니다.
+          sequence: 1, // 기본 이미지 1개
+        },
+      ];
+
+      await models.EventImages.bulkCreate(defaultEventImageData, {
+        transaction,
+      });
     }
 
     // 해당 이벤트 스케줄 부분 튜플 생성

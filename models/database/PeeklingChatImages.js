@@ -1,31 +1,27 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class PeeklingChatroom extends Model {
+export default class PeeklingChatImages extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    peeklingId: {
+    chatId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'peekling',
-        key: 'peekling_id'
-      },
-      field: 'peekling_id'
-    },
-    name: {
-      type: DataTypes.STRING(30),
-      allowNull: false
-    },
-    noticeChatId: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
-      references: {
         model: 'peekling_chats',
         key: 'chat_id'
       },
-      field: 'notice_chat_id'
+      field: 'chat_id'
+    },
+    imageUrl: {
+      type: DataTypes.STRING(512),
+      allowNull: false,
+      field: 'image_url'
+    },
+    sequence: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -41,7 +37,7 @@ export default class PeeklingChatroom extends Model {
     }
   }, {
     sequelize,
-    tableName: 'peekling_chatroom',
+    tableName: 'peekling_chat_images',
     timestamps: false,
     indexes: [
       {
@@ -49,14 +45,7 @@ export default class PeeklingChatroom extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "peekling_id" },
-        ]
-      },
-      {
-        name: "peekling_chatroom_chats_chat_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "notice_chat_id" },
+          { name: "chat_id" },
         ]
       },
     ]

@@ -1,18 +1,32 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class PeeklingChatroom extends Model {
+export default class Chatroom extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    peeklingId: {
+    chatroomId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
+      field: 'chatroom_id'
+    },
+    senderId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
       references: {
-        model: 'peekling',
-        key: 'peekling_id'
+        model: 'users',
+        key: 'user_id'
       },
-      field: 'peekling_id'
+      field: 'sender_id'
+    },
+    receiverId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      references: {
+        model: 'users',
+        key: 'user_id'
+      },
+      field: 'receiver_id'
     },
     name: {
       type: DataTypes.STRING(30),
@@ -22,7 +36,7 @@ export default class PeeklingChatroom extends Model {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
-        model: 'peekling_chats',
+        model: 'chats',
         key: 'chat_id'
       },
       field: 'notice_chat_id'
@@ -41,7 +55,7 @@ export default class PeeklingChatroom extends Model {
     }
   }, {
     sequelize,
-    tableName: 'peekling_chatroom',
+    tableName: 'chatroom',
     timestamps: false,
     indexes: [
       {
@@ -49,14 +63,28 @@ export default class PeeklingChatroom extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "peekling_id" },
+          { name: "chatroom_id" },
         ]
       },
       {
-        name: "peekling_chatroom_chats_chat_id_fk",
+        name: "chatroom_chats_chat_id_fk",
         using: "BTREE",
         fields: [
           { name: "notice_chat_id" },
+        ]
+      },
+      {
+        name: "chatroom_users_user_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "sender_id" },
+        ]
+      },
+      {
+        name: "chatroom_users_user_id_fk_2",
+        using: "BTREE",
+        fields: [
+          { name: "receiver_id" },
         ]
       },
     ]
