@@ -2,6 +2,7 @@
 import {
   InvalidQueryError,
   NotExistsError,
+  NotAllowedError,
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
@@ -104,6 +105,11 @@ export const getArticles = async (
   { limit, cursor = null },
   userId
 ) => {
+  // 사용자가 다른 사용자가 작성한 글을 조회하는 경우 차단
+  if (authorId !== undefined && (parseInt(authorId, 10) !== parseInt(userId, 10))) {
+      throw new NotAllowedError("다른 사용자의 댓글을 조회할 수 없습니다");
+    }
+
   // 게시글 조회 조건 설정
   const whereCondition = {
     ...(query && {
@@ -121,7 +127,7 @@ export const getArticles = async (
   }
 
   // authorId가 있을 경우 필터링 추가
-  if (authorId) {
+  if (authorId !== undefined) {
     whereCondition.authorId = authorId;
   }
 
