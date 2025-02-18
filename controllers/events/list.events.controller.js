@@ -17,6 +17,11 @@ export const listEvent = async (req, res, next) => {
       price,
       startDate,
       endDate,
+      sort, // '가까운 날짜순', '낮은 금액순', '가까운 거리순'
+      lat,
+      lng,
+      southWest,
+      northEast,
     } = req.query;
 
     // 중복 선택 받아오는 배열로
@@ -42,6 +47,11 @@ export const listEvent = async (req, res, next) => {
       price,
       startDate,
       endDate,
+      sort,
+      lat, // 유저 위치 위경도
+      lng,
+      southWest, // 해당 객체로 이벤트 반경
+      northEast,
     });
 
     // 페이지네이션 기본값 설정
@@ -54,9 +64,13 @@ export const listEvent = async (req, res, next) => {
       price,
       startDate,
       endDate,
+      sort,
+      userLocation:
+        lat && lng ? { lat: parseFloat(lat), lng: parseFloat(lng) } : null,
+      southWest,
+      northEast,
     };
 
-    // TODO : location, price, startDate, endDate에 대한 처리를 하고 있지 않음
     const { events, nextCursor, hasNextPage } = await listService.listEvent({
       paginationOptions,
     });

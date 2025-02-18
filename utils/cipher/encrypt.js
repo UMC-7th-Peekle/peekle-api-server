@@ -3,7 +3,7 @@
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import baseX from "base-x";
-import config from "../../config/config.js";
+import config from "../../config.js";
 
 import logger from "../logger/logger.js";
 import {

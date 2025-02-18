@@ -1,3 +1,4 @@
+// 이벤트 생성 스키마
 export const postEventSchema = {
   type: "object",
   properties: {
@@ -9,28 +10,10 @@ export const postEventSchema = {
       type: "object",
       properties: {
         locationGroupId: { type: "number" },
-        roadAddress: { type: ["string", "null"] },
-        jibunAddress: { type: ["string", "null"] },
-        buildingCode: { type: ["string", "null"] },
-        sido: { type: ["string", "null"] },
-        sigungu: { type: ["string", "null"] },
-        sigunguCode: { type: ["string", "null"] },
-        roadnameCode: { type: ["string", "null"] },
-        zoneCode: { type: ["string", "null"] },
-        detail: { type: ["string", "null"] },
+        address: { type: ["string", "null"] },
+        buildingName: { type: ["string", "null"] },
       },
-      required: [
-        "locationGroupId",
-        "roadAddress",
-        "jibunAddress",
-        "buildingCode",
-        "sido",
-        "sigungu",
-        "sigunguCode",
-        "roadnameCode",
-        "zoneCode",
-        "detail",
-      ],
+      required: ["locationGroupId", "address", "buildingName"],
     },
     eventUrl: { type: "string", format: "uri" },
     applicationStart: { type: "string", format: "date" },
@@ -78,6 +61,7 @@ export const postEventSchema = {
   additionalProperties: false,
 };
 
+// 이벤트 수정 스키마
 export const patchEventSchema = {
   ...postEventSchema,
   properties: {

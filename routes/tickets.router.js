@@ -28,7 +28,7 @@ router.get(
   detailTicketController.detailTicket
 );
 
-// tickets 생성, 수정, 삭제 (이미지 업로드 관련 없음)
+// tickets 생성, 수정(이미지 업로드 관련 없음)
 // 생성할 때는 상태가 open으로 고정합니다.
 router.post(
   "/",

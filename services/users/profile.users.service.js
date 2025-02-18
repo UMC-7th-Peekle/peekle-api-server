@@ -11,7 +11,7 @@ import {
   deleteLocalFile,
 } from "../../utils/upload/uploader.object.js";
 
-import config from "../../config/config.js";
+import config from "../../config.js";
 
 export const getProfile = async ({ userId }) => {
   const user = await models.Users.findByPk(userId, {

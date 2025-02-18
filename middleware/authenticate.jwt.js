@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import logger from "../utils/logger/logger.js";
-import config from "../config/config.js";
+import config from "../config.js";
 import {
   TokenError,
   NotAllowedError,
@@ -160,12 +160,20 @@ export const autheticateAccessTokenIfExists = (req, res, next) => {
       req.user = {
         userId: user.userId,
       }; // 검증된 사용자 정보를 요청 객체에 추가
+
+      // 확인용
+      console.log("Middleware -> req.user:", req.user);
+
       next();
     });
   } else {
     req.user = {
       userId: null,
     };
+
+    // 확인용
+    console.log("Middleware -> req.user:", req.user);
+
     return next();
   }
 };

@@ -30,14 +30,14 @@ const crudEvent = {
       tag: eventTags.crud,
       summary: "이벤트 삭제",
       description: "이벤트를 삭제합니다.",
-      requestBody: "events/DeleteEvents",
+      // requestBody: "events/DeleteEvents",    // 삭제 할 때는 딱히 req 필요 없을 것 같습니다.
     }),
 
     post: swaggerFormat({
       tag: eventTags.crud,
       summary: "이벤트 생성",
       description: "이벤트를 새로 생성합니다.",
-      requestBody: "events/CreateEvents",
+      requestBody: "events/postEventSchema",
     }),
   },
 
@@ -55,7 +55,7 @@ const crudEvent = {
       summary: "이벤트 상세정보 수정",
       description: "이벤트 상세정보를 수정합니다.",
       params: ["events/eventId"],
-      requestBody: "events/UpdateDetailEvents",
+      requestBody: "events/patchEventSchema",
     }),
   },
 };
@@ -74,14 +74,14 @@ const scrapEvent = {
       tag: eventTags.scrap,
       summary: "이벤트 스크랩",
       description: "이벤트를 스크랩 합니다.",
-      requestBody: "events/ScrapEvents",
+      requestBody: "events/scrapEventSchema",
     }),
 
     delete: swaggerFormat({
       tag: eventTags.scrap,
       summary: "스크랩 취소",
       description: "스크랩 했던 이벤트를 스크랩 취소합니다.",
-      requestBody: "events/DeleteScrapEvents",
+      // requestBody: "events/DeleteScrapEvents",     // 삭제 할 때는 딱히 req 필요 없을 것 같습니다.
     }),
   },
 };
@@ -113,7 +113,7 @@ const report = {
       tag: eventTags.report,
       summary: "이벤트 신고",
       description: "이벤트를 신고합니다.",
-      requestBody: "events/EventReport",
+      requestBody: "events/reportEventSchema",
     }),
   },
 };

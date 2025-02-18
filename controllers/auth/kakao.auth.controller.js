@@ -1,4 +1,4 @@
-import config from "../../config/config.js";
+import config from "../../config.js";
 const { KAKAO_REST_API_KEY } = config.KAKAO;
 
 let KAKAO_REDIRECT_URI;

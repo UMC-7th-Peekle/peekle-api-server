@@ -8,7 +8,7 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { InvalidInputError, NotAllowedError } from "../errors/errors.js";
 import logger from "../logger/logger.js";
 
-import config from "../../config/config.js";
+import config from "../../config.js";
 const { REGION, ACCESS_KEY_ID, SECRET_ACCESS_KEY, BUCKET_NAME } = config.AWS;
 const { STATIC_FILE_BASE_URL } = config.SERVER;
 

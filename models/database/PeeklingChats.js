@@ -1,7 +1,7 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Chats extends Model {
+export default class PeeklingChats extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
     chatId: {
@@ -15,14 +15,18 @@ export default class Chats extends Model {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
-        model: 'chatroom',
-        key: 'chatroom_id'
+        model: 'peekling_chatroom',
+        key: 'peekling_id'
       },
       field: 'chatroom_id'
     },
     parentChatId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
+      references: {
+        model: 'peekling_chats',
+        key: 'chat_id'
+      },
       field: 'parent_chat_id'
     },
     status: {
@@ -33,6 +37,10 @@ export default class Chats extends Model {
     authorId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
+      references: {
+        model: 'users',
+        key: 'user_id'
+      },
       field: 'author_id'
     },
     type: {
@@ -57,7 +65,7 @@ export default class Chats extends Model {
     }
   }, {
     sequelize,
-    tableName: 'chats',
+    tableName: 'peekling_chats',
     timestamps: false,
     indexes: [
       {
@@ -69,7 +77,21 @@ export default class Chats extends Model {
         ]
       },
       {
-        name: "chats_chatroom_chatroom_id_fk2",
+        name: "chats_users_user_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "author_id" },
+        ]
+      },
+      {
+        name: "chats_chats_chat_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "parent_chat_id" },
+        ]
+      },
+      {
+        name: "chats_peekling_chatroom_peekling_id_fk",
         using: "BTREE",
         fields: [
           { name: "chatroom_id" },
