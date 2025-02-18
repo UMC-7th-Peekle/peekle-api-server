@@ -7,6 +7,8 @@ import {
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
+import { addBaseUrl } from "../../utils/upload/uploader.object.js";
+import config from "../../config/config.js";
 
 /**
  * communityId, articleId에 해당하는 게시글에 댓글을 추가합니다
@@ -301,15 +303,30 @@ export const createCommentReply = async ({
 /**
  * communityId, articleId에 해당하는 댓글 목록을 조회합니다
  */
-export const getComments = async ({ communityId, articleId, userId }) => {
+export const getComments = async ({ communityId, articleId, authorId, userId }) => {
+  // 사용자가 다른 사용자가 작성한 글을 조회하는 경우 차단
+  if (authorId !== undefined && (parseInt(authorId, 10) !== parseInt(userId, 10))) {
+    throw new NotAllowedError("다른 사용자가 작성한 댓글 목록을 조회할 수 없습니다");
+  }
+  
+  const whereCondition = {
+    communityId,
+    articleId,
+  };
+
+  const commentWhereCondition = {};
+  // authorId가 존재하면 조건에 추가
+  if (authorId !== undefined) {
+    commentWhereCondition.authorId = authorId;
+  }
+
+  
   const articleWithComments = await models.Articles.findOne({
-    where: {
-      communityId,
-      articleId,
-    },
+    where: whereCondition,
     include: [
       {
         model: models.ArticleComments,
+        where: commentWhereCondition,
         as: "articleComments",
         include: [
           {
@@ -363,9 +380,13 @@ export const getComments = async ({ communityId, articleId, userId }) => {
       if (isAnonymous !== 0) {
         transformedAuthorInfo = {
           nickname: `익명${isAnonymous}`, // isAnonymous 값을 그대로 사용하여 익명 번호 지정
-          profileImage: null,
+          profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE), // 익명인 경우 기본 이미지 대신 null 반환
           authorId: null,
         };
+      } else {
+        transformedAuthorInfo.profileImage = addBaseUrl(
+          transformedAuthorInfo.profileImage
+        );
       }
       return {
         authorInfo: status === "deleted" ? null : transformedAuthorInfo,

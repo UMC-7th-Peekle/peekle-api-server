@@ -72,6 +72,15 @@ export const patchEventSchema = {
   required: [],
 };
 
+export const deleteEventSchema = {
+  type: "object",
+  properties: {
+    eventId: { type: "number" },
+  },
+  required: ["eventId"],
+  additionalProperties: false,
+};
+
 export const scrapEventSchema = {
   type: "object",
   properties: {

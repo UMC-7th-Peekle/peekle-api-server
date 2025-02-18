@@ -123,7 +123,7 @@ export const createCommentReply = async (req, res, next) => {
 // 댓글 조회
 export const getComments = async (req, res, next) => {
   try {
-    const { communityId, articleId } = req.query; // URL에서 communityId, articleId 추출
+    const { communityId, articleId, authorId } = req.query; // URL에서 communityId, articleId 추출
     const userId = req.user ? req.user.userId : null; // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
 
     if (communityId === undefined || articleId === undefined) {
@@ -142,6 +142,7 @@ export const getComments = async (req, res, next) => {
     const { comments } = await commentService.getComments({
       communityId,
       articleId,
+      authorId,
       userId,
     }); // 댓글 조회
 

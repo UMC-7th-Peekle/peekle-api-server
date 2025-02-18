@@ -30,7 +30,7 @@ const crudEvent = {
       tag: eventTags.crud,
       summary: "이벤트 삭제",
       description: "이벤트를 삭제합니다.",
-      // requestBody: "events/DeleteEvents",    // 삭제 할 때는 딱히 req 필요 없을 것 같습니다.
+      requestBody: "events/deleteEventSchema",
     }),
 
     post: swaggerFormat({
@@ -81,7 +81,7 @@ const scrapEvent = {
       tag: eventTags.scrap,
       summary: "스크랩 취소",
       description: "스크랩 했던 이벤트를 스크랩 취소합니다.",
-      // requestBody: "events/DeleteScrapEvents",     // 삭제 할 때는 딱히 req 필요 없을 것 같습니다.
+      requestBody: "events/deleteEventSchema",
     }),
   },
 };
