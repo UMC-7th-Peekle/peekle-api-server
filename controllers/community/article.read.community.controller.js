@@ -26,13 +26,14 @@ export const getArticles = async (req, res, next) => {
   // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
   try {
     articleReadService.validateArticleQuery(req.query);
-    const { communityId, limit, cursor, query } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
+    const { communityId, authorId, limit, cursor, query } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
     const userId = req.user ? req.user.userId : null; // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
 
     logger.debug("게시글 목록 조회", {
       action: "article:getArticles",
       actionType: "request",
       communityId,
+      authorId,
       limit,
       cursor,
       query,
@@ -47,6 +48,7 @@ export const getArticles = async (req, res, next) => {
     const { articles, nextCursor, hasNextPage } =
       await articleReadService.getArticles(
         communityId,
+        authorId,
         query,
         paginationOptions,
         userId

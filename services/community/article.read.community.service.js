@@ -9,7 +9,7 @@ import { Op, fn, col } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
 export const validateArticleQuery = (queries) => {
-  const { limit, cursor, query, communityId } = queries; // 쿼리 파라미터에서 limit와 cursor 추출
+  const { limit, cursor, query, communityId, authorId } = queries; // 쿼리 파라미터에서 limit와 cursor 추출
 
   const isInteger = (value) => /^\d+$/.test(value); // 정수만 허용
   if (limit !== undefined && !isInteger(limit)) {
@@ -20,6 +20,9 @@ export const validateArticleQuery = (queries) => {
   }
   if (communityId !== undefined && !isInteger(communityId)) {
     throw new InvalidQueryError("communityId는 정수여야 합니다.");
+  }
+  if (authorId !== undefined && !isInteger(authorId)) {
+    throw new InvalidQueryError("authorId는 정수여야 합니다.");
   }
 
   if (query !== undefined && query.trim().length < 2) {
@@ -96,6 +99,7 @@ const getAuthorInfo = (article, isAnonymous) => {
  */
 export const getArticles = async (
   communityId,
+  authorId,
   query,
   { limit, cursor = null },
   userId
@@ -114,6 +118,11 @@ export const getArticles = async (
   // communityId가 있을 경우 필터링 추가
   if (communityId) {
     whereCondition.communityId = communityId;
+  }
+
+  // authorId가 있을 경우 필터링 추가
+  if (authorId) {
+    whereCondition.authorId = authorId;
   }
 
   // 게시글 조회
