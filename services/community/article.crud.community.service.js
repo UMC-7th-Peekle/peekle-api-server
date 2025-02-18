@@ -109,14 +109,6 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     imageUrl: addBaseUrl(image.imageUrl),
     sequence: image.sequence,
   }));
-  
-  const transformedProfileImages = data.articleComments.map((comment) => {
-    if(comment.author.profileImage === config.PEEKLE.DEFAULT_PROFILE_IMAGE) {
-      comment.author.profileImage = null;
-    } else {
-      comment.author.profileImage = addBaseUrl(author.profileImage);
-    }
-  });
 
   // 게시글 좋아요 여부 및 좋아요 개수
   const isArticleLikedByUser = userId
@@ -126,53 +118,12 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     : false;
   const articleLikesCount = data.articleLikes.length;
 
-  // 댓글 정보에 좋아요 여부, 좋아요 개수 및 작성자 정보 추가
-  const transformedComments = data.articleComments.map((comment) => {
-    const {
-      author,
-      articleCommentLikes,
-      status,
-      content,
-      isAnonymous,
-      ...commentData
-    } = comment.dataValues;
-
-    const isCommentLikedByUser = userId
-      ? articleCommentLikes.some(
-          (like) => Number(like.likedUserId) === Number(userId)
-        )
-      : false;
-    const commentLikesCount = articleCommentLikes.length;
-
-    // status가 'deleted'인 경우 content를 빈 문자열로 설정
-    const processedContent = status === "deleted" ? "" : content;
-
-    // 익명 처리 로직: isAnonymous 값에 따라 익명 닉네임 설정
-    let transformedAuthorInfo = data.author;
-    // isAnonymous가 0이 아닌 양의 정수일 경우 익명이 됨
-    if (isAnonymous !== 0) {
-      transformedAuthorInfo = {
-        nickname: `익명${isAnonymous}`, // isAnonymous 값을 그대로 사용하여 익명 번호 지정
-        profileImage: null,
-        authorId: null,
-      };
-    }
-    return {
-      authorInfo: status === "deleted" ? null : transformedAuthorInfo,
-      isLikedByUser: isCommentLikedByUser,
-      commentLikesCount: status === "deleted" ? 0 : commentLikesCount,
-      content: processedContent,
-      isAnonymous,
-      status, // 상태 정보도 포함해 응답
-      ...commentData,
-    };
-  });
-
   // 댓글 개수 계산
   const commentsCount = data.articleComments.length;
 
   // 게시글의 작성자 정보 및 익명 처리
-  const { author, articleLikes, ...articleData } = data.dataValues;
+  const { author, articleLikes, articleComments, ...articleData } =
+    data.dataValues;
   let transformedAuthorInfo = author;
 
   if (articleData.isAnonymous === true) {
@@ -181,25 +132,18 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
       profileImage: null,
       authorId: null,
     };
-
-    transformedComments.forEach((comment) => {
-      if (comment.isAnonymous === true) {
-        comment.authorInfo = {
-          nickname: null,
-          profileImage: null,
-          authorId: null,
-        };
-      }
-    });
+  } else if (transformedAuthorInfo.profileImage === config.PEEKLE.DEFAULT_PROFILE_IMAGE) {
+    // 기본 이미지인 경우 null로 전송
+    transformedAuthorInfo.profileImage = null;
+  } else {
+    transformedAuthorInfo.profileImage = addBaseUrl(transformedAuthorInfo.profileImage);
   }
-
   const article = {
     authorInfo: transformedAuthorInfo,
     isLikedByUser: isArticleLikedByUser,
     articleLikesCount,
     commentsCount,
     ...articleData,
-    articleComments: transformedComments,
     articleImages: transformedImages,
   };
 
