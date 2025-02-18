@@ -137,3 +137,24 @@ export const deleteArticle = async (req, res, next) => {
     next(error); // 에러 핸들러로 전달
   }
 };
+
+// 게시판 건의하기
+export const suggestCommunity = async (req, res, next) => {
+  try {
+    const { title, content  } = req.body; // Request body에서 title, content 추출
+    const authorId = req.user.userId; // JWT에서 사용자 ID 추출
+
+    await articleCrudService.suggestCommunity({
+      title,
+      content,
+      authorId,
+    }); // 게시판 건의하기
+    
+    return res.status(201).success({
+      message: "게시판 건의하기 성공",
+    });
+  } catch (error) {
+    logError(error);
+    next(error); // 에러 핸들러로 전달
+  }
+};

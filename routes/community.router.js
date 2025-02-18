@@ -31,17 +31,22 @@ router.post(
 );
 
 /*
+ 게시판 목록 조회 (게시판별로 게시판 이름과 최신 글 하나만 가져옵니다)
+*/
+router.get("/", articleReadController.getCommunities);
+
+/*
   게시판 조회
 */
 
 // communityId에 해당하는 게시판의 게시글들을 가져옵니다, 좋아요 누른 게시글만 가져올 수도 있습니다
 router.get(
-  "/",
+  "/articles", // "/:communityId/articles/:articleId"와 충돌을 피하기 위해 그보다 먼저 선언되어야 함
   autheticateAccessTokenIfExists,
   articleReadController.getArticles
 );
 router.get(
-  "/article/like",
+  "/articles/like",
   authenticateAccessToken,
   articleReadController.getLikedArticles
 );
@@ -105,6 +110,14 @@ router.delete(
   validateRequestBody(articleValidator.specificArticlePathSchema),
   authenticateAccessToken,
   articleCrudController.deleteArticle
+);
+
+// 게시판 건의하기
+router.post(
+  "/suggest",
+  validateRequestBody(articleValidator.suggestCommunitySchema),
+  authenticateAccessToken,
+  articleCrudController.suggestCommunity
 );
 
 /*
