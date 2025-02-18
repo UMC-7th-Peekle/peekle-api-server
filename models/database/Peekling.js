@@ -56,6 +56,11 @@ export default class Peekling extends Model {
       },
       field: 'created_user_id'
     },
+    cancelReason: {
+      type: DataTypes.STRING(1000),
+      allowNull: true,
+      field: 'cancel_reason'
+    },
     createdAt: {
       type: DataTypes.DATE(6),
       allowNull: false,

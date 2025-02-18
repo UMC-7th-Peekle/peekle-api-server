@@ -5,7 +5,7 @@ import crypto from "crypto";
 
 import logger from "../logger/logger.js";
 
-import config from "../../config/config.js";
+import config from "../../config.js";
 import { logError } from "../handlers/error.logger.js";
 const { API_KEY, API_SECRET, SENDER } = config.COOLSMS;
 

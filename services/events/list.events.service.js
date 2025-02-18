@@ -1,8 +1,9 @@
 import models from "../../models/index.js";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { InvalidQueryError } from "../../utils/errors/errors.js";
 import logger from "../../utils/logger/logger.js";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
+import { getDistance, getBoundsOfDistance } from "geolib";
 
 // 이벤트 목록 조회
 export const listEvent = async ({ paginationOptions }) => {
@@ -16,13 +17,16 @@ export const listEvent = async ({ paginationOptions }) => {
     startDate,
     endDate,
     sort,
+    userLocation, // 유저 위치 받아오기
+    southWest,
+    northEast,
   } = paginationOptions;
 
   // 커서 기준 조건 설정
   let cursorWhereClause = {};
   if (cursor) {
     cursorWhereClause = {
-      eventId: { [Op.lt]: cursor }, // 해당 커서 기준, 더 과거의 값 (더 작은 값)
+      eventId: { [Op.lt]: BigInt(cursor) }, // 해당 커서 기준, 더 과거의 값 (더 작은 값)
     };
   }
 
@@ -33,12 +37,12 @@ export const listEvent = async ({ paginationOptions }) => {
   } else if (Array.isArray(category)) {
     categoryWhereClause = {
       categoryId: {
-        [Op.in]: category, // 배열인 카테고리로
+        [Op.in]: category.map((cate) => BigInt(cate)), // 배열인 카테고리로
       },
     };
   } else {
     categoryWhereClause = {
-      categoryId: category, // 단일 카테고리
+      categoryId: BigInt(category), // 단일 카테고리
     };
   }
 
@@ -64,12 +68,12 @@ export const listEvent = async ({ paginationOptions }) => {
   } else if (Array.isArray(location)) {
     locationWhereClause = {
       locationGroupId: {
-        [Op.in]: location, // 배열인 location
+        [Op.in]: location.map((loc) => BigInt(loc)), // 배열인 location
       },
     };
   } else {
     locationWhereClause = {
-      locationGroupId: location, // 단일 location
+      locationGroupId: BigInt(location), // 단일 location
     };
   }
 
@@ -88,6 +92,47 @@ export const listEvent = async ({ paginationOptions }) => {
   if (endDate)
     dateWhereClause.applicationEnd = { [Op.lte]: endDate.split("T")[0] };
 
+  // 위치 범위 (남서쪽, 북동쪽 좌표 사용)
+  let locationRangeWhereClause = {};
+  const [southWestLng, southWestLat] = southWest.split(",").map(parseFloat);
+  const [northEastLng, northEastLat] = northEast.split(",").map(parseFloat);
+
+  if (southWest && northEast) {
+    locationRangeWhereClause = {
+      [Op.and]: [
+        Sequelize.where(Sequelize.fn("ST_Y", Sequelize.col("position")), {
+          [Op.between]: [southWestLat, northEastLat], // 위도 세트
+        }),
+        Sequelize.where(Sequelize.fn("ST_X", Sequelize.col("position")), {
+          [Op.between]: [southWestLng, northEastLng], // 경도 세트
+        }),
+      ],
+    };
+  }
+
+  // 반경 5km 내 이벤트 필터링
+  const places = await models.EventLocation.findAll({
+    where: {
+      [Op.or]: [
+        locationRangeWhereClause, // 위치 범위 조건
+        Sequelize.where(
+          Sequelize.fn(
+            "ST_Distance_Sphere",
+            Sequelize.fn(
+              "POINT",
+              Sequelize.fn("ST_X", Sequelize.col("position")),
+              Sequelize.fn("ST_Y", Sequelize.col("position"))
+            ),
+            Sequelize.fn("POINT", southWestLng, southWestLat) // 기준 좌표 (남서쪽)
+          ),
+          { [Op.lte]: 5000 } // 반경 5km 이내
+        ),
+      ],
+    },
+  });
+
+  const placeEventIds = places.map((place) => place.eventId);
+
   const events = await models.Events.findAll({
     where: {
       ...cursorWhereClause, // 커서 기준 조건 추가
@@ -95,6 +140,10 @@ export const listEvent = async ({ paginationOptions }) => {
       // ...locationWhereClause, // 위치 기준 조건 추가 - 25.02.11 event 테이블 구조 변경에 따라 depracated
       ...dateWhereClause, // 날짜 기준 조건 추가
       ...queryWhereClause, // 검색어 기준 조건 추가
+      [Op.or]: [
+        { eventId: { [Op.in]: placeEventIds } },
+        { eventId: { [Op.notIn]: placeEventIds } },
+      ],
     },
     limit: limit + 1, // 다음 페이지 존재 여부 확인을 위해 하나 더 조회
     order: [["eventId", "DESC"]],
@@ -148,36 +197,16 @@ export const listEvent = async ({ paginationOptions }) => {
 
   // 이미지 링크 첨부하도록 변환
   let modifiedEvents = events.map((event) => {
-    // 각 ID의 타입 출력 (원본 값 확인)
-    console.log(`eventId type (before): ${typeof event.eventId}`);
-    console.log(`categoryId type (before): ${typeof event.categoryId}`);
-    console.log(
-      `locationGroupId type (before): ${typeof event.locationGroupId}`
-    );
-    console.log(`createdUserId type (before): ${typeof event.createdUserId}`);
-
-    // BigInt로 변환
+    // BigInt로 변환이 안돼서 string으로 변환
     const transformedEvent = {
       ...event.dataValues,
-      eventId: BigInt(event.eventId),
-      categoryId: BigInt(event.categoryId),
+      eventId: String(event.eventId),
+      categoryId: String(event.categoryId),
       locationGroupId: event.locationGroupId
-        ? BigInt(event.locationGroupId)
+        ? String(event.locationGroupId)
         : null,
-      createdUserId: event.createdUserId ? BigInt(event.createdUserId) : null,
+      createdUserId: event.createdUserId ? String(event.createdUserId) : null,
     };
-
-    // 변환 후 타입 출력 (BigInt로 바뀌었는지 확인)
-    console.log(`~~eventId type (after): ${typeof transformedEvent.eventId}`);
-    console.log(
-      `~~categoryId type (after): ${typeof transformedEvent.categoryId}`
-    );
-    console.log(
-      `~~locationGroupId type (after): ${typeof transformedEvent.locationGroupId}`
-    );
-    console.log(
-      `~~createdUserId type (after): ${typeof transformedEvent.createdUserId}`
-    );
 
     const transformedImages = event.eventImages.map((image) => ({
       imageUrl: addBaseUrl(image.imageUrl),
@@ -212,9 +241,24 @@ export const listEvent = async ({ paginationOptions }) => {
     } else if (sort === "낮은 금액순") {
       // ㅇㅋ 굳
       modifiedEvents.sort((a, b) => a.price - b.price);
-    } else if (sort === "가까운 거리순") {
+    } else if (sort === "가까운 거리순" && userLocation) {
       modifiedEvents.sort((a, b) => {
         // 프론트에서 유저 위치를 받아서 해야하는 것 같아요.
+        const distanceA = getDistance(
+          { latitude: userLocation.lat, longitude: userLocation.lng },
+          {
+            latitude: a.eventLocation.coordinates[1],
+            longitude: a.eventLocation.coordinates[0],
+          }
+        );
+        const distanceB = getDistance(
+          { latitude: userLocation.lat, longitude: userLocation.lng },
+          {
+            latitude: b.eventLocation.coordinates[1],
+            longitude: b.eventLocation.coordinates[0],
+          }
+        );
+        return distanceA - distanceB;
       });
     }
   }

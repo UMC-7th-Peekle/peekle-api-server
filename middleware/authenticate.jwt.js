@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import logger from "../utils/logger/logger.js";
-import config from "../config/config.js";
+import config from "../config.js";
 import {
   TokenError,
   NotAllowedError,
