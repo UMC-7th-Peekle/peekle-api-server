@@ -107,7 +107,7 @@ export const getArticles = async (
 ) => {
   // 사용자가 다른 사용자가 작성한 글을 조회하는 경우 차단
   if (authorId !== undefined && (parseInt(authorId, 10) !== parseInt(userId, 10))) {
-      throw new NotAllowedError("다른 사용자의 댓글을 조회할 수 없습니다");
+      throw new NotAllowedError("다른 사용자가 작성한 게시글 목록을 조회할 수 없습니다");
     }
 
   // 게시글 조회 조건 설정

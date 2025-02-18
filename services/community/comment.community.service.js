@@ -304,7 +304,7 @@ export const createCommentReply = async ({
 export const getComments = async ({ communityId, articleId, authorId, userId }) => {
   // 사용자가 다른 사용자가 작성한 글을 조회하는 경우 차단
   if (authorId !== undefined && (parseInt(authorId, 10) !== parseInt(userId, 10))) {
-    throw new NotAllowedError("다른 사용자의 댓글을 조회할 수 없습니다");
+    throw new NotAllowedError("다른 사용자가 작성한 댓글 목록을 조회할 수 없습니다");
   }
   
   const whereCondition = {
