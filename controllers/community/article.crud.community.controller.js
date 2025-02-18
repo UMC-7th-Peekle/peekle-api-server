@@ -95,8 +95,13 @@ export const updateArticle = async (req, res, next) => {
       throw new InvalidInputError("수정할 내용이 없습니다.");
     }
 
-    // 업로드된 파일 정보 추출
-    const uploadedFiles = req.files?.article_images || [];
+    // 업로드된 파일들(article_images + article_videos)을 하나의 배열로 합치기
+    // 이 경우 video 파일의 순서는 무조건 뒤에 위치하게 됨
+    const uploadedFiles = [
+      ...(req.files?.article_images || []), // 이미지 파일
+      ...(req.files?.article_videos || []), // 비디오 파일
+    ];
+  
 
     await articleCrudService.updateArticle({
       communityId,

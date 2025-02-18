@@ -80,14 +80,14 @@ router.post(
   authenticateAccessToken,
   fileUploadMiddleware.localStorage({
     field: [
-      { 
-        name: "article_images", 
+      {
+        name: "article_images",
         maxCount: 5,
-        restrictions: fileUploadMiddleware.restrictions("article") // 이미지 업로드 제한
+        restrictions: fileUploadMiddleware.restrictions("article"), // 이미지 업로드 제한
       },
-      { 
+      {
         name: "article_videos",
-        restrictions: fileUploadMiddleware.restrictions("video") // 비디오 업로드 제한
+        restrictions: fileUploadMiddleware.restrictions("video"), // 비디오 업로드 제한
       },
     ],
     destination: "uploads/articles", // 저장 경로 설정
@@ -103,8 +103,17 @@ router.patch(
   "/:communityId/articles/:articleId",
   authenticateAccessToken,
   fileUploadMiddleware.localStorage({
-    restrictions: fileUploadMiddleware.restrictions("article"),
-    field: [{ name: "article_images", maxCount: 5 }], // 다중 파일 업로드 설정
+    field: [
+      {
+        name: "article_images",
+        maxCount: 5,
+        restrictions: fileUploadMiddleware.restrictions("article"), // 이미지 업로드 제한
+      },
+      {
+        name: "article_videos",
+        restrictions: fileUploadMiddleware.restrictions("video"), // 비디오 업로드 제한
+      },
+    ],
     destination: "uploads/articles", // 저장 경로 설정
   }),
   // validator는 body를 검증하기에 순서에 유의
