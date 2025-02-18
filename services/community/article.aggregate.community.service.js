@@ -9,7 +9,7 @@ import logger from "../../utils/logger/logger.js";
 import { Sequelize } from "sequelize";
 import { Op, fn, col } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
-
+import config from "../../config/config.js";
 
 export const validateStatisticsQuery = (queries) => {
   const { startTime, endTime } = queries;
@@ -141,12 +141,14 @@ export const getPopularArticles = async (communityId, startTime, endTime) => {
     if (article.isAnonymous === true) {
       article.authorInfo = {
         nickname: null,
-        profileImage: null,
+        profileImage: null, // 익명인 경우 기본 이미지 대신 null 반환
         authorId: null,
       };
     } else {
       article.author = article.author.dataValues;
-      article.author.profileImage = addBaseUrl(article.author.profileImage);
+      // 기본 이미지인 경우 null로 전송
+      
+      article.author.profileImage = article.author.profileImage === config.PEEKLE.DEFAULT_PROFILE_IMAGE ? null : addBaseUrl(article.author.profileImage),
       article.author.authorId = article.author.userId;
       delete article.author.userId;
 

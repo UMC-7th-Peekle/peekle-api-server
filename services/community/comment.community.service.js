@@ -7,6 +7,8 @@ import {
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
+import { addBaseUrl } from "../../utils/upload/uploader.object.js";
+import config from "../../config/config.js";
 
 /**
  * communityId, articleId에 해당하는 게시글에 댓글을 추가합니다
@@ -363,10 +365,15 @@ export const getComments = async ({ communityId, articleId, userId }) => {
       if (isAnonymous !== 0) {
         transformedAuthorInfo = {
           nickname: `익명${isAnonymous}`, // isAnonymous 값을 그대로 사용하여 익명 번호 지정
-          profileImage: null,
+          profileImage: null, // 익명인 경우 기본 이미지 대신 null 반환
           authorId: null,
         };
+      } else if (transformedAuthorInfo.profileImage === config.PEEKLE.DEFAULT_PROFILE_IMAGE) {
+        transformedAuthorInfo.profileImage = null; // 기본 이미지인 경우 null로 전송
+      } else {
+        transformedAuthorInfo.profileImage = addBaseUrl(transformedAuthorInfo.profileImage);
       }
+
       return {
         authorInfo: status === "deleted" ? null : transformedAuthorInfo,
         isLikedByUser: isCommentLikedByUser,

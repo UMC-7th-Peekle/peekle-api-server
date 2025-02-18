@@ -12,6 +12,7 @@ import {
   isEditInputCorrect,
 } from "../../utils/upload/uploader.object.js";
 import { parseImagePaths } from "../../utils/upload/uploader.object.js";
+import config from "../../config/config.js";
 
 export const createCommunity = async ({ communityName }) => {
   // 게시판 생성
@@ -108,9 +109,13 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     imageUrl: addBaseUrl(image.imageUrl),
     sequence: image.sequence,
   }));
-
+  
   const transformedProfileImages = data.articleComments.map((comment) => {
-    comment.author.profileImage = addBaseUrl(author.profileImage);
+    if(comment.author.profileImage === config.PEEKLE.DEFAULT_PROFILE_IMAGE) {
+      comment.author.profileImage = null;
+    } else {
+      comment.author.profileImage = addBaseUrl(author.profileImage);
+    }
   });
 
   // 게시글 좋아요 여부 및 좋아요 개수
@@ -143,7 +148,7 @@ export const getArticleById = async ({ communityId, articleId, userId }) => {
     const processedContent = status === "deleted" ? "" : content;
 
     // 익명 처리 로직: isAnonymous 값에 따라 익명 닉네임 설정
-    let transformedAuthorInfo = author;
+    let transformedAuthorInfo = data.author;
     // isAnonymous가 0이 아닌 양의 정수일 경우 익명이 됨
     if (isAnonymous !== 0) {
       transformedAuthorInfo = {
