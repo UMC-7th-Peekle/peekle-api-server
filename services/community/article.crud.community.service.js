@@ -12,7 +12,7 @@ import {
   isEditInputCorrect,
 } from "../../utils/upload/uploader.object.js";
 import { parseImagePaths } from "../../utils/upload/uploader.object.js";
-import config from "../../config/config.js";
+import config from "../../config.js";
 
 export const createCommunity = async ({ communityName }) => {
   // 게시판 생성

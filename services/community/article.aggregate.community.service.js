@@ -9,7 +9,7 @@ import logger from "../../utils/logger/logger.js";
 import { Sequelize } from "sequelize";
 import { Op, fn, col } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
-import config from "../../config/config.js";
+import config from "../../config.js";
 
 export const validateStatisticsQuery = (queries) => {
   const { startTime, endTime } = queries;

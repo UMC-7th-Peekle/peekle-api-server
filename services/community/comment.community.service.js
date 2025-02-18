@@ -8,7 +8,7 @@ import {
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
-import config from "../../config/config.js";
+import config from "../../config.js";
 
 /**
  * communityId, articleId에 해당하는 게시글에 댓글을 추가합니다

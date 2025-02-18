@@ -8,7 +8,7 @@ import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Op, fn, col } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
-import config from "../../config/config.js";
+import config from "../../config.js";
 
 export const validateArticleQuery = (queries) => {
   const { limit, cursor, query, communityId, authorId } = queries; // 쿼리 파라미터에서 limit와 cursor 추출
