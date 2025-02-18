@@ -1,3 +1,4 @@
+// 티켓 생성
 export const postTicketSchema = {
   type: "object",
   properties: {

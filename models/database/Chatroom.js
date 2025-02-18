@@ -28,13 +28,23 @@ export default class Chatroom extends Model {
       },
       field: 'receiver_id'
     },
+    isSenderAnonymous: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      field: 'is_sender_anonymous'
+    },
+    isReceiverAnonymous: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      field: 'is_receiver_anonymous'
+    },
     name: {
       type: DataTypes.STRING(30),
       allowNull: false
     },
     noticeChatId: {
       type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'chats',
         key: 'chat_id'

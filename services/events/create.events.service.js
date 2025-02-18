@@ -75,6 +75,19 @@ export const createEvent = async ({ userId, eventData }) => {
       }));
 
       await models.EventImages.bulkCreate(eventImageData, { transaction });
+    } else if (eventData.imagePaths.length == 0) {
+      // 이미지가 새로 들어오지 않은 경우, 기본 이미지 처리
+      const defaultEventImageData = [
+        {
+          eventId: event.eventId,
+          imageUrl: "uploads/default/events/v1.png", // 기본 이미지 URL 설정
+          sequence: 1, // 기본 이미지 1개
+        },
+      ];
+
+      await models.EventImages.bulkCreate(defaultEventImageData, {
+        transaction,
+      });
     }
 
     // 해당 이벤트 스케줄 부분 튜플 생성
@@ -89,7 +102,7 @@ export const createEvent = async ({ userId, eventData }) => {
 
     // 주소로 위치 좌표 계산
     const locs = eventData.location;
-    const detailAddress = `${locs.roadAddress || locs.jibunAdress} ${locs.detail}`;
+    const detailAddress = `${locs.address}`;
     if (locs) {
       const { latitude, longitude } =
         await getLocationFromAddress(detailAddress);

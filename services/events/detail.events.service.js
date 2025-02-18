@@ -63,7 +63,7 @@ import {
 //   return { position: { latitude, longitude } };
 // };
 
-export const detailEvent = async ({ eventId }) => {
+export const detailEvent = async ({ eventId, userId }) => {
   // eventId가 유효하지 않은 경우 400
   /**
    * 아직 Ajv로 유효성 검사 안했어요
@@ -132,6 +132,11 @@ export const detailEvent = async ({ eventId }) => {
     ],
   });
 
+  // 유저가 로그인했다면, 해당 유저가 이 이벤트를 스크랩 했는지 여부 파악
+  const isScraped = userId
+    ? await models.EventScraps.findOne({ where: { eventId, userId } })
+    : null;
+
   if (!data) {
     logger.warn("존재하지 않는 이벤트에 대한 조회 요청입니다.", {
       action: "event:getDetail",
@@ -148,7 +153,18 @@ export const detailEvent = async ({ eventId }) => {
     sequence: image.sequence,
   }));
 
-  return { ...data.dataValues, eventImages: transformedImages };
+  const parsedLocation = {
+    coordinates: data.eventLocation?.position.coordinates,
+    ...data.eventLocation?.dataValues,
+  };
+  delete parsedLocation.position;
+
+  return {
+    ...data.dataValues,
+    eventImages: transformedImages,
+    eventLocation: parsedLocation,
+    isScraped: !!isScraped,
+  };
 };
 
 // 이벤트 내용 수정

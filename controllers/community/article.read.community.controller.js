@@ -3,18 +3,37 @@ import * as articleReadService from "../../services/community/article.read.commu
 import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
 
+// 게시판 목록 조회
+export const getCommunities = async (req, res, next) => {
+  try {
+    const { communities } = await articleReadService.getCommunities();
+
+    if (communities.length === 0) {
+      return res.status(204).end(); // 응답 본문 없이 204 반환
+    }
+    return res.status(200).success({
+      message: "게시판 목록 조회 성공",
+      communities,
+    });
+  } catch (error) {
+    logError(error);
+    next(error); // 에러 핸들러로 전달
+  }
+};
+
 // 게시글 검색
 export const getArticles = async (req, res, next) => {
   // 입력 형식 검증은 완료된 상태로 들어온다고 가정.
   try {
     articleReadService.validateArticleQuery(req.query);
-    const { communityId, limit, cursor, query } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
-    const userId = req.user ? req.user.userId : null;  // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
+    const { communityId, authorId, limit, cursor, query } = req.query; // 쿼리 파라미터에서 limit와 cursor 추출
+    const userId = req.user ? req.user.userId : null; // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
 
     logger.debug("게시글 목록 조회", {
       action: "article:getArticles",
       actionType: "request",
       communityId,
+      authorId,
       limit,
       cursor,
       query,
@@ -29,6 +48,7 @@ export const getArticles = async (req, res, next) => {
     const { articles, nextCursor, hasNextPage } =
       await articleReadService.getArticles(
         communityId,
+        authorId,
         query,
         paginationOptions,
         userId

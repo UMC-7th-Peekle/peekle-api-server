@@ -17,7 +17,11 @@ import {
 const router = Router();
 
 // 이벤트 조회
-router.get("/", listEventController.listEvent);
+router.get(
+  "/",
+  authMiddleware.autheticateAccessTokenIfExists,
+  listEventController.listEvent
+);
 
 // 이벤트 삭제
 router.delete(
@@ -29,12 +33,16 @@ router.delete(
 // 스크랩된 이벤트 조회
 router.get(
   "/scrap",
-  authMiddleware.authenticateAccessToken,
+  authMiddleware.autheticateAccessTokenIfExists,
   scrapEventController.listScrap
 );
 
 // 이벤트 상세정보 조회
-router.get("/:eventId", detailEventController.detailEvent);
+router.get(
+  "/:eventId",
+  authMiddleware.autheticateAccessTokenIfExists,
+  detailEventController.detailEvent
+);
 
 // 이벤트 수정
 router.patch(
