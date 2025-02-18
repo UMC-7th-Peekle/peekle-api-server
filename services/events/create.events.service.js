@@ -80,7 +80,7 @@ export const createEvent = async ({ userId, eventData }) => {
       const defaultEventImageData = [
         {
           eventId: event.eventId,
-          imageUrl: "uploads/default/profile/v1.png", // 기본 이미지 URL 설정 => 일단 임의로 default에 있는 이미지 파일이고요, 추후 기본 이미지로 수정해야합니다.
+          imageUrl: "uploads/default/events/v1.png", // 기본 이미지 URL 설정
           sequence: 1, // 기본 이미지 1개
         },
       ];

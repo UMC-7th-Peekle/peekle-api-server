@@ -44,6 +44,7 @@ import _UserFilters from  "./UserFilters.js";
 import _UserOauth from  "./UserOauth.js";
 import _UserRestrictions from  "./UserRestrictions.js";
 import _UserRoles from  "./UserRoles.js";
+import _UserSocketRooms from  "./UserSocketRooms.js";
 import _UserTerms from  "./UserTerms.js";
 import _Users from  "./Users.js";
 import _VerificationCode from  "./VerificationCode.js";
@@ -93,6 +94,7 @@ export default function initModels(sequelize) {
   const UserOauth = _UserOauth.init(sequelize, DataTypes);
   const UserRestrictions = _UserRestrictions.init(sequelize, DataTypes);
   const UserRoles = _UserRoles.init(sequelize, DataTypes);
+  const UserSocketRooms = _UserSocketRooms.init(sequelize, DataTypes);
   const UserTerms = _UserTerms.init(sequelize, DataTypes);
   const Users = _Users.init(sequelize, DataTypes);
   const VerificationCode = _VerificationCode.init(sequelize, DataTypes);
@@ -225,6 +227,8 @@ export default function initModels(sequelize) {
   Users.hasMany(UserRestrictions, { as: "userUserRestrictions", foreignKey: "userId"});
   UserRoles.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserRoles, { as: "userRoles", foreignKey: "userId"});
+  UserSocketRooms.belongsTo(Users, { as: "user", foreignKey: "userId"});
+  Users.hasMany(UserSocketRooms, { as: "userSocketRooms", foreignKey: "userId"});
   UserTerms.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserTerms, { as: "userTerms", foreignKey: "userId"});
 
@@ -273,6 +277,7 @@ export default function initModels(sequelize) {
     UserOauth,
     UserRestrictions,
     UserRoles,
+    UserSocketRooms,
     UserTerms,
     Users,
     VerificationCode,

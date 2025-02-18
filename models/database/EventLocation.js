@@ -44,7 +44,7 @@ export default class EventLocation extends Model {
     },
     buildingName: {
       type: DataTypes.STRING(1024),
-      allowNull: false,
+      allowNull: true,
       field: 'building_name'
     },
     sido: {
