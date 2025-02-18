@@ -301,12 +301,18 @@ export const createCommentReply = async ({
 /**
  * communityId, articleId에 해당하는 댓글 목록을 조회합니다
  */
-export const getComments = async ({ communityId, articleId, userId }) => {
+export const getComments = async ({ communityId, articleId, authorId, userId }) => {
+  const whereCondition = {
+    communityId,
+    articleId,
+  };
+  // 작성자 ID가 주어진 경우 작성자 ID로 댓글을 조회
+  if (authorId) {
+    whereCondition.authorId = authorId;
+  }
+  
   const articleWithComments = await models.Articles.findOne({
-    where: {
-      communityId,
-      articleId,
-    },
+    where: whereCondition,
     include: [
       {
         model: models.ArticleComments,
