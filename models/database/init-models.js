@@ -6,8 +6,10 @@ import _ArticleImages from  "./ArticleImages.js";
 import _ArticleLikes from  "./ArticleLikes.js";
 import _Articles from  "./Articles.js";
 import _ChatImages from  "./ChatImages.js";
+import _Chatroom from  "./Chatroom.js";
 import _Chats from  "./Chats.js";
 import _Communities from  "./Communities.js";
+import _CommunitySuggestions from  "./CommunitySuggestions.js";
 import _EventCategory from  "./EventCategory.js";
 import _EventImages from  "./EventImages.js";
 import _EventLocation from  "./EventLocation.js";
@@ -21,7 +23,9 @@ import _NoticeImages from  "./NoticeImages.js";
 import _Notices from  "./Notices.js";
 import _Peekling from  "./Peekling.js";
 import _PeeklingCategory from  "./PeeklingCategory.js";
+import _PeeklingChatImages from  "./PeeklingChatImages.js";
 import _PeeklingChatroom from  "./PeeklingChatroom.js";
+import _PeeklingChats from  "./PeeklingChats.js";
 import _PeeklingImages from  "./PeeklingImages.js";
 import _PeeklingParticipants from  "./PeeklingParticipants.js";
 import _PeeklingSave from  "./PeeklingSave.js";
@@ -40,6 +44,7 @@ import _UserFilters from  "./UserFilters.js";
 import _UserOauth from  "./UserOauth.js";
 import _UserRestrictions from  "./UserRestrictions.js";
 import _UserRoles from  "./UserRoles.js";
+import _UserSocketRooms from  "./UserSocketRooms.js";
 import _UserTerms from  "./UserTerms.js";
 import _Users from  "./Users.js";
 import _VerificationCode from  "./VerificationCode.js";
@@ -51,8 +56,10 @@ export default function initModels(sequelize) {
   const ArticleLikes = _ArticleLikes.init(sequelize, DataTypes);
   const Articles = _Articles.init(sequelize, DataTypes);
   const ChatImages = _ChatImages.init(sequelize, DataTypes);
+  const Chatroom = _Chatroom.init(sequelize, DataTypes);
   const Chats = _Chats.init(sequelize, DataTypes);
   const Communities = _Communities.init(sequelize, DataTypes);
+  const CommunitySuggestions = _CommunitySuggestions.init(sequelize, DataTypes);
   const EventCategory = _EventCategory.init(sequelize, DataTypes);
   const EventImages = _EventImages.init(sequelize, DataTypes);
   const EventLocation = _EventLocation.init(sequelize, DataTypes);
@@ -66,7 +73,9 @@ export default function initModels(sequelize) {
   const Notices = _Notices.init(sequelize, DataTypes);
   const Peekling = _Peekling.init(sequelize, DataTypes);
   const PeeklingCategory = _PeeklingCategory.init(sequelize, DataTypes);
+  const PeeklingChatImages = _PeeklingChatImages.init(sequelize, DataTypes);
   const PeeklingChatroom = _PeeklingChatroom.init(sequelize, DataTypes);
+  const PeeklingChats = _PeeklingChats.init(sequelize, DataTypes);
   const PeeklingImages = _PeeklingImages.init(sequelize, DataTypes);
   const PeeklingParticipants = _PeeklingParticipants.init(sequelize, DataTypes);
   const PeeklingSave = _PeeklingSave.init(sequelize, DataTypes);
@@ -85,6 +94,7 @@ export default function initModels(sequelize) {
   const UserOauth = _UserOauth.init(sequelize, DataTypes);
   const UserRestrictions = _UserRestrictions.init(sequelize, DataTypes);
   const UserRoles = _UserRoles.init(sequelize, DataTypes);
+  const UserSocketRooms = _UserSocketRooms.init(sequelize, DataTypes);
   const UserTerms = _UserTerms.init(sequelize, DataTypes);
   const Users = _Users.init(sequelize, DataTypes);
   const VerificationCode = _VerificationCode.init(sequelize, DataTypes);
@@ -107,12 +117,12 @@ export default function initModels(sequelize) {
   Articles.hasMany(ArticleImages, { as: "articleImages", foreignKey: "articleId"});
   ArticleLikes.belongsTo(Articles, { as: "article", foreignKey: "articleId"});
   Articles.hasMany(ArticleLikes, { as: "articleLikes", foreignKey: "articleId"});
+  Chats.belongsTo(Chatroom, { as: "chatroomChatroom", foreignKey: "chatroomId"});
+  Chatroom.hasMany(Chats, { as: "chats", foreignKey: "chatroomId"});
   ChatImages.belongsTo(Chats, { as: "chat", foreignKey: "chatId"});
   Chats.hasOne(ChatImages, { as: "chatImage", foreignKey: "chatId"});
-  Chats.belongsTo(Chats, { as: "parentChat", foreignKey: "parentChatId"});
-  Chats.hasMany(Chats, { as: "chats", foreignKey: "parentChatId"});
-  PeeklingChatroom.belongsTo(Chats, { as: "noticeChat", foreignKey: "noticeChatId"});
-  Chats.hasMany(PeeklingChatroom, { as: "peeklingChatrooms", foreignKey: "noticeChatId"});
+  Chatroom.belongsTo(Chats, { as: "noticeChat", foreignKey: "noticeChatId"});
+  Chats.hasMany(Chatroom, { as: "chatrooms", foreignKey: "noticeChatId"});
   Articles.belongsTo(Communities, { as: "community", foreignKey: "communityId"});
   Communities.hasMany(Articles, { as: "articles", foreignKey: "communityId"});
   Events.belongsTo(EventCategory, { as: "category", foreignKey: "categoryId"});
@@ -141,6 +151,14 @@ export default function initModels(sequelize) {
   PeeklingCategory.hasMany(Peekling, { as: "peeklings", foreignKey: "categoryId"});
   PeeklingSave.belongsTo(PeeklingCategory, { as: "category", foreignKey: "categoryId"});
   PeeklingCategory.hasMany(PeeklingSave, { as: "peeklingSaves", foreignKey: "categoryId"});
+  PeeklingChats.belongsTo(PeeklingChatroom, { as: "chatroom", foreignKey: "chatroomId"});
+  PeeklingChatroom.hasMany(PeeklingChats, { as: "peeklingChats", foreignKey: "chatroomId"});
+  PeeklingChatImages.belongsTo(PeeklingChats, { as: "chat", foreignKey: "chatId"});
+  PeeklingChats.hasOne(PeeklingChatImages, { as: "peeklingChatImage", foreignKey: "chatId"});
+  PeeklingChatroom.belongsTo(PeeklingChats, { as: "noticeChat", foreignKey: "noticeChatId"});
+  PeeklingChats.hasMany(PeeklingChatroom, { as: "peeklingChatrooms", foreignKey: "noticeChatId"});
+  PeeklingChats.belongsTo(PeeklingChats, { as: "parentChat", foreignKey: "parentChatId"});
+  PeeklingChats.hasMany(PeeklingChats, { as: "peeklingChats", foreignKey: "parentChatId"});
   RolePermissions.belongsTo(Permissions, { as: "permission", foreignKey: "permissionId"});
   Permissions.hasMany(RolePermissions, { as: "rolePermissions", foreignKey: "permissionId"});
   RoleHierarchy.belongsTo(Roles, { as: "parentRole", foreignKey: "parentRoleId"});
@@ -165,8 +183,12 @@ export default function initModels(sequelize) {
   Users.hasMany(ArticleLikes, { as: "articleLikes", foreignKey: "likedUserId"});
   Articles.belongsTo(Users, { as: "author", foreignKey: "authorId"});
   Users.hasMany(Articles, { as: "articles", foreignKey: "authorId"});
-  Chats.belongsTo(Users, { as: "author", foreignKey: "authorId"});
-  Users.hasMany(Chats, { as: "chats", foreignKey: "authorId"});
+  Chatroom.belongsTo(Users, { as: "sender", foreignKey: "senderId"});
+  Users.hasMany(Chatroom, { as: "chatrooms", foreignKey: "senderId"});
+  Chatroom.belongsTo(Users, { as: "receiver", foreignKey: "receiverId"});
+  Users.hasMany(Chatroom, { as: "receiverChatrooms", foreignKey: "receiverId"});
+  CommunitySuggestions.belongsTo(Users, { as: "author", foreignKey: "authorId"});
+  Users.hasMany(CommunitySuggestions, { as: "communitySuggestions", foreignKey: "authorId"});
   EventScraps.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(EventScraps, { as: "eventScraps", foreignKey: "userId"});
   Events.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
@@ -177,6 +199,8 @@ export default function initModels(sequelize) {
   Users.hasMany(Notices, { as: "notices", foreignKey: "authorId"});
   Peekling.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
   Users.hasMany(Peekling, { as: "peeklings", foreignKey: "createdUserId"});
+  PeeklingChats.belongsTo(Users, { as: "author", foreignKey: "authorId"});
+  Users.hasMany(PeeklingChats, { as: "peeklingChats", foreignKey: "authorId"});
   PeeklingParticipants.belongsTo(Users, { as: "participant", foreignKey: "participantId"});
   Users.hasMany(PeeklingParticipants, { as: "peeklingParticipants", foreignKey: "participantId"});
   PeeklingSave.belongsTo(Users, { as: "createdUser", foreignKey: "createdUserId"});
@@ -203,6 +227,8 @@ export default function initModels(sequelize) {
   Users.hasMany(UserRestrictions, { as: "userUserRestrictions", foreignKey: "userId"});
   UserRoles.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserRoles, { as: "userRoles", foreignKey: "userId"});
+  UserSocketRooms.belongsTo(Users, { as: "user", foreignKey: "userId"});
+  Users.hasMany(UserSocketRooms, { as: "userSocketRooms", foreignKey: "userId"});
   UserTerms.belongsTo(Users, { as: "user", foreignKey: "userId"});
   Users.hasMany(UserTerms, { as: "userTerms", foreignKey: "userId"});
 
@@ -213,8 +239,10 @@ export default function initModels(sequelize) {
     ArticleLikes,
     Articles,
     ChatImages,
+    Chatroom,
     Chats,
     Communities,
+    CommunitySuggestions,
     EventCategory,
     EventImages,
     EventLocation,
@@ -228,7 +256,9 @@ export default function initModels(sequelize) {
     Notices,
     Peekling,
     PeeklingCategory,
+    PeeklingChatImages,
     PeeklingChatroom,
+    PeeklingChats,
     PeeklingImages,
     PeeklingParticipants,
     PeeklingSave,
@@ -247,6 +277,7 @@ export default function initModels(sequelize) {
     UserOauth,
     UserRestrictions,
     UserRoles,
+    UserSocketRooms,
     UserTerms,
     Users,
     VerificationCode,

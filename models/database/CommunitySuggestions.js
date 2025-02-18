@@ -1,31 +1,32 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class PeeklingChatroom extends Model {
+export default class CommunitySuggestions extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    peeklingId: {
+    suggestionId: {
+      autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
-      references: {
-        model: 'peekling',
-        key: 'peekling_id'
-      },
-      field: 'peekling_id'
+      field: 'suggestion_id'
     },
-    name: {
-      type: DataTypes.STRING(30),
+    authorId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      references: {
+        model: 'users',
+        key: 'user_id'
+      },
+      field: 'author_id'
+    },
+    title: {
+      type: DataTypes.STRING(512),
       allowNull: false
     },
-    noticeChatId: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
-      references: {
-        model: 'peekling_chats',
-        key: 'chat_id'
-      },
-      field: 'notice_chat_id'
+    content: {
+      type: DataTypes.TEXT,
+      allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -41,7 +42,7 @@ export default class PeeklingChatroom extends Model {
     }
   }, {
     sequelize,
-    tableName: 'peekling_chatroom',
+    tableName: 'community_suggestions',
     timestamps: false,
     indexes: [
       {
@@ -49,14 +50,14 @@ export default class PeeklingChatroom extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "peekling_id" },
+          { name: "suggestion_id" },
         ]
       },
       {
-        name: "peekling_chatroom_chats_chat_id_fk",
+        name: "community_suggestions_user_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "notice_chat_id" },
+          { name: "author_id" },
         ]
       },
     ]

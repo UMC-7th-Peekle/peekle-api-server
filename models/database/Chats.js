@@ -11,13 +11,18 @@ export default class Chats extends Model {
       primaryKey: true,
       field: 'chat_id'
     },
+    chatroomId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: false,
+      references: {
+        model: 'chatroom',
+        key: 'chatroom_id'
+      },
+      field: 'chatroom_id'
+    },
     parentChatId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
-      references: {
-        model: 'chats',
-        key: 'chat_id'
-      },
       field: 'parent_chat_id'
     },
     status: {
@@ -28,10 +33,6 @@ export default class Chats extends Model {
     authorId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
-      references: {
-        model: 'users',
-        key: 'user_id'
-      },
       field: 'author_id'
     },
     type: {
@@ -68,17 +69,10 @@ export default class Chats extends Model {
         ]
       },
       {
-        name: "chats_users_user_id_fk",
+        name: "chats_chatroom_chatroom_id_fk2",
         using: "BTREE",
         fields: [
-          { name: "author_id" },
-        ]
-      },
-      {
-        name: "chats_chats_chat_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "parent_chat_id" },
+          { name: "chatroom_id" },
         ]
       },
     ]

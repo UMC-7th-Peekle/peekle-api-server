@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import models from "../../models/index.js";
+import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 
 /**
  * 피클링 생성하기
@@ -85,22 +86,37 @@ export const getPeeklingById = async ({ peeklingId }) => {
     include: [
       {
         model: models.PeeklingImages,
-        alias: "peeklingImages",
+        as: "peeklingImages",
       },
       {
         model: models.PeeklingCategory,
-        alias: "category",
+        as: "category",
+        exclude: ["categoryId", "createdAt", "updatedAt"],
       },
       {
         model: models.PeeklingParticipants,
-        alias: "peeklingParticipants",
+        as: "peeklingParticipants",
+        exclude: ["participantId"],
       },
       // {
       //   model: models.PeeklingChatroom,
-      //   alias: "peeklingChatroom",
+      //   as: "peeklingChatroom",
       // },
     ],
   });
+
+  const transformedImages = data.peeklingImages.map((image) => ({
+    imageUrl: addBaseUrl(image.imageUrl),
+    sequence: image.sequence,
+  }));
+
+  delete data.categoryId;
+
+  return {
+    ...data.dataValues,
+    // ...data.category.dataValues,
+    peeklingImages: transformedImages,
+  };
 };
 
 export const getPeeklingByQuery = async ({ query, categoryId }) => {
@@ -123,4 +139,9 @@ export const getPeeklingByQuery = async ({ query, categoryId }) => {
   const data = await models.Peekling.findAll({
     where: {},
   });
+};
+
+export const joinPeekling = async ({ peeklingId, userId }) => {
+  // 사용자가 이미 나간 적이 있는 피클링이거나,
+  // 피클링에서 쫓겨난 사용자면 참여 불가
 };

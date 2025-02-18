@@ -1,6 +1,6 @@
 import { Server } from "socket.io"; // socket을 사용하려면 주석 해제
 import { corsOptions } from "../utils/options/options.js";
-import { handleMessage } from "./handlers/messageHandler.js";
+import { handleMessage } from "./handlers/message.socket.js";
 
 let io;
 

@@ -32,14 +32,25 @@ export const getPeeklings = async (req, res, next) => {
     // query의 종류에는 검색어, 카테고리
 
     const { query, categoryId } = req.query;
+
+    
+
   } catch (err) {
     logError(err);
     next(err);
   }
 };
 
-export const getPeeklingDetails = async (req, res, next) => {
+export const getPeeklingById = async (req, res, next) => {
   try {
+    const data = await crudService.getPeeklingById({
+      peeklingId: req.params.peeklingId,
+    });
+
+    return res.status(200).success({
+      message: "Peekling을 가져왔습니다.",
+      peekling: data,
+    });
   } catch (err) {
     logError(err);
     next(err);

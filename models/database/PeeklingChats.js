@@ -1,65 +1,55 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Peekling extends Model {
+export default class PeeklingChats extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    peeklingId: {
+    chatId: {
       autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
-      field: 'peekling_id'
+      field: 'chat_id'
     },
-    title: {
-      type: DataTypes.STRING(20),
-      allowNull: false
-    },
-    description: {
-      type: DataTypes.STRING(1000),
-      allowNull: true
-    },
-    status: {
-      type: DataTypes.ENUM('active','canceled','completed'),
+    chatroomId: {
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
-      defaultValue: "active"
+      references: {
+        model: 'peekling_chatroom',
+        key: 'peekling_id'
+      },
+      field: 'chatroom_id'
     },
-    minPeople: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      field: 'min_people'
-    },
-    maxPeople: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      field: 'max_people'
-    },
-    schedule: {
-      type: DataTypes.DATE,
-      allowNull: false
-    },
-    categoryId: {
+    parentChatId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       references: {
-        model: 'peekling_category',
-        key: 'category_id'
+        model: 'peekling_chats',
+        key: 'chat_id'
       },
-      field: 'category_id'
+      field: 'parent_chat_id'
     },
-    createdUserId: {
-      type: DataTypes.BIGINT.UNSIGNED,
+    status: {
+      type: DataTypes.ENUM('active','edited','deleted'),
       allowNull: false,
+      defaultValue: "active"
+    },
+    authorId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
       references: {
         model: 'users',
         key: 'user_id'
       },
-      field: 'created_user_id'
+      field: 'author_id'
     },
-    cancelReason: {
+    type: {
+      type: DataTypes.BLOB,
+      allowNull: false
+    },
+    content: {
       type: DataTypes.STRING(1000),
-      allowNull: true,
-      field: 'cancel_reason'
+      allowNull: true
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -75,7 +65,7 @@ export default class Peekling extends Model {
     }
   }, {
     sequelize,
-    tableName: 'peekling',
+    tableName: 'peekling_chats',
     timestamps: false,
     indexes: [
       {
@@ -83,21 +73,28 @@ export default class Peekling extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "peekling_id" },
+          { name: "chat_id" },
         ]
       },
       {
-        name: "peekling_peekling_category_category_id_fk",
+        name: "chats_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "category_id" },
+          { name: "author_id" },
         ]
       },
       {
-        name: "peekling_users_user_id_fk",
+        name: "chats_chats_chat_id_fk",
         using: "BTREE",
         fields: [
-          { name: "created_user_id" },
+          { name: "parent_chat_id" },
+        ]
+      },
+      {
+        name: "chats_peekling_chatroom_peekling_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "chatroom_id" },
         ]
       },
     ]

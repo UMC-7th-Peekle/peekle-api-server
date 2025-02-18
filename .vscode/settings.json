@@ -1,5 +1,9 @@
 {
   "javascript.preferences.importModuleSpecifierEnding": "js",
+  "javascript.suggest.completeJSDoc": false,
   "editor.formatOnSave": true,
-  "prettier.requireConfig": true
+  "prettier.requireConfig": true,
+  "emmet.triggerExpansionOnTab": true,
+  "emmet.showExpandedAbbreviation": "never",
+  "emmet.excludeLanguages": ["html", "css"]
 }

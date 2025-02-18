@@ -27,6 +27,21 @@ export const assignRoleToUser = async ({ userId, roleId }) => {
   }
 };
 
+export const getUserRoles = async ({ userId }) => {
+  return await models.UserRoles.findAll({
+    where: {
+      userId,
+    },
+    attributes: {
+      exclude: ["createdAt", "updatedAt"],
+    },
+    include: {
+      model: models.Users,
+      as: "user",
+    },
+  });
+};
+
 export const deleteRoleFromUser = async ({ userId, roleId }) => {
   if (userId == 1 && roleId == 1) {
     throw new NotAllowedError(

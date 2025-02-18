@@ -32,7 +32,7 @@ router.post(
 router.get("/", notImplementedController);
 
 // 피클링 세부 조회
-router.get("/:peeklingId", notImplementedController);
+router.get("/:peeklingId", crudController.getPeeklingById);
 
 // 피클링 수정
 router.patch("/:peeklingId", notImplementedController);
