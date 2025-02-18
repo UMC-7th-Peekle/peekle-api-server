@@ -45,9 +45,9 @@ export const getCommunities = async () => {
       {
         model: models.Articles,
         as: "articles",
-        attributes: ["content"],
+        attributes: ["title"],
         order: [["createdAt", "DESC"]],
-        limit: 1,
+        limit: 2,
       },
     ],
   });
