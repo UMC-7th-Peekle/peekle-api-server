@@ -7,6 +7,7 @@ import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Op, fn, col } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
+import config from "../../config/config.js";
 
 export const validateArticleQuery = (queries) => {
   const { limit, cursor, query, communityId } = queries; // 쿼리 파라미터에서 limit와 cursor 추출
@@ -54,7 +55,8 @@ const getAuthorInfo = (article, isAnonymous) => {
   const author = article.author.dataValues;
   const authorInfo = {
     nickname: author.nickname,
-    profileImage: addBaseUrl(author.profileImage),
+    // 기본 이미지인 경우 null로 전송
+    profileImage: author.profileImage === config.PEEKLE.DEFAULT_PROFILE_IMAGE ? null : addBaseUrl(author.profileImage),
     authorId: author.userId,
   };
 
