@@ -79,8 +79,17 @@ router.post(
   "/:communityId/articles",
   authenticateAccessToken,
   fileUploadMiddleware.localStorage({
-    restrictions: fileUploadMiddleware.restrictions("article"),
-    field: [{ name: "article_images", maxCount: 5 }], // `field`에 따라 다중 업로드 설정
+    field: [
+      { 
+        name: "article_images", 
+        maxCount: 5,
+        restrictions: fileUploadMiddleware.restrictions("article") // 이미지 업로드 제한
+      },
+      { 
+        name: "article_videos",
+        restrictions: fileUploadMiddleware.restrictions("video") // 비디오 업로드 제한
+      },
+    ],
     destination: "uploads/articles", // 저장 경로 설정
   }),
   // validator는 body를 검증하기에 순서에 유의

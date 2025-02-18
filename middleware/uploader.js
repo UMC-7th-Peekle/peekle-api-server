@@ -11,38 +11,62 @@ import multer from "multer";
  * localSingle과 localMultiple을 합친 미들웨어, field명 정의를 해야합니다.
  */
 export const localStorage = ({
-  restrictions,
   destination = "uploads",
-  field = [{ name: "image" }, { name: "images", maxCount: 5 }],
+  field = [],
 }) => {
-  const upload = uploadService
-    .createUploadMiddleware({ destination, restrictions })
-    .fields(field);
+  // 필드별로 다른 restrictions을 적용하기 위해 각 필드를 개별적으로 처리
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, destination);
+      },
+      filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+      },
+    }),
+    limits: getFieldLimits(field), // 필드별 제한 적용
+    fileFilter: (req, file, cb) => {
+      const fieldRestriction = field.find(f => f.name === file.fieldname)?.restrictions;
+      if (!fieldRestriction) {
+        return cb(new InvalidInputError("파일 제한 사항을 찾을 수 없습니다."), false);
+      }
+
+      if (!fieldRestriction.allowedMimeTypes.includes(file.mimetype)) {
+        return cb(new InvalidInputError("허용되지 않은 파일 형식입니다."), false);
+      }
+
+      cb(null, true);
+    },
+  }).fields(field.map(f => ({ name: f.name, maxCount: f.maxCount || 1 })));
+
   return (req, res, next) => {
     upload(req, res, (err) => {
       if (err instanceof multer.MulterError) {
-        // Multer 오류 처리
-        logger.error(
-          `[localStorage] 업로드 중 에러 ${err.name} | ${err.code} | ${err.message} | ${err.field}`
-        );
+        logger.error(`[localStorage] 업로드 중 에러 ${err.name} | ${err.code} | ${err.message} | ${err.field}`);
         return next(new MulterError(err.code));
       } else if (err) {
-        // Multer 관련 오류가 아니라면 그대로 next로 전달
         logger.error("[localStorage] Error :", err.message);
         return next(err);
       }
 
       if (!req.files) {
         logger.debug("[localStorage] 파일이 첨부되지 않았습니다.");
-        // return next(new InvalidInputError("파일이 첨부되지 않았습니다."));
       }
 
       return next();
-
-      // 업로드된 파일의 키 추출
-      // const fileKey = req.file.key;
     });
   };
+};
+
+// 필드별 제한 사항을 가져오는 함수
+const getFieldLimits = (fields) => {
+  const limits = {};
+  fields.forEach(f => {
+    if (f.restrictions?.limits) {
+      Object.assign(limits, f.restrictions.limits);
+    }
+  });
+  return limits;
 };
 
 export const s3Storage = ({
