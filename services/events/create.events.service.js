@@ -102,7 +102,7 @@ export const createEvent = async ({ userId, eventData }) => {
 
     // 주소로 위치 좌표 계산
     const locs = eventData.location;
-    const detailAddress = `${locs.roadAddress || locs.jibunAdress} ${locs.detail}`;
+    const detailAddress = `${locs.address}`;
     if (locs) {
       const { latitude, longitude } =
         await getLocationFromAddress(detailAddress);
