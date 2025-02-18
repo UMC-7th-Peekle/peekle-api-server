@@ -1,22 +1,31 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class PeeklingCategory extends Model {
+export default class CommunitySuggestions extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    categoryId: {
+    suggestionId: {
       autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
-      field: 'category_id'
+      field: 'suggestion_id'
     },
-    category: {
-      type: DataTypes.STRING(50),
+    authorId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      references: {
+        model: 'users',
+        key: 'user_id'
+      },
+      field: 'author_id'
+    },
+    title: {
+      type: DataTypes.STRING(512),
       allowNull: false
     },
-    subcategory: {
-      type: DataTypes.STRING(512),
+    content: {
+      type: DataTypes.TEXT,
       allowNull: false
     },
     createdAt: {
@@ -33,7 +42,7 @@ export default class PeeklingCategory extends Model {
     }
   }, {
     sequelize,
-    tableName: 'peekling_category',
+    tableName: 'community_suggestions',
     timestamps: false,
     indexes: [
       {
@@ -41,7 +50,14 @@ export default class PeeklingCategory extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "category_id" },
+          { name: "suggestion_id" },
+        ]
+      },
+      {
+        name: "community_suggestions_user_user_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "author_id" },
         ]
       },
     ]

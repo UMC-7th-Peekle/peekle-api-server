@@ -1,23 +1,31 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class PeeklingCategory extends Model {
+export default class PeeklingChatroom extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    categoryId: {
-      autoIncrement: true,
+    peeklingId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
-      field: 'category_id'
+      references: {
+        model: 'peekling',
+        key: 'peekling_id'
+      },
+      field: 'peekling_id'
     },
-    category: {
-      type: DataTypes.STRING(50),
+    name: {
+      type: DataTypes.STRING(30),
       allowNull: false
     },
-    subcategory: {
-      type: DataTypes.STRING(512),
-      allowNull: false
+    noticeChatId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: false,
+      references: {
+        model: 'chats',
+        key: 'chat_id'
+      },
+      field: 'notice_chat_id'
     },
     createdAt: {
       type: DataTypes.DATE(6),
@@ -33,7 +41,7 @@ export default class PeeklingCategory extends Model {
     }
   }, {
     sequelize,
-    tableName: 'peekling_category',
+    tableName: 'peekling_chatroom',
     timestamps: false,
     indexes: [
       {
@@ -41,7 +49,14 @@ export default class PeeklingCategory extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "category_id" },
+          { name: "peekling_id" },
+        ]
+      },
+      {
+        name: "peekling_chatroom_chats_chat_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "notice_chat_id" },
         ]
       },
     ]

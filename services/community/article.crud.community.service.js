@@ -423,3 +423,26 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
   // 게시글 삭제
   await article.destroy();
 };
+
+
+/**
+ * 게시판 건의하기
+ */
+export const suggestCommunity = async ({ title, content, authorId }) => {
+  // 게시판 건의하기
+  await models.CommunitySuggestions.create({
+    title,
+    content,
+    authorId,
+  });
+
+  logger.debug({
+    layer: "service",
+    action: "community:suggest",
+    actionType: "success",
+    message: "게시판 건의 완료",
+    data: { title, content },
+  });
+
+  return;
+};

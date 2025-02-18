@@ -2,6 +2,7 @@
 import {
   InvalidQueryError,
   NotExistsError,
+  NotAllowedError,
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
@@ -10,7 +11,7 @@ import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 import config from "../../config/config.js";
 
 export const validateArticleQuery = (queries) => {
-  const { limit, cursor, query, communityId } = queries; // 쿼리 파라미터에서 limit와 cursor 추출
+  const { limit, cursor, query, communityId, authorId } = queries; // 쿼리 파라미터에서 limit와 cursor 추출
 
   const isInteger = (value) => /^\d+$/.test(value); // 정수만 허용
   if (limit !== undefined && !isInteger(limit)) {
@@ -22,6 +23,9 @@ export const validateArticleQuery = (queries) => {
   if (communityId !== undefined && !isInteger(communityId)) {
     throw new InvalidQueryError("communityId는 정수여야 합니다.");
   }
+  if (authorId !== undefined && !isInteger(authorId)) {
+    throw new InvalidQueryError("authorId는 정수여야 합니다.");
+  }
 
   if (query !== undefined && query.trim().length < 2) {
     throw new InvalidQueryError(
@@ -30,6 +34,34 @@ export const validateArticleQuery = (queries) => {
   }
 
   return;
+};
+
+/**
+ * 전체 게시판 목록 조회
+ */
+export const getCommunities = async () => {
+  const communities = await models.Communities.findAll({
+    attributes: ["communityId", "title"],
+    include: [
+      {
+        model: models.Articles,
+        as: "articles",
+        attributes: ["title"],
+        order: [["createdAt", "DESC"]],
+        limit: 2,
+      },
+    ],
+  });
+
+  if (!communities) {
+    logger.error("게시판이 존재하지 않습니다.", {
+      action: "community:getCommunities",
+      actionType: "error",
+    });
+    throw new NotExistsError("게시판이 존재하지 않습니다.");
+  }
+
+  return { communities };
 };
 
 /**
@@ -70,131 +102,125 @@ const getAuthorInfo = (article, isAnonymous) => {
  */
 export const getArticles = async (
   communityId,
+  authorId,
   query,
   { limit, cursor = null },
   userId
 ) => {
-  // 게시판 및 게시글 조회
-  const community = await models.Communities.findOne({
-    where: { ...(communityId && { communityId: communityId }) },
+  // 사용자가 다른 사용자가 작성한 글을 조회하는 경우 차단
+  if (authorId !== undefined && (parseInt(authorId, 10) !== parseInt(userId, 10))) {
+      throw new NotAllowedError("다른 사용자가 작성한 게시글 목록을 조회할 수 없습니다");
+    }
+
+  // 게시글 조회 조건 설정
+  const whereCondition = {
+    ...(query && {
+      [Op.or]: [
+        { title: { [Op.like]: `%${query}%` } }, // 제목에 검색어 포함
+        { content: { [Op.like]: `%${query}%` } }, // 내용에 검색어 포함
+      ],
+    }),
+    ...(cursor && { articleId: { [Op.lt]: cursor } }), // 커서 기반 페이징
+  };
+
+  // communityId가 있을 경우 필터링 추가
+  if (communityId) {
+    whereCondition.communityId = communityId;
+  }
+
+  // authorId가 있을 경우 필터링 추가
+  if (authorId !== undefined) {
+    whereCondition.authorId = authorId;
+  }
+
+  // 게시글 조회
+  const articles = await models.Articles.findAll({
+    where: whereCondition,
+    attributes: { exclude: ["authorId"] },
+    order: [["createdAt", "DESC"]],
+    limit: limit + 1, // 다음 페이지 여부 확인을 위해 limit보다 1개 더 가져옴
     include: [
       {
-        model: models.Articles,
-        as: "articles",
-        attributes: { exclude: ["authorId"] }, // 모든 필드 가져오기
-        where: {
-          ...(query && {
-            [Op.or]: [
-              {
-                title: {
-                  [Op.like]: `%${query}%`, // 제목에 검색어 포함
-                },
-              },
-              {
-                content: {
-                  [Op.like]: `%${query}%`, // 내용에 검색어 포함
-                },
-              },
-            ],
-          }),
-          ...(cursor && { articleId: { [Op.lt]: cursor } }), // 커서 조건: articleId 기준
-          // ...(communityId && { communityId: communityId }), // 게시판 필터링
-        },
-        order: [["createdAt", "DESC"]], // 최신순 정렬
-        limit: limit + 1, // 조회 개수 제한
-        required: false, // 게시글이 없는 경우에도 커뮤니티는 반환
-        include: [
-          {
-            model: models.ArticleComments,
-            as: "articleComments",
-            attributes: ["commentId"], // 댓글 개수만 가져오기 위해 commentId만 추출
-            where: { status: { [Op.ne]: "deleted" } }, // 삭제되지 않은 댓글만 가져오기
-            required: false, // 댓글이 없는 경우에도 커뮤니티는 반환
-            separate: true,
-          },
-          {
-            model: models.ArticleLikes,
-            as: "articleLikes",
-            attributes: ["likedUserId"], // 좋아요 개수만 가져오기 위해 userId만 추출
-            required: false, // 좋아요가 없는 경우에도 커뮤니티는 반환
-            separate: true,
-          },
-          {
-            model: models.ArticleImages,
-            as: "articleImages",
-            attributes: ["imageUrl", "sequence"], // 필요한 필드만 가져오기
-            where: { sequence: 1 }, // 대표 이미지만 가져오기
-            limit: 1,
-            required: false, // 이미지가 없는 경우에도 커뮤니티는 반환
-            separate: true,
-          },
-          {
-            model: models.Users,
-            as: "author",
-            attributes: ["userId", "nickname", "profileImage"], // 필요한 필드만 가져오기
-            required: true,
-          },
-        ],
+        model: models.Communities,
+        as: "community",
+        attributes: ["communityId"], // 필요한 필드만 가져오기
+      },
+      {
+        model: models.ArticleComments,
+        as: "articleComments",
+        attributes: ["commentId"],
+        where: { status: { [Op.ne]: "deleted" } },
+        required: false,
+      },
+      {
+        model: models.ArticleLikes,
+        as: "articleLikes",
+        attributes: ["likedUserId"],
+        required: false,
+      },
+      {
+        model: models.ArticleImages,
+        as: "articleImages",
+        attributes: ["imageUrl", "sequence"],
+        where: { sequence: 1 },
+        limit: 1,
+        required: false,
+      },
+      {
+        model: models.Users,
+        as: "author",
+        attributes: ["userId", "nickname", "profileImage"],
+        required: true,
       },
     ],
   });
-  // console.log(
-  //   `communityId: ${communityId}, query: ${query}, limit: ${limit}, cursor: ${cursor}`
-  // );
-  // console.log(community.dataValues.articles[0].dataValues.author.dataValues.profileImage);
 
-  if (!community) {
-    // 결과값이 존재하지 않는 경우
-    logger.error("존재하지 않는 게시판입니다.", {
+  if (!articles.length) {
+    logger.error("게시글이 존재하지 않습니다.", {
       action: "community:getArticles",
       actionType: "error",
-      communityId: communityId,
+      communityId: communityId || "전체",
     });
-    throw new NotExistsError("존재하지 않는 게시판입니다.");
+    throw new NotExistsError("게시글이 존재하지 않습니다.");
   }
 
-  // 게시글만 추출
-  const articles = community.dataValues.articles; // dataValues가 빠져 있어서 오류 발생했었음
-
-  // 좋아요, 댓글 수 및 썸네일만을 반환하도록 가공
-  articles.map((article) => {
-    article = article.dataValues;
-
-    // 좋아요 여부 확인
-    if (userId) {
-      article.isLikedByUser = article.articleLikes.some((like) => {
-        logger.silly("좋아요 여부 확인", {
-          like: like,
-          likedUserId: like.likedUserId,
-          userId: userId,
-          return: like.likedUserId === userId,
-        });
-        return Number(like.likedUserId) === Number(userId);
-      });
-    } else {
-      article.isLikedByUser = false; // 비로그인 사용자는 항상 false
-    }
-
-    article.articleComments = article.articleComments.length; // 댓글 개수만 추출
-    article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
-    article.thumbnail = getThumbnail(article.articleImages); // 썸네일 정보 추출
-    delete article.articleImages; // 불필요한 필드 제거
-    article.authorInfo = getAuthorInfo(article, article.isAnonymous); // 작성자 정보 추출
+  // 데이터 가공
+  const processedArticles = articles.map((article) => {
+    return {
+      communityId: article.community ? article.community.communityId : null,
+      articleId: article.articleId,
+      title: article.title,
+      content: article.content,
+      isAnonymous: article.isAnonymous,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
+      articleComments: article.articleComments.length, // 댓글 개수만 반환
+      articleLikes: article.articleLikes.length, // 좋아요 개수만 반환
+      isLikedByUser: userId
+        ? article.articleLikes.some(
+            (like) => Number(like.likedUserId) === Number(userId)
+          )
+        : false,
+      thumbnail: getThumbnail(article.articleImages), // 대표 이미지 처리
+      authorInfo: getAuthorInfo(article, article.isAnonymous),
+    };
   });
 
   // 다음 커서 설정
-  const hasNextPage = articles.length > limit; // limit + 1개를 가져왔으면 다음 페이지 있음
-  const nextCursor = hasNextPage ? articles[limit - 1].articleId : null;
+  const hasNextPage = processedArticles.length > limit;
+  const nextCursor = hasNextPage
+    ? processedArticles[limit - 1].articleId
+    : null;
   if (hasNextPage) {
-    articles.pop(); // limit + 1개를 가져왔으면 마지막 요소는 버림
+    processedArticles.pop();
   }
 
   logger.debug("게시글 조회 완료", {
     action: "community:getArticles",
     actionType: "success",
     data: {
-      communityId: communityId,
-      articleCount: articles.length,
+      communityId: communityId || "전체",
+      articleCount: processedArticles.length,
       limit: limit,
       nextCursor: nextCursor,
       hasNextPage: hasNextPage,
@@ -202,7 +228,7 @@ export const getArticles = async (
   });
 
   return {
-    articles,
+    articles: processedArticles,
     nextCursor,
     hasNextPage,
   };

@@ -1,42 +1,36 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Peekling extends Model {
+export default class PeeklingSave extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    peeklingId: {
+    id: {
       autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
-      primaryKey: true,
-      field: 'peekling_id'
+      primaryKey: true
     },
     title: {
       type: DataTypes.STRING(20),
-      allowNull: false
+      allowNull: true
     },
     description: {
       type: DataTypes.STRING(1000),
       allowNull: true
     },
-    status: {
-      type: DataTypes.ENUM('active','canceled','completed'),
-      allowNull: false,
-      defaultValue: "active"
-    },
     minPeople: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       field: 'min_people'
     },
     maxPeople: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       field: 'max_people'
     },
     schedule: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     },
     categoryId: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -56,11 +50,6 @@ export default class Peekling extends Model {
       },
       field: 'created_user_id'
     },
-    cancelReason: {
-      type: DataTypes.STRING(1000),
-      allowNull: true,
-      field: 'cancel_reason'
-    },
     createdAt: {
       type: DataTypes.DATE(6),
       allowNull: false,
@@ -75,7 +64,7 @@ export default class Peekling extends Model {
     }
   }, {
     sequelize,
-    tableName: 'peekling',
+    tableName: 'peekling_save',
     timestamps: false,
     indexes: [
       {
@@ -83,18 +72,18 @@ export default class Peekling extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "peekling_id" },
+          { name: "id" },
         ]
       },
       {
-        name: "peekling_peekling_category_category_id_fk",
+        name: "peekling_save_peekling_category_category_id_fk",
         using: "BTREE",
         fields: [
           { name: "category_id" },
         ]
       },
       {
-        name: "peekling_users_user_id_fk",
+        name: "peekling_save_users_user_id_fk",
         using: "BTREE",
         fields: [
           { name: "created_user_id" },

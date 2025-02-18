@@ -158,6 +158,24 @@ export const createCommunitySchema = {
   additionalProperties: false,
 };
 
+export const suggestCommunitySchema = {
+  type: "object",
+  properties: {
+    title: {
+      type: "string",
+      example: "피클 레시피 게시판 제안합니다.",
+    },
+    content: {
+      type: "string",
+      example: "피클 레시피 게시판을 만들어주세요.",
+    },
+  },
+  required: ["title", "content"],
+  additionalProperties: false,
+};
+
+
+
 export const specificArticlePathSchema = {
   type: "object",
   properties: {
