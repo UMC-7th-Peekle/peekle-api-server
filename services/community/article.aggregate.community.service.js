@@ -1,13 +1,11 @@
 // Description: 커뮤니티의 게시글에 대한 집계를 다루는 서비스 파일입니다.
 import {
-  InvalidInputError,
   InvalidQueryError,
   NotExistsError,
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
-import logger from "../../utils/logger/logger.js";
 import { Sequelize } from "sequelize";
-import { Op, fn, col } from "sequelize";
+import { Op } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 import config from "../../config.js";
 
@@ -84,34 +82,34 @@ export const getPopularArticles = async (communityId, startTime, endTime) => {
       ],
     ],
     include: [
-          {
-            model: models.ArticleComments,
-            as: "articleComments",
-            attributes: ["commentId"], // 댓글 정보
-            where: { status: { [Op.ne]: "deleted" } }, // 삭제된 댓글 제외
-            required: false, // 댓글이 없어도 Article은 가져옴
-          },
-          {
-            model: models.ArticleImages,
-            as: "articleImages",
-            attributes: ["imageUrl"], // 이미지 정보
-            where: { sequence: 1 }, // 특정 조건(대표 이미지)
-            required: false, // 이미지가 없어도 Article은 가져옴
-          },
-          {
-            model: models.ArticleLikes,
-            as: "articleLikes",
-            attributes: ["likedUserId"], // 좋아요 개수
-            separate: true, // 좋아요 수 계산을 위해 쿼리를 분리
-            required: false,
-          },
-          {
-            model: models.Users,
-            as: "author",
-            attributes: ["userId", "nickname", "profileImage"], // 필요한 필드만 가져오기
-            required: true,
-          },
-        ],
+      {
+        model: models.ArticleComments,
+        as: "articleComments",
+        attributes: ["commentId"], // 댓글 정보
+        where: { status: { [Op.ne]: "deleted" } }, // 삭제된 댓글 제외
+        required: false, // 댓글이 없어도 Article은 가져옴
+      },
+      {
+        model: models.ArticleImages,
+        as: "articleImages",
+        attributes: ["imageUrl"], // 이미지 정보
+        where: { sequence: 1 }, // 특정 조건(대표 이미지)
+        required: false, // 이미지가 없어도 Article은 가져옴
+      },
+      {
+        model: models.ArticleLikes,
+        as: "articleLikes",
+        attributes: ["likedUserId"], // 좋아요 개수
+        separate: true, // 좋아요 수 계산을 위해 쿼리를 분리
+        required: false,
+      },
+      {
+        model: models.Users,
+        as: "author",
+        attributes: ["userId", "nickname", "profileImage"], // 필요한 필드만 가져오기
+        required: true,
+      },
+    ],
     order: [
       // 좋아요 수 + 댓글 수로 정렬
       [Sequelize.literal("(likeCount + commentCount)"), "DESC"],
@@ -136,7 +134,6 @@ export const getPopularArticles = async (communityId, startTime, endTime) => {
     article.thumbnail = article.articleImages;
     delete article.articleImages;
 
-
     // 작성자 정보 가공
     if (article.isAnonymous === true) {
       article.authorInfo = {
@@ -145,9 +142,9 @@ export const getPopularArticles = async (communityId, startTime, endTime) => {
         authorId: null,
       };
     } else {
-      article.author = article.author.dataValues;      
-      article.author.profileImage = addBaseUrl(article.author.profileImage),
-      article.author.authorId = article.author.userId;
+      article.author = article.author.dataValues;
+      (article.author.profileImage = addBaseUrl(article.author.profileImage)),
+        (article.author.authorId = article.author.userId);
       delete article.author.userId;
 
       // 작성자 정보를 authorInfo로 변경

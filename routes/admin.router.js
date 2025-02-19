@@ -122,6 +122,14 @@ router.post(
   acController.assignRoleToUser
 );
 
+// get user roles
+router.get(
+  "/roles/user",
+  authenticatMiddleware.authenticateAccessToken,
+  checkPermission("admin:super"),
+  acController.getUserRoles
+);
+
 // delete roles from users
 router.delete(
   "/roles/user",

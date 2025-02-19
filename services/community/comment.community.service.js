@@ -1,10 +1,5 @@
 // Description: 댓글 관련 조회, 생성, 수정, 삭제와 관련된 서비스 파일입니다.
-import {
-  InvalidInputError,
-  NotAllowedError,
-  NotExistsError,
-  UnauthorizedError,
-} from "../../utils/errors/errors.js";
+import { NotAllowedError, NotExistsError } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
@@ -303,12 +298,22 @@ export const createCommentReply = async ({
 /**
  * communityId, articleId에 해당하는 댓글 목록을 조회합니다
  */
-export const getComments = async ({ communityId, articleId, authorId, userId }) => {
+export const getComments = async ({
+  communityId,
+  articleId,
+  authorId,
+  userId,
+}) => {
   // 사용자가 다른 사용자가 작성한 글을 조회하는 경우 차단
-  if (authorId !== undefined && (parseInt(authorId, 10) !== parseInt(userId, 10))) {
-    throw new NotAllowedError("다른 사용자가 작성한 댓글 목록을 조회할 수 없습니다");
+  if (
+    authorId !== undefined &&
+    parseInt(authorId, 10) !== parseInt(userId, 10)
+  ) {
+    throw new NotAllowedError(
+      "다른 사용자가 작성한 댓글 목록을 조회할 수 없습니다"
+    );
   }
-  
+
   const whereCondition = {
     communityId,
     articleId,
@@ -320,7 +325,6 @@ export const getComments = async ({ communityId, articleId, authorId, userId }) 
     commentWhereCondition.authorId = authorId;
   }
 
-  
   const articleWithComments = await models.Articles.findOne({
     where: whereCondition,
     include: [

@@ -43,6 +43,19 @@ export const assignRoleToUser = async (req, res, next) => {
   }
 };
 
+export const getUserRoles = async (req, res, next) => {
+  try {
+    const userRoles = await acService.getUserRoles(req.body);
+
+    return res.status(200).success({
+      userRoles,
+    });
+  } catch (err) {
+    logError(err);
+    next(err);
+  }
+};
+
 export const deleteRoleFromUser = async (req, res, next) => {
   try {
     // { userId, roleId }

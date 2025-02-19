@@ -424,7 +424,6 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
   await article.destroy();
 };
 
-
 /**
  * 게시판 건의하기
  */

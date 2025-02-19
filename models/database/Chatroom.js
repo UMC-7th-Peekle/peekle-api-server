@@ -5,6 +5,7 @@ export default class Chatroom extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
     chatroomId: {
+      autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,

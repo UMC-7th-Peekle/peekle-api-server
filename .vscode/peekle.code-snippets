@@ -46,4 +46,11 @@
     ],
     "description": "Async Request Handler",
   },
+
+  "Simple JSDoc Comment": {
+    "scope": "javascript",
+    "prefix": "/**",
+    "body": ["/**", " * $1", " */"],
+    "description": "Simple JSDoc comment without parameter/return hints",
+  },
 }
