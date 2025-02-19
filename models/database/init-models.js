@@ -141,8 +141,8 @@ export default function initModels(sequelize) {
   NoticeCategory.hasMany(Notices, { as: "notices", foreignKey: "categoryId"});
   NoticeImages.belongsTo(Notices, { as: "notice", foreignKey: "noticeId"});
   Notices.hasMany(NoticeImages, { as: "noticeImages", foreignKey: "noticeId"});
-  PeeklingChatroom.belongsTo(Peekling, { as: "peekling", foreignKey: "peeklingId"});
-  Peekling.hasOne(PeeklingChatroom, { as: "peeklingChatroom", foreignKey: "peeklingId"});
+  PeeklingChatroom.belongsTo(Peekling, { as: "chatroom", foreignKey: "chatroomId"});
+  Peekling.hasOne(PeeklingChatroom, { as: "peeklingChatroom", foreignKey: "chatroomId"});
   PeeklingImages.belongsTo(Peekling, { as: "peekling", foreignKey: "peeklingId"});
   Peekling.hasMany(PeeklingImages, { as: "peeklingImages", foreignKey: "peeklingId"});
   PeeklingParticipants.belongsTo(Peekling, { as: "peekling", foreignKey: "peeklingId"});

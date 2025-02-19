@@ -427,11 +427,10 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
 /**
  * 게시판 건의하기
  */
-export const suggestCommunity = async ({ title, content, authorId }) => {
+export const suggestCommunity = async ({ title, authorId }) => {
   // 게시판 건의하기
   await models.CommunitySuggestions.create({
     title,
-    content,
     authorId,
   });
 
@@ -440,7 +439,7 @@ export const suggestCommunity = async ({ title, content, authorId }) => {
     action: "community:suggest",
     actionType: "success",
     message: "게시판 건의 완료",
-    data: { title, content },
+    data: { title },
   });
 
   return;

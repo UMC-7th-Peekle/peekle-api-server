@@ -4,7 +4,7 @@ const { Model, Sequelize } = _sequelize;
 export default class PeeklingChatroom extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    peeklingId: {
+    chatroomId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
@@ -12,7 +12,7 @@ export default class PeeklingChatroom extends Model {
         model: 'peekling',
         key: 'peekling_id'
       },
-      field: 'peekling_id'
+      field: 'chatroom_id'
     },
     name: {
       type: DataTypes.STRING(30),
@@ -49,7 +49,7 @@ export default class PeeklingChatroom extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "peekling_id" },
+          { name: "chatroom_id" },
         ]
       },
       {

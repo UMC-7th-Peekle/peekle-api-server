@@ -16,7 +16,7 @@ export default class PeeklingChats extends Model {
       allowNull: false,
       references: {
         model: 'peekling_chatroom',
-        key: 'peekling_id'
+        key: 'chatroom_id'
       },
       field: 'chatroom_id'
     },
@@ -77,13 +77,6 @@ export default class PeeklingChats extends Model {
         ]
       },
       {
-        name: "peekling_chats_peekling_chatroom_peekling_id_fk",
-        using: "BTREE",
-        fields: [
-          { name: "chatroom_id" },
-        ]
-      },
-      {
         name: "peekling_chats_peekling_chats_chat_id_fk",
         using: "BTREE",
         fields: [
@@ -95,6 +88,13 @@ export default class PeeklingChats extends Model {
         using: "BTREE",
         fields: [
           { name: "author_id" },
+        ]
+      },
+      {
+        name: "peekling_chats_peekling_chatroom_chatroom_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "chatroom_id" },
         ]
       },
     ]
