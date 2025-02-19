@@ -14,7 +14,6 @@ export const localStorage = ({
   destination = "uploads",
   field = [],
 }) => {
-  // 필드별로 다른 restrictions을 적용하기 위해 각 필드를 개별적으로 처리
   const upload = multer({
     storage: multer.diskStorage({
       destination: (req, file, cb) => {
@@ -26,18 +25,23 @@ export const localStorage = ({
     }),
     limits: getFieldLimits(field), // 필드별 제한 적용
     fileFilter: (req, file, cb) => {
-      const fieldRestriction = field.find(f => f.name === file.fieldname)?.restrictions;
-      if (!fieldRestriction) {
-        return cb(new InvalidInputError("파일 제한 사항을 찾을 수 없습니다."), false);
+      // 파일 타입 구분
+      const isImage = articleImageRestrictions.allowedMimeTypes.includes(file.mimetype);
+      const isVideo = videoRestrictions.allowedMimeTypes.includes(file.mimetype);
+
+      if (!isImage && !isVideo) {
+        return cb(new InvalidInputError(`"${file.originalname}" 파일 형식이 허용되지 않습니다.`), false);
       }
 
-      if (!fieldRestriction.allowedMimeTypes.includes(file.mimetype)) {
-        return cb(new InvalidInputError("허용되지 않은 파일 형식입니다."), false);
+      // 파일 크기 제한 검증
+      const restriction = isImage ? articleImageRestrictions : videoRestrictions;
+      if (file.size > restriction.limits.fileSize) {
+        return cb(new InvalidInputError(`"${file.originalname}" 파일 크기가 제한을 초과했습니다.`), false);
       }
 
       cb(null, true);
     },
-  }).fields(field.map(f => ({ name: f.name, maxCount: f.maxCount || 1 })));
+  }).fields([{ name: "article_files", maxCount: 15 }]); // 총 파일 개수 제한
 
   return (req, res, next) => {
     upload(req, res, (err) => {
@@ -52,21 +56,43 @@ export const localStorage = ({
       if (!req.files) {
         logger.debug("[localStorage] 파일이 첨부되지 않았습니다.");
       }
+      
+      // 파일 개수 제한 적용
+      let imageCount = 0;
+      let videoCount = 0;
+
+      // restrictions 타입에 따라 개수 제한 적용
+      req.files.article_files.forEach(file => {
+        const isImage = articleImageRestrictions.allowedMimeTypes.includes(file.mimetype);
+        const isVideo = videoRestrictions.allowedMimeTypes.includes(file.mimetype);
+
+        if (isImage) imageCount++;
+        if (isVideo) videoCount++;
+      });
+
+      console.log(imageCount, videoCount);
+
+      // 이미지 개수 제한 체크
+      if (imageCount > articleImageRestrictions.limits.files) {
+        return next(new InvalidInputError(`이미지는 최대 ${articleImageRestrictions.limits.files}개까지 업로드할 수 있습니다.`));
+      }
+
+      // 동영상 개수 제한 체크
+      if (videoCount > videoRestrictions.limits.files) {
+        return next(new InvalidInputError(`동영상은 최대 ${videoRestrictions.limits.files}개까지 업로드할 수 있습니다.`));
+      }
 
       return next();
     });
   };
 };
 
-// 필드별 제한 사항을 가져오는 함수
+// 필드별 제한 사항을 적용하는 함수
 const getFieldLimits = (fields) => {
-  const limits = {};
-  fields.forEach(f => {
-    if (f.restrictions?.limits) {
-      Object.assign(limits, f.restrictions.limits);
-    }
-  });
-  return limits;
+  return {
+    fileSize: Math.max(articleImageRestrictions.limits.fileSize, videoRestrictions.limits.fileSize), // 가장 큰 제한값 적용
+    files: fields.reduce((acc, f) => acc + (f.maxCount || 1), 0), // 최대 파일 개수
+  };
 };
 
 export const s3Storage = ({
