@@ -62,20 +62,20 @@ export const listEvent = async ({ paginationOptions }) => {
   }
 
   // 지역 조건 설정
-  // let locationWhereClause = {};
-  // if (!location || location.length === 0) {
-  //   locationWhereClause = {};
-  // } else if (Array.isArray(location)) {
-  //   locationWhereClause = {
-  //     locationGroupId: {
-  //       [Op.in]: location.map((loc) => BigInt(loc)), // 배열인 location
-  //     },
-  //   };
-  // } else {
-  //   locationWhereClause = {
-  //     locationGroupId: BigInt(location), // 단일 location
-  //   };
-  // }
+  let locationWhereClause = {};
+  if (!location || location.length === 0) {
+    locationWhereClause = {};
+  } else if (Array.isArray(location)) {
+    locationWhereClause = {
+      locationGroupId: {
+        [Op.in]: location.map((loc) => BigInt(loc)), // 배열인 location
+      },
+    };
+  } else {
+    locationWhereClause = {
+      locationGroupId: BigInt(location), // 단일 location
+    };
+  }
 
   // 금액 조건 설정
   let priceWhereClause = {};
@@ -137,7 +137,7 @@ export const listEvent = async ({ paginationOptions }) => {
 
   const placeEventIds = places.map((place) => place.eventId);
 
-  // 쿼리즈 따로 빼뒀음
+  // 쿼리즈 따로
   const queryConditions = {
     ...cursorWhereClause, // 커서 기준 조건 추가
     ...priceWhereClause, // 금액 기준 조건 추가
