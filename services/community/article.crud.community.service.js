@@ -285,6 +285,9 @@ export const updateArticle = async ({
   const existingImages = await models.ArticleImages.findAll({
     where: { articleId },
     attributes: ["articleImageId", "imageUrl", "sequence"],
+    order: [["sequence", "ASC"]], // 한 번 순서를 바꾼 뒤 다시 순서를 바꿀 때를 위해 추가
+    // 예를 들어 사진이 2장 있을 때 exisitingImageSequence가 [2, 1]로 순서를 바꾼 뒤
+    // 다시 순서를 바꾸고 싶을 때 [1,2]가 아닌 [2,1]로 바꿀 수 있게 하기 위함
   });
 
   logger.silly({

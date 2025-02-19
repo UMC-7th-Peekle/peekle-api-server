@@ -62,13 +62,17 @@ export const localStorage = ({
       let videoCount = 0;
 
       // restrictions 타입에 따라 개수 제한 적용
-      req.files.article_files.forEach(file => {
-        const isImage = articleImageRestrictions.allowedMimeTypes.includes(file.mimetype);
-        const isVideo = videoRestrictions.allowedMimeTypes.includes(file.mimetype);
-
-        if (isImage) imageCount++;
-        if (isVideo) videoCount++;
-      });
+      if (req.files?.article_files && Array.isArray(req.files.article_files)) {
+        req.files.article_files.forEach(file => {
+          if (!file?.mimetype) return; // 파일이 undefined일 경우 방어 코드 추가
+      
+          const isImage = articleImageRestrictions.allowedMimeTypes.includes(file.mimetype);
+          const isVideo = videoRestrictions.allowedMimeTypes.includes(file.mimetype);
+      
+          if (isImage) imageCount++;
+          if (isVideo) videoCount++;
+        });
+      }
 
       console.log(imageCount, videoCount);
 

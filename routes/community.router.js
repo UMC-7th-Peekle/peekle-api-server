@@ -94,18 +94,9 @@ router.patch(
   "/:communityId/articles/:articleId",
   authenticateAccessToken,
   fileUploadMiddleware.localStorage({
-    field: [
-      {
-        name: "article_images",
-        maxCount: 5,
-        restrictions: fileUploadMiddleware.restrictions("article"), // 이미지 업로드 제한
-      },
-      {
-        name: "article_videos",
-        restrictions: fileUploadMiddleware.restrictions("video"), // 비디오 업로드 제한
-      },
-    ],
-    destination: "uploads/articles", // 저장 경로 설정
+    destination: "uploads/articles",
+    field: [{ name: "article_files", maxCount: 15 }], 
+    // 사진/비디오 별 개수 제한은 localStorage에서 처리
   }),
   // validator는 body를 검증하기에 순서에 유의
   // form-data의 경우 multer가 body에 채워주는 것임
