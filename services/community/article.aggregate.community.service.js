@@ -1,13 +1,11 @@
 // Description: 커뮤니티의 게시글에 대한 집계를 다루는 서비스 파일입니다.
 import {
-  InvalidInputError,
   InvalidQueryError,
   NotExistsError,
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
-import logger from "../../utils/logger/logger.js";
 import { Sequelize } from "sequelize";
-import { Op, fn, col } from "sequelize";
+import { Op } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 import config from "../../config.js";
 

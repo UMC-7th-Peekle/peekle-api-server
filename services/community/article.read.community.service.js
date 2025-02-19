@@ -6,7 +6,7 @@ import {
 } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
-import { Op, fn, col } from "sequelize";
+import { Op } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
 import config from "../../config.js";
 

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { notImplementedController } from "../controllers/empty.cotroller.js";
 import * as dmController from "../controllers/chats/dm.chats.controller.js";
+import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 
 const router = Router();
 
@@ -19,7 +20,25 @@ on connection 시에 user socket rooms에서 모든 room 연결 필요
 */
 
 // 개인 채팅방 생성 요청
-router.post("/dm", dmController.startChatWithArticle);
+
+// 게시글에서 생성
+router.post(
+  "/dm/article",
+  authenticateAccessToken,
+  dmController.startChatWithArticle
+);
+// 댓글에서 생성
+router.post(
+  "/dm/comment",
+  authenticateAccessToken,
+  dmController.startChatWithComment
+);
+// 프로필에서 생성
+router.post(
+  "/dm/profile",
+  authenticateAccessToken,
+  dmController.startChatWithProfile
+);
 
 router.get("/", notImplementedController);
 

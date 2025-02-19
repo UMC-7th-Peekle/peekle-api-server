@@ -37,7 +37,7 @@ export default class EventSchedules extends Model {
     },
     customText: {
       type: DataTypes.STRING(512),
-      allowNull: false,
+      allowNull: true,
       field: 'custom_text'
     },
     startDate: {

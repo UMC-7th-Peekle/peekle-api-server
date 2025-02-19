@@ -60,7 +60,9 @@ export const isArticleAuthorAnonymous = async ({ articleId }) => {
   });
 
   if (!ret) {
-    throw NotExistsError(`${articleId}에 해당하는 게시글은 존재하지 않습니다.`);
+    throw new NotExistsError(
+      `${articleId}에 해당하는 게시글은 존재하지 않습니다.`
+    );
   }
 
   return {
@@ -75,7 +77,7 @@ export const isArticleAuthorAnonymous = async ({ articleId }) => {
  */
 export const isCommentAuthorAnonymous = async ({ commentId }) => {
   const ret = await models.ArticleComments.findByPk(commentId, {
-    attributes: ["authorId", "isAnonymous", "title"],
+    attributes: ["authorId", "isAnonymous", "content"],
   });
 
   if (!ret) {
@@ -86,5 +88,21 @@ export const isCommentAuthorAnonymous = async ({ commentId }) => {
     isAnonymous: !!ret.isAnonymous,
     name: ret.content,
     authorId: ret.authorId,
+  };
+};
+
+export const getUserNickname = async ({ userId }) => {
+  const user = await models.Users.findByPk(userId, {
+    attributes: ["nickname"],
+  });
+
+  if (!user) {
+    throw new NotExistsError(
+      `${userId}에 해당하는 사용자가 존재하지 않습니다.`
+    );
+  }
+
+  return {
+    nickname: user.nickname,
   };
 };

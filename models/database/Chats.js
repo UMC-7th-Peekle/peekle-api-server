@@ -69,7 +69,7 @@ export default class Chats extends Model {
         ]
       },
       {
-        name: "chats_chatroom_chatroom_id_fk2",
+        name: "chats_chatroom_chatroom_id_fk",
         using: "BTREE",
         fields: [
           { name: "chatroom_id" },

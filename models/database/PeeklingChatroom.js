@@ -53,7 +53,7 @@ export default class PeeklingChatroom extends Model {
         ]
       },
       {
-        name: "peekling_chatroom_chats_chat_id_fk",
+        name: "peekling_chatroom_peekling_chats_chat_id_fk",
         using: "BTREE",
         fields: [
           { name: "notice_chat_id" },

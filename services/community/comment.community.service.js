@@ -1,10 +1,5 @@
 // Description: 댓글 관련 조회, 생성, 수정, 삭제와 관련된 서비스 파일입니다.
-import {
-  InvalidInputError,
-  NotAllowedError,
-  NotExistsError,
-  UnauthorizedError,
-} from "../../utils/errors/errors.js";
+import { NotAllowedError, NotExistsError } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";

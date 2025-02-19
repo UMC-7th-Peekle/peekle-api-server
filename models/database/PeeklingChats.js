@@ -77,24 +77,24 @@ export default class PeeklingChats extends Model {
         ]
       },
       {
-        name: "chats_users_user_id_fk",
+        name: "peekling_chats_peekling_chatroom_peekling_id_fk",
         using: "BTREE",
         fields: [
-          { name: "author_id" },
+          { name: "chatroom_id" },
         ]
       },
       {
-        name: "chats_chats_chat_id_fk",
+        name: "peekling_chats_peekling_chats_chat_id_fk",
         using: "BTREE",
         fields: [
           { name: "parent_chat_id" },
         ]
       },
       {
-        name: "chats_peekling_chatroom_peekling_id_fk",
+        name: "peekling_chats_users_user_id_fk",
         using: "BTREE",
         fields: [
-          { name: "chatroom_id" },
+          { name: "author_id" },
         ]
       },
     ]
