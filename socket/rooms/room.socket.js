@@ -1,11 +1,10 @@
 // /socket/rooms/roomHandler.js
 import { getSocketIO } from "../index.js";
 
-const io = getSocketIO();
-
 // TEST 용 Methods
 
 export const sendMessageToRoom = ({ roomId, event, message }) => {
+  const io = getSocketIO();
   io.to(roomId).emit(event, message);
 };
 

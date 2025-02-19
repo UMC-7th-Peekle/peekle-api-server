@@ -6,18 +6,18 @@ let io;
 
 export const initSocket = (server) => {
   io = new Server(server, { cors: corsOptions });
-  console.log(`✅ SOCKET.IO LISTENING, IO INITIALIZED : ${!!io}`);
+  console.log(`✅ SOCKET.IO INITIALIZED => ${!!io}`);
 
   io.on("connection", (socket) => {
-    console.log(`🔗 User connected: ${socket.id}`);
+    console.log(`🔗 [SOCKET] User connected: ${socket.id}`);
     handleMessage(socket);
     socket.on("disconnect", () =>
-      console.log(`❌ User disconnected: ${socket.id}`)
+      console.log(`❌ [SOCKET] User disconnected: ${socket.id}`)
     );
   });
 };
 
 export const getSocketIO = () => {
-  if (!io) throw new Error("Socket.io not initialized");
+  if (!io) throw new Error("❌ Socket.io not initialized");
   return io;
 };

@@ -10,6 +10,8 @@ export const createPersonalChatroom = async ({
   senderId,
   receiverId,
   name,
+  isSenderAnonymous,
+  isReceiverAnonymous,
 }) => {
   // 채팅방 생성, Room 목록에 추가하기
   // TODO : 해당 소켓은 어떡하지?
@@ -20,6 +22,8 @@ export const createPersonalChatroom = async ({
         senderId,
         receiverId,
         name,
+        isSenderAnonymous,
+        isReceiverAnonymous,
       },
       { transaction }
     );
@@ -52,12 +56,35 @@ export const createPersonalChatroom = async ({
  */
 export const isArticleAuthorAnonymous = async ({ articleId }) => {
   const ret = await models.Articles.findByPk(articleId, {
-    attributes: ["isAnonymous"],
+    attributes: ["authorId", "isAnonymous", "title"],
   });
 
   if (!ret) {
     throw NotExistsError(`${articleId}에 해당하는 게시글은 존재하지 않습니다.`);
   }
 
-  return !!ret.isAnonymous;
+  return {
+    isAnonymous: !!ret.isAnonymous,
+    name: ret.title,
+    authorId: ret.authorId,
+  };
+};
+
+/**
+ * Comment ID를 받아서 해당 사용자가 댓글을 익명으로 작성했는지를 리턴합니다.
+ */
+export const isCommentAuthorAnonymous = async ({ commentId }) => {
+  const ret = await models.ArticleComments.findByPk(commentId, {
+    attributes: ["authorId", "isAnonymous", "title"],
+  });
+
+  if (!ret) {
+    throw NotExistsError(`${commentId}에 해당하는 댓글은 존재하지 않습니다.`);
+  }
+
+  return {
+    isAnonymous: !!ret.isAnonymous,
+    name: ret.content,
+    authorId: ret.authorId,
+  };
 };

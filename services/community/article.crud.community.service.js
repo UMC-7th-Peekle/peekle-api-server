@@ -12,7 +12,7 @@ import {
   isEditInputCorrect,
 } from "../../utils/upload/uploader.object.js";
 import { parseImagePaths } from "../../utils/upload/uploader.object.js";
-import config from "../../config/config.js";
+import config from "../../config.js";
 
 export const createCommunity = async ({ communityName }) => {
   // 게시판 생성
@@ -423,7 +423,6 @@ export const deleteArticle = async ({ communityId, articleId, authorId }) => {
   // 게시글 삭제
   await article.destroy();
 };
-
 
 /**
  * 게시판 건의하기

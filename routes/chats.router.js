@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { notImplementedController } from "../controllers/empty.cotroller.js";
+import * as dmController from "../controllers/chats/dm.chats.controller.js";
 
 const router = Router();
 
@@ -18,7 +19,7 @@ on connection 시에 user socket rooms에서 모든 room 연결 필요
 */
 
 // 개인 채팅방 생성 요청
-router.post("/dm");
+router.post("/dm", dmController.startChatWithArticle);
 
 router.get("/", notImplementedController);
 
