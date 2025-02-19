@@ -3,7 +3,7 @@ import { Op, Sequelize } from "sequelize";
 import { InvalidQueryError } from "../../utils/errors/errors.js";
 import logger from "../../utils/logger/logger.js";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
-import { getDistance, getBoundsOfDistance } from "geolib";
+import { getDistance } from "geolib";
 
 // 이벤트 목록 조회
 export const listEvent = async ({ paginationOptions }) => {
@@ -62,20 +62,20 @@ export const listEvent = async ({ paginationOptions }) => {
   }
 
   // 지역 조건 설정
-  let locationWhereClause = {};
-  if (!location || location.length === 0) {
-    locationWhereClause = {};
-  } else if (Array.isArray(location)) {
-    locationWhereClause = {
-      locationGroupId: {
-        [Op.in]: location.map((loc) => BigInt(loc)), // 배열인 location
-      },
-    };
-  } else {
-    locationWhereClause = {
-      locationGroupId: BigInt(location), // 단일 location
-    };
-  }
+  // let locationWhereClause = {};
+  // if (!location || location.length === 0) {
+  //   locationWhereClause = {};
+  // } else if (Array.isArray(location)) {
+  //   locationWhereClause = {
+  //     locationGroupId: {
+  //       [Op.in]: location.map((loc) => BigInt(loc)), // 배열인 location
+  //     },
+  //   };
+  // } else {
+  //   locationWhereClause = {
+  //     locationGroupId: BigInt(location), // 단일 location
+  //   };
+  // }
 
   // 금액 조건 설정
   let priceWhereClause = {};
@@ -94,10 +94,13 @@ export const listEvent = async ({ paginationOptions }) => {
 
   // 위치 범위 (남서쪽, 북동쪽 좌표 사용)
   let locationRangeWhereClause = {};
-  const [southWestLng, southWestLat] = southWest.split(",").map(parseFloat);
-  const [northEastLng, northEastLat] = northEast.split(",").map(parseFloat);
+  let southWestLng, southWestLat;
+  let northEastLng, northEastLat;
 
   if (southWest && northEast) {
+    [southWestLng, southWestLat] = southWest.split(",").map(parseFloat);
+    [northEastLng, northEastLat] = northEast.split(",").map(parseFloat);
+
     locationRangeWhereClause = {
       [Op.and]: [
         Sequelize.where(Sequelize.fn("ST_Y", Sequelize.col("position")), {
@@ -110,41 +113,49 @@ export const listEvent = async ({ paginationOptions }) => {
     };
   }
 
-  // 반경 5km 내 이벤트 필터링
   const places = await models.EventLocation.findAll({
     where: {
       [Op.or]: [
         locationRangeWhereClause, // 위치 범위 조건
-        Sequelize.where(
-          Sequelize.fn(
-            "ST_Distance_Sphere",
+        southWest &&
+          northEast &&
+          Sequelize.where(
             Sequelize.fn(
-              "POINT",
-              Sequelize.fn("ST_X", Sequelize.col("position")),
-              Sequelize.fn("ST_Y", Sequelize.col("position"))
+              "ST_Distance_Sphere",
+              Sequelize.fn(
+                "POINT",
+                Sequelize.fn("ST_X", Sequelize.col("position")),
+                Sequelize.fn("ST_Y", Sequelize.col("position"))
+              ),
+              Sequelize.fn("POINT", southWestLng, southWestLat) // 기준 좌표 (남서쪽)
             ),
-            Sequelize.fn("POINT", southWestLng, southWestLat) // 기준 좌표 (남서쪽)
+            { [Op.lte]: 5000 } // 반경 5km 이내
           ),
-          { [Op.lte]: 5000 } // 반경 5km 이내
-        ),
-      ],
+      ].filter(Boolean), // 필터된 조건이 없으면 무시
     },
   });
 
   const placeEventIds = places.map((place) => place.eventId);
 
+  // 쿼리즈 따로 빼뒀음
+  const queryConditions = {
+    ...cursorWhereClause, // 커서 기준 조건 추가
+    ...priceWhereClause, // 금액 기준 조건 추가
+    // ...locationWhereClause, // 위치 기준 조건 추가 - 25.02.11 event 테이블 구조 변경에 따라 depracated
+    ...dateWhereClause, // 날짜 기준 조건 추가
+    ...queryWhereClause, // 검색어 기준 조건 추가
+  };
+
+  // placeEventIds가 있을 경우만 이벤트 거르기
+  if (placeEventIds.length > 0) {
+    queryConditions[Op.or] = [
+      { eventId: { [Op.in]: placeEventIds } },
+      { eventId: { [Op.notIn]: placeEventIds } },
+    ];
+  }
+
   const events = await models.Events.findAll({
-    where: {
-      ...cursorWhereClause, // 커서 기준 조건 추가
-      ...priceWhereClause, // 금액 기준 조건 추가
-      // ...locationWhereClause, // 위치 기준 조건 추가 - 25.02.11 event 테이블 구조 변경에 따라 depracated
-      ...dateWhereClause, // 날짜 기준 조건 추가
-      ...queryWhereClause, // 검색어 기준 조건 추가
-      [Op.or]: [
-        { eventId: { [Op.in]: placeEventIds } },
-        { eventId: { [Op.notIn]: placeEventIds } },
-      ],
-    },
+    where: queryConditions,
     limit: limit + 1, // 다음 페이지 존재 여부 확인을 위해 하나 더 조회
     order: [["eventId", "DESC"]],
 

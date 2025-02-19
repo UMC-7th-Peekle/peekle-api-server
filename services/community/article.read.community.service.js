@@ -8,7 +8,7 @@ import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { Op, fn, col } from "sequelize";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
-import config from "../../config/config.js";
+import config from "../../config.js";
 
 export const validateArticleQuery = (queries) => {
   const { limit, cursor, query, communityId, authorId } = queries; // 쿼리 파라미터에서 limit와 cursor 추출
@@ -81,7 +81,11 @@ const getThumbnail = (articleImages) => {
 const getAuthorInfo = (article, isAnonymous) => {
   if (isAnonymous) {
     delete article.author.dataValues;
-    return { nickname: null, profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE), authorId: null };
+    return {
+      nickname: null,
+      profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE),
+      authorId: null,
+    };
   }
 
   const author = article.author.dataValues;
@@ -108,9 +112,14 @@ export const getArticles = async (
   userId
 ) => {
   // 사용자가 다른 사용자가 작성한 글을 조회하는 경우 차단
-  if (authorId !== undefined && (parseInt(authorId, 10) !== parseInt(userId, 10))) {
-      throw new NotAllowedError("다른 사용자가 작성한 게시글 목록을 조회할 수 없습니다");
-    }
+  if (
+    authorId !== undefined &&
+    parseInt(authorId, 10) !== parseInt(userId, 10)
+  ) {
+    throw new NotAllowedError(
+      "다른 사용자가 작성한 게시글 목록을 조회할 수 없습니다"
+    );
+  }
 
   // 게시글 조회 조건 설정
   const whereCondition = {

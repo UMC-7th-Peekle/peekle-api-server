@@ -4,7 +4,6 @@ import { InvalidInputError } from "../../utils/errors/errors.js";
 import { logError } from "../../utils/handlers/error.logger.js";
 import logger from "../../utils/logger/logger.js";
 import config from "../../config.js";
-import { randomUUID } from "crypto";
 
 // 네이버 API URL
 const NAVER_ADDRESS_URL =
