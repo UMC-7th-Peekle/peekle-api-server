@@ -3,6 +3,7 @@ import { NotAllowedError, NotExistsError } from "../../utils/errors/errors.js";
 import models from "../../models/index.js";
 import logger from "../../utils/logger/logger.js";
 import { addBaseUrl } from "../../utils/upload/uploader.object.js";
+import { Op } from "sequelize";
 import config from "../../config.js";
 
 /**
@@ -356,6 +357,9 @@ export const getComments = async ({
     throw new NotExistsError("게시글이 존재하지 않습니다");
   }
 
+  // 차단 사용자 목록 조회
+  const blockedUserIds = await getBlockedUserIds(userId);
+
   // 댓글 정보에 좋아요 여부, 좋아요 개수 및 작성자 정보 추가
   const transformedComments = articleWithComments.articleComments.map(
     (comment) => {
@@ -376,7 +380,7 @@ export const getComments = async ({
       const commentLikesCount = articleCommentLikes.length;
 
       // status가 'deleted'인 경우 content를 빈 문자열로 설정
-      const processedContent = status === "deleted" ? "" : content;
+      let processedContent = status === "deleted" ? "" : content;
 
       // 익명 처리 로직: isAnonymous 값에 따라 익명 닉네임 설정
       let transformedAuthorInfo = author;
@@ -392,6 +396,13 @@ export const getComments = async ({
           transformedAuthorInfo.profileImage
         );
       }
+
+      // 차단 사용자일 경우 내용을 "차단된 사용자입니다."로 변경
+      if (blockedUserIds.includes(author.userId)) {
+        processedContent = "차단된 사용자입니다.";
+        // 사용자 정보는 그대로 전달(figma에 따른 내용)
+      }
+
       return {
         authorInfo: status === "deleted" ? null : transformedAuthorInfo,
         isLikedByUser: isCommentLikedByUser,
@@ -406,4 +417,29 @@ export const getComments = async ({
   return {
     comments: transformedComments,
   };
+};
+
+/**
+ * 내가 차단거나 나를 차단한 사용자 ID 목록을 조회합니다.
+ */
+const getBlockedUserIds = async (userId) => {
+  // 내가 차단한 사용자 + 나를 차단한 사용자 조회
+  const blockedUsers = await models.UserBlocks.findAll({
+    where: {
+      [Op.or]: [
+        { blockerUserId: userId }, // 내가 차단한 사용자
+        { blockedUserId: userId }, // 나를 차단한 사용자
+      ],
+    },
+    attributes: ["blockerUserId", "blockedUserId"],
+  });
+
+  // 중복 제거를 위해 Set 사용
+  const blockedUserIds = new Set();
+  blockedUsers.forEach(({ blockerUserId, blockedUserId }) => {
+    if (blockerUserId !== userId) blockedUserIds.add(blockerUserId);
+    if (blockedUserId !== userId) blockedUserIds.add(blockedUserId);
+  });
+
+  return Array.from(blockedUserIds);
 };
