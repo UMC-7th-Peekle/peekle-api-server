@@ -121,6 +121,9 @@ export const getArticles = async (
     );
   }
 
+  // 차단 사용자 목록 조회
+  const blockedUserIds = await getBlockedUserIds(userId);
+
   // 게시글 조회 조건 설정
   const whereCondition = {
     ...(query && {
@@ -140,6 +143,11 @@ export const getArticles = async (
   // authorId가 있을 경우 필터링 추가
   if (authorId !== undefined) {
     whereCondition.authorId = authorId;
+  }
+
+  // 차단된 사용자의 게시글 제외
+  if (blockedUserIds.length > 0) {
+    whereCondition.authorId = { [Op.notIn]: blockedUserIds };
   }
 
   // 게시글 조회
@@ -331,6 +339,32 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
     hasNextPage,
   };
 };
+
+/**
+ * 내가 차단거나 나를 차단한 사용자 ID 목록을 조회합니다.
+ */
+const getBlockedUserIds = async (userId) => {
+  // 내가 차단한 사용자 + 나를 차단한 사용자 조회
+  const blockedUsers = await models.UserBlocks.findAll({
+    where: {
+      [Op.or]: [
+        { blockerUserId: userId }, // 내가 차단한 사용자
+        { blockedUserId: userId }, // 나를 차단한 사용자
+      ],
+    },
+    attributes: ["blockerUserId", "blockedUserId"],
+  });
+
+  // 중복 제거를 위해 Set 사용
+  const blockedUserIds = new Set();
+  blockedUsers.forEach(({ blockerUserId, blockedUserId }) => {
+    if (blockerUserId !== userId) blockedUserIds.add(blockerUserId);
+    if (blockedUserId !== userId) blockedUserIds.add(blockedUserId);
+  });
+
+  return Array.from(blockedUserIds);
+};
+
 
 /*
 
