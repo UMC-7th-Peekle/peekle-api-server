@@ -21,7 +21,7 @@ export const createPersonalChatroom = async ({
       {
         senderId,
         receiverId,
-        name,
+        name: name.slice(0, 30),
         isSenderAnonymous,
         isReceiverAnonymous,
       },
@@ -67,7 +67,7 @@ export const isArticleAuthorAnonymous = async ({ articleId }) => {
 
   return {
     isAnonymous: !!ret.isAnonymous,
-    name: ret.title,
+    name: ret.title.slice(0, 30),
     authorId: ret.authorId,
   };
 };
@@ -86,7 +86,7 @@ export const isCommentAuthorAnonymous = async ({ commentId }) => {
 
   return {
     isAnonymous: !!ret.isAnonymous,
-    name: ret.content,
+    name: ret.content.slice(0, 30),
     authorId: ret.authorId,
   };
 };

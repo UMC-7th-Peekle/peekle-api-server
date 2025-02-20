@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { notImplementedController } from "../controllers/empty.cotroller.js";
 import * as dmController from "../controllers/chats/dm.chats.controller.js";
+
 import { authenticateAccessToken } from "../middleware/authenticate.jwt.js";
 
 const router = Router();
