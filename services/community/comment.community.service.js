@@ -395,9 +395,9 @@ export const getComments = async ({
       // isAnonymous가 0이 아닌 양의 정수일 경우 익명이 됨
       if (isAnonymous !== 0) {
         transformedAuthorInfo = {
+          userId: null,
           nickname: `익명${isAnonymous}`, // isAnonymous 값을 그대로 사용하여 익명 번호 지정
           profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE), // 익명인 경우 기본 이미지 대신 null 반환
-          authorId: null,
         };
       } else {
         transformedAuthorInfo.profileImage = addBaseUrl(
@@ -413,10 +413,11 @@ export const getComments = async ({
 
       // 탈퇴한 사용자인 경우 닉네임을 "알 수 없음", profileImage는 기본으로 변경
       if (terminatedUserIds.has(author.userId)) {
-        transformedAuthorInfo.nickname = "알 수 없음";
-        transformedAuthorInfo.profileImage = addBaseUrl(
-          config.PEEKLE.DEFAULT_PROFILE_IMAGE
-        ); // 기본 이미지 설정
+        transformedAuthorInfo = {
+          userId: null,
+          nickname: "알 수 없음",
+          profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE),
+        };
       }
 
       return {

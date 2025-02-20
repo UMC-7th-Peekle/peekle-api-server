@@ -52,7 +52,10 @@ export const getCommunities = async (userId) => {
         attributes: ["title"],
         order: [["createdAt", "DESC"]],
         limit: 2,
-        where: blockedUserIds.length > 0 ? { authorId: { [Op.notIn]: blockedUserIds } } : {}, // 차단된 사용자 게시글 제외
+        where:
+          blockedUserIds.length > 0
+            ? { authorId: { [Op.notIn]: blockedUserIds } }
+            : {}, // 차단된 사용자 게시글 제외
       },
     ],
   });
@@ -82,11 +85,20 @@ const getThumbnail = (articleImages) => {
 /**
  *  게시글의 작성자 정보를 가공하고 불필요한 필드를 제거합니다.
  */
-const getAuthorInfo = (article, isAnonymous) => {
+const getAuthorInfo = (article, isAnonymous, terminatedUserIds) => {
   if (isAnonymous) {
     delete article.author.dataValues;
     return {
       nickname: null,
+      profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE),
+      authorId: null,
+    };
+  }
+
+  if (terminatedUserIds.has(article.author.userId)) {
+    delete article.author.dataValues;
+    return {
+      nickname: "알 수 없음",
       profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE),
       authorId: null,
     };
@@ -127,6 +139,9 @@ export const getArticles = async (
 
   // 차단 사용자 목록 조회
   const blockedUserIds = await getBlockedUserIds(userId);
+
+  // 탈퇴한 사용자 목록 조회
+  const terminatedUserIds = await getTerminatedUserIds(userId);
 
   // 게시글 조회 조건 설정
   const whereCondition = {
@@ -223,7 +238,7 @@ export const getArticles = async (
           )
         : false,
       thumbnail: getThumbnail(article.articleImages), // 대표 이미지 처리
-      authorInfo: getAuthorInfo(article, article.isAnonymous),
+      authorInfo: getAuthorInfo(article, article.isAnonymou, terminatedUserIds),
     };
   });
 
@@ -382,6 +397,21 @@ const getBlockedUserIds = async (userId) => {
   });
 
   return Array.from(blockedUserIds);
+};
+
+/**
+ * 탈퇴한 사용자 목록 조회
+ */
+const getTerminatedUserIds = async (userId) => {
+  // 탈퇴한 사용자 목록 조회
+  const terminatedUsers = await models.Users.findAll({
+    where: { status: "terminated" },
+    attributes: ["userId"],
+  });
+  // 탈퇴 사용자 ID를 빠르게 검색할 수 있도록 Set 변환
+  const terminatedUserIds = new Set(terminatedUsers.map((user) => user.userId));
+
+  return terminatedUserIds;
 };
 
 /*
