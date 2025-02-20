@@ -274,6 +274,9 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
   // 차단 사용자 목록 조회
   const blockedUserIds = await getBlockedUserIds(userId);
 
+  // 탈퇴한 사용자 목록 조회
+  const terminatedUserIds = await getTerminatedUserIds(userId);
+
   // cursor는 articleLikesId 기준
   const likedArticleIds = await models.ArticleLikes.findAll({
     where: {
@@ -343,7 +346,7 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
     article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
     article.thumbnail = getThumbnail(article.articleImages); // 썸네일 정보 추출
     delete article.articleImages; // 불필요한 필드 제거
-    article.authorInfo = getAuthorInfo(article, article.isAnonymous); // 작성자 정보 추출
+    article.authorInfo = getAuthorInfo(article, article.isAnonymous, terminatedUserIds); // 작성자 정보 추출
   });
 
   // 다음 커서 설정
