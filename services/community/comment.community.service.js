@@ -399,7 +399,7 @@ export const getComments = async ({
 
       // 차단 사용자일 경우 내용을 "차단된 사용자입니다."로 변경
       if (blockedUserIds.includes(author.userId)) {
-        processedContent = "차단된 사용자입니다.";
+        processedContent = "! 차단된 사용자입니다.";
         // 사용자 정보는 그대로 전달(figma에 따른 내용)
       }
 
