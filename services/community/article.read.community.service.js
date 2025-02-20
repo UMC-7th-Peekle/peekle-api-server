@@ -252,6 +252,9 @@ export const getArticles = async (
 };
 
 export const getLikedArticles = async (userId, { limit, cursor = null }) => {
+  // 차단 사용자 목록 조회
+  const blockedUserIds = await getBlockedUserIds(userId);
+  
   // cursor는 articleLikesId 기준
   const likedArticleIds = await models.ArticleLikes.findAll({
     where: {
@@ -260,6 +263,15 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
     }, // 커서 조건: articleId 기준 },
     limit: limit + 1, // 조회 개수 제한
     attributes: ["articleLikesId", "articleId"],
+    include: [
+      {
+        model: models.Articles,
+        as: "article",
+        attributes: ["authorId"], // 게시글의 작성자 ID 가져오기
+        where: blockedUserIds.length > 0 ? { authorId: { [Op.notIn]: blockedUserIds } } : {},
+        required: true, // 차단된 사용자의 게시글은 제외
+      },
+    ],
     order: [["createdAt", "DESC"]],
   });
 
