@@ -6,7 +6,8 @@ import logger from "../../utils/logger/logger.js";
 // 게시판 목록 조회
 export const getCommunities = async (req, res, next) => {
   try {
-    const { communities } = await articleReadService.getCommunities();
+    const userId = req.user ? req.user.userId : null; // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
+    const { communities } = await articleReadService.getCommunities(userId);
 
     if (communities.length === 0) {
       return res.status(204).end(); // 응답 본문 없이 204 반환

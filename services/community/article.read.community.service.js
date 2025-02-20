@@ -39,7 +39,10 @@ export const validateArticleQuery = (queries) => {
 /**
  * 전체 게시판 목록 조회
  */
-export const getCommunities = async () => {
+export const getCommunities = async (userId) => {
+  // 차단 사용자 목록 조회
+  const blockedUserIds = await getBlockedUserIds(userId);
+
   const communities = await models.Communities.findAll({
     attributes: ["communityId", "title"],
     include: [
@@ -49,6 +52,10 @@ export const getCommunities = async () => {
         attributes: ["title"],
         order: [["createdAt", "DESC"]],
         limit: 2,
+        where:
+          blockedUserIds.length > 0
+            ? { authorId: { [Op.notIn]: blockedUserIds } }
+            : {}, // 차단된 사용자 게시글 제외
       },
     ],
   });
@@ -78,11 +85,20 @@ const getThumbnail = (articleImages) => {
 /**
  *  게시글의 작성자 정보를 가공하고 불필요한 필드를 제거합니다.
  */
-const getAuthorInfo = (article, isAnonymous) => {
+const getAuthorInfo = (article, isAnonymous, terminatedUserIds) => {
   if (isAnonymous) {
     delete article.author.dataValues;
     return {
       nickname: null,
+      profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE),
+      authorId: null,
+    };
+  }
+
+  if (terminatedUserIds.has(article.author.userId)) {
+    delete article.author.dataValues;
+    return {
+      nickname: "알 수 없음",
       profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE),
       authorId: null,
     };
@@ -121,6 +137,12 @@ export const getArticles = async (
     );
   }
 
+  // 차단 사용자 목록 조회
+  const blockedUserIds = await getBlockedUserIds(userId);
+
+  // 탈퇴한 사용자 목록 조회
+  const terminatedUserIds = await getTerminatedUserIds(userId);
+
   // 게시글 조회 조건 설정
   const whereCondition = {
     ...(query && {
@@ -140,6 +162,11 @@ export const getArticles = async (
   // authorId가 있을 경우 필터링 추가
   if (authorId !== undefined) {
     whereCondition.authorId = authorId;
+  }
+
+  // 차단된 사용자의 게시글 제외
+  if (blockedUserIds.length > 0) {
+    whereCondition.authorId = { [Op.notIn]: blockedUserIds };
   }
 
   // 게시글 조회
@@ -211,7 +238,7 @@ export const getArticles = async (
           )
         : false,
       thumbnail: getThumbnail(article.articleImages), // 대표 이미지 처리
-      authorInfo: getAuthorInfo(article, article.isAnonymous),
+      authorInfo: getAuthorInfo(article, article.isAnonymou, terminatedUserIds),
     };
   });
 
@@ -244,6 +271,12 @@ export const getArticles = async (
 };
 
 export const getLikedArticles = async (userId, { limit, cursor = null }) => {
+  // 차단 사용자 목록 조회
+  const blockedUserIds = await getBlockedUserIds(userId);
+
+  // 탈퇴한 사용자 목록 조회
+  const terminatedUserIds = await getTerminatedUserIds(userId);
+
   // cursor는 articleLikesId 기준
   const likedArticleIds = await models.ArticleLikes.findAll({
     where: {
@@ -252,6 +285,18 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
     }, // 커서 조건: articleId 기준 },
     limit: limit + 1, // 조회 개수 제한
     attributes: ["articleLikesId", "articleId"],
+    include: [
+      {
+        model: models.Articles,
+        as: "article",
+        attributes: ["authorId"], // 게시글의 작성자 ID 가져오기
+        where:
+          blockedUserIds.length > 0
+            ? { authorId: { [Op.notIn]: blockedUserIds } }
+            : {},
+        required: true, // 차단된 사용자의 게시글은 제외
+      },
+    ],
     order: [["createdAt", "DESC"]],
   });
 
@@ -301,7 +346,7 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
     article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
     article.thumbnail = getThumbnail(article.articleImages); // 썸네일 정보 추출
     delete article.articleImages; // 불필요한 필드 제거
-    article.authorInfo = getAuthorInfo(article, article.isAnonymous); // 작성자 정보 추출
+    article.authorInfo = getAuthorInfo(article, article.isAnonymous, terminatedUserIds); // 작성자 정보 추출
   });
 
   // 다음 커서 설정
@@ -330,6 +375,46 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
     nextCursor,
     hasNextPage,
   };
+};
+
+/**
+ * 내가 차단거나 나를 차단한 사용자 ID 목록을 조회합니다.
+ */
+const getBlockedUserIds = async (userId) => {
+  // 내가 차단한 사용자 + 나를 차단한 사용자 조회
+  const blockedUsers = await models.UserBlocks.findAll({
+    where: {
+      [Op.or]: [
+        { blockerUserId: userId }, // 내가 차단한 사용자
+        { blockedUserId: userId }, // 나를 차단한 사용자
+      ],
+    },
+    attributes: ["blockerUserId", "blockedUserId"],
+  });
+
+  // 중복 제거를 위해 Set 사용
+  const blockedUserIds = new Set();
+  blockedUsers.forEach(({ blockerUserId, blockedUserId }) => {
+    if (blockerUserId !== userId) blockedUserIds.add(blockerUserId);
+    if (blockedUserId !== userId) blockedUserIds.add(blockedUserId);
+  });
+
+  return Array.from(blockedUserIds);
+};
+
+/**
+ * 탈퇴한 사용자 목록 조회
+ */
+const getTerminatedUserIds = async (userId) => {
+  // 탈퇴한 사용자 목록 조회
+  const terminatedUsers = await models.Users.findAll({
+    where: { status: "terminated" },
+    attributes: ["userId"],
+  });
+  // 탈퇴 사용자 ID를 빠르게 검색할 수 있도록 Set 변환
+  const terminatedUserIds = new Set(terminatedUsers.map((user) => user.userId));
+
+  return terminatedUserIds;
 };
 
 /*
