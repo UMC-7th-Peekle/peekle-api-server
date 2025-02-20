@@ -58,6 +58,7 @@ router.get(
 // 특정 communityId에 startTime부터 endTime까지의 인기글을 가져옵니다.
 router.get(
   "/:communityId/articles/popular",
+  autheticateAccessTokenIfExists,
   articleAggregateController.getPopularArticles
 );
 

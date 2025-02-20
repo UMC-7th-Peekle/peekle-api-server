@@ -37,7 +37,12 @@ export const validateStatisticsQuery = (queries) => {
 /**
  * 인기 게시글을 조회합니다
  */
-export const getPopularArticles = async (communityId, startTime, endTime) => {
+export const getPopularArticles = async (
+  communityId,
+  startTime,
+  endTime,
+  userId
+) => {
   // 커뮤니티 존재 여부 확인
   const communityExists = await models.Communities.findOne({
     where: { communityId },
@@ -46,10 +51,15 @@ export const getPopularArticles = async (communityId, startTime, endTime) => {
   if (!communityExists) {
     throw new NotExistsError("해당 커뮤니티가 존재하지 않습니다."); // 404
   }
+
+  // 차단 사용자 목록 조회
+  const blockedUserIds = await getBlockedUserIds(userId);
+
   // 인기 게시글 조회 쿼리
   const popularArticles = await models.Articles.findAll({
     where: {
       communityId,
+      ...(blockedUserIds.length > 0 && { authorId: { [Op.notIn]: blockedUserIds } }), // 차단된 사용자 게시글 제외
     },
     attributes: [
       "articleId",
@@ -122,6 +132,10 @@ export const getPopularArticles = async (communityId, startTime, endTime) => {
   popularArticles.map((article) => {
     article = article.dataValues;
     article.articleComments = article.articleComments.length; // 댓글 개수만 추출
+   // 사용자 좋아요 여부 가공
+   article.isLikedByUser = article.articleLikes.some(
+    (like) => Number(like.dataValues.likedUserId) === Number(userId)
+  );
     article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
     if (article.articleImages.length > 0) {
       article.articleImages = addBaseUrl(
@@ -154,4 +168,29 @@ export const getPopularArticles = async (communityId, startTime, endTime) => {
   });
 
   return { articles: popularArticles };
+};
+
+/**
+ * 내가 차단거나 나를 차단한 사용자 ID 목록을 조회합니다.
+ */
+const getBlockedUserIds = async (userId) => {
+  // 내가 차단한 사용자 + 나를 차단한 사용자 조회
+  const blockedUsers = await models.UserBlocks.findAll({
+    where: {
+      [Op.or]: [
+        { blockerUserId: userId }, // 내가 차단한 사용자
+        { blockedUserId: userId }, // 나를 차단한 사용자
+      ],
+    },
+    attributes: ["blockerUserId", "blockedUserId"],
+  });
+
+  // 중복 제거를 위해 Set 사용
+  const blockedUserIds = new Set();
+  blockedUsers.forEach(({ blockerUserId, blockedUserId }) => {
+    if (blockerUserId !== userId) blockedUserIds.add(blockerUserId);
+    if (blockedUserId !== userId) blockedUserIds.add(blockedUserId);
+  });
+
+  return Array.from(blockedUserIds);
 };

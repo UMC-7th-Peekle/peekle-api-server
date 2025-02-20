@@ -7,6 +7,7 @@ import logger from "../../utils/logger/logger.js";
 export const getPopularArticles = async (req, res, next) => {
   try {
     const { communityId } = req.params; // URL에서 communityId 추출
+    const userId = req.user ? req.user.userId : null; // JWT에서 userId 추출 - 로그인되지 않은 경우를 위한 null
 
     articleAggregateService.validateStatisticsQuery(req.query); // 쿼리 파라미터 검증
     const { startTime, endTime } = req.query; // 쿼리 파라미터에서 startTime과 endTime 추출
@@ -35,7 +36,8 @@ export const getPopularArticles = async (req, res, next) => {
     const { articles } = await articleAggregateService.getPopularArticles(
       communityId,
       isoStartTime,
-      isoEndTime
+      isoEndTime,
+      userId
     );
 
     // 인기 게시글이 없는 경우
