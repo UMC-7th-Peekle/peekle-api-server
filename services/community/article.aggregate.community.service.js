@@ -54,12 +54,21 @@ export const getPopularArticles = async (
 
   // 차단 사용자 목록 조회
   const blockedUserIds = await getBlockedUserIds(userId);
+  // 탈퇴한 사용자 목록 조회
+  const terminatedUsers = await models.Users.findAll({
+    where: { status: "terminated" },
+    attributes: ["userId"],
+  });
+  // 탈퇴 사용자 ID를 빠르게 검색할 수 있도록 Set 변환
+  const terminatedUserIds = new Set(terminatedUsers.map((user) => user.userId));
 
   // 인기 게시글 조회 쿼리
   const popularArticles = await models.Articles.findAll({
     where: {
       communityId,
-      ...(blockedUserIds.length > 0 && { authorId: { [Op.notIn]: blockedUserIds } }), // 차단된 사용자 게시글 제외
+      ...(blockedUserIds.length > 0 && {
+        authorId: { [Op.notIn]: blockedUserIds },
+      }), // 차단된 사용자 게시글 제외
     },
     attributes: [
       "articleId",
@@ -132,10 +141,10 @@ export const getPopularArticles = async (
   popularArticles.map((article) => {
     article = article.dataValues;
     article.articleComments = article.articleComments.length; // 댓글 개수만 추출
-   // 사용자 좋아요 여부 가공
-   article.isLikedByUser = article.articleLikes.some(
-    (like) => Number(like.dataValues.likedUserId) === Number(userId)
-  );
+    // 사용자 좋아요 여부 가공
+    article.isLikedByUser = article.articleLikes.some(
+      (like) => Number(like.dataValues.likedUserId) === Number(userId)
+    );
     article.articleLikes = article.articleLikes.length; // 좋아요 개수만 추출
     if (article.articleImages.length > 0) {
       article.articleImages = addBaseUrl(
@@ -165,6 +174,15 @@ export const getPopularArticles = async (
       article.authorInfo = article.author;
     }
     delete article.author;
+
+    // 탈퇴한 사용자인 경우 닉네임을 "알 수 없음", profileImage는 기본으로 변경
+    if (terminatedUserIds.has(article.authorInfo.authorId)) {
+      article.authorInfo = {
+        nickname: "알 수 없음",
+        profileImage: addBaseUrl(config.PEEKLE.DEFAULT_PROFILE_IMAGE),
+        authorId: null,
+      };
+    }
   });
 
   return { articles: popularArticles };
