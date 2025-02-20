@@ -127,7 +127,7 @@ export const detailEvent = async ({ eventId, userId }) => {
       {
         model: models.EventLocation,
         as: "eventLocation",
-        attributes: ["position"],
+        attributes: ["position", "address", "buildingName"],
       },
     ],
   });

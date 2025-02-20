@@ -61,6 +61,7 @@ export const createEvent = async ({ userId, eventData }) => {
       {
         ...eventData,
         createdUserId: userId,
+        locationGroupId: eventData.location.locationGroupId,
       },
       { transaction }
     );

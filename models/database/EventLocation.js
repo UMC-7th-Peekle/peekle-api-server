@@ -16,7 +16,7 @@ export default class EventLocation extends Model {
     },
     locationGroupId: {
       type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'event_location_groups',
         key: 'group_id'
@@ -25,11 +25,11 @@ export default class EventLocation extends Model {
     },
     position: {
       type: DataTypes.GEOMETRY,
-      allowNull: false
+      allowNull: true
     },
     address: {
       type: DataTypes.STRING(1024),
-      allowNull: false
+      allowNull: true
     },
     buildingName: {
       type: DataTypes.STRING(1024),
