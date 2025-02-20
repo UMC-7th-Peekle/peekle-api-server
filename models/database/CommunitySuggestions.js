@@ -24,10 +24,6 @@ export default class CommunitySuggestions extends Model {
       type: DataTypes.STRING(512),
       allowNull: false
     },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false
-    },
     createdAt: {
       type: DataTypes.DATE(6),
       allowNull: false,

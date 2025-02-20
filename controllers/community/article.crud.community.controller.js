@@ -141,12 +141,11 @@ export const deleteArticle = async (req, res, next) => {
 // 게시판 건의하기
 export const suggestCommunity = async (req, res, next) => {
   try {
-    const { title, content  } = req.body; // Request body에서 title, content 추출
+    const { title  } = req.body; // Request body에서 title 추출
     const authorId = req.user.userId; // JWT에서 사용자 ID 추출
 
     await articleCrudService.suggestCommunity({
       title,
-      content,
       authorId,
     }); // 게시판 건의하기
     
