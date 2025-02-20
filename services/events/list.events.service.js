@@ -190,7 +190,7 @@ export const listEvent = async ({ paginationOptions }) => {
       {
         model: models.EventLocation,
         as: "eventLocation",
-        attributes: ["position"],
+        attributes: ["position", "address", "buildingName"],
       },
     ],
   });
