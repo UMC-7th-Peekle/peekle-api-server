@@ -22,7 +22,7 @@ export default class EventSchedules extends Model {
     },
     repeatType: {
       type: DataTypes.ENUM('none','daily','weekly','monthly','yearly','custom'),
-      allowNull: false,
+      allowNull: true,
       field: 'repeat_type'
     },
     repeatEndDate: {
@@ -32,7 +32,7 @@ export default class EventSchedules extends Model {
     },
     isAllDay: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      allowNull: true,
       field: 'is_all_day'
     },
     customText: {

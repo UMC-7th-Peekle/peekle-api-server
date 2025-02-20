@@ -21,7 +21,8 @@ export default class Events extends Model {
     },
     price: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 0
     },
     categoryId: {
       type: DataTypes.BIGINT.UNSIGNED,
