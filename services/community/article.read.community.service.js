@@ -39,7 +39,10 @@ export const validateArticleQuery = (queries) => {
 /**
  * 전체 게시판 목록 조회
  */
-export const getCommunities = async () => {
+export const getCommunities = async (userId) => {
+  // 차단 사용자 목록 조회
+  const blockedUserIds = await getBlockedUserIds(userId);
+
   const communities = await models.Communities.findAll({
     attributes: ["communityId", "title"],
     include: [
@@ -49,6 +52,7 @@ export const getCommunities = async () => {
         attributes: ["title"],
         order: [["createdAt", "DESC"]],
         limit: 2,
+        where: blockedUserIds.length > 0 ? { authorId: { [Op.notIn]: blockedUserIds } } : {}, // 차단된 사용자 게시글 제외
       },
     ],
   });
@@ -254,7 +258,7 @@ export const getArticles = async (
 export const getLikedArticles = async (userId, { limit, cursor = null }) => {
   // 차단 사용자 목록 조회
   const blockedUserIds = await getBlockedUserIds(userId);
-  
+
   // cursor는 articleLikesId 기준
   const likedArticleIds = await models.ArticleLikes.findAll({
     where: {
@@ -268,7 +272,10 @@ export const getLikedArticles = async (userId, { limit, cursor = null }) => {
         model: models.Articles,
         as: "article",
         attributes: ["authorId"], // 게시글의 작성자 ID 가져오기
-        where: blockedUserIds.length > 0 ? { authorId: { [Op.notIn]: blockedUserIds } } : {},
+        where:
+          blockedUserIds.length > 0
+            ? { authorId: { [Op.notIn]: blockedUserIds } }
+            : {},
         required: true, // 차단된 사용자의 게시글은 제외
       },
     ],
@@ -376,7 +383,6 @@ const getBlockedUserIds = async (userId) => {
 
   return Array.from(blockedUserIds);
 };
-
 
 /*
 

@@ -33,7 +33,11 @@ router.post(
 /*
  게시판 목록 조회 (게시판별로 게시판 이름과 최신 글 하나만 가져옵니다)
 */
-router.get("/", articleReadController.getCommunities);
+router.get(
+  "/",
+  autheticateAccessTokenIfExists,
+  articleReadController.getCommunities
+);
 
 /*
   게시판 조회
