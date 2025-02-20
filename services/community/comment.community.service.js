@@ -360,6 +360,14 @@ export const getComments = async ({
   // 차단 사용자 목록 조회
   const blockedUserIds = await getBlockedUserIds(userId);
 
+  // 탈퇴한 사용자 목록 조회
+  const terminatedUsers = await models.Users.findAll({
+    where: { status: "terminated" },
+    attributes: ["userId"],
+  });
+  // 탈퇴 사용자 ID를 빠르게 검색할 수 있도록 Set 변환
+  const terminatedUserIds = new Set(terminatedUsers.map((user) => user.userId));
+
   // 댓글 정보에 좋아요 여부, 좋아요 개수 및 작성자 정보 추가
   const transformedComments = articleWithComments.articleComments.map(
     (comment) => {
@@ -401,6 +409,14 @@ export const getComments = async ({
       if (blockedUserIds.includes(author.userId)) {
         processedContent = "! 차단된 사용자입니다.";
         // 사용자 정보는 그대로 전달(figma에 따른 내용)
+      }
+
+      // 탈퇴한 사용자인 경우 닉네임을 "알 수 없음", profileImage는 기본으로 변경
+      if (terminatedUserIds.has(author.userId)) {
+        transformedAuthorInfo.nickname = "알 수 없음";
+        transformedAuthorInfo.profileImage = addBaseUrl(
+          config.PEEKLE.DEFAULT_PROFILE_IMAGE
+        ); // 기본 이미지 설정
       }
 
       return {
