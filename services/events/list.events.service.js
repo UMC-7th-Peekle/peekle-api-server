@@ -249,38 +249,49 @@ export const listEvent = async ({ paginationOptions }) => {
         const startDateB = b.eventSchedules[0]?.startDate;
         return new Date(startDateA) - new Date(startDateB);
       });
+
+      return a.title.localeCompare(b.title); // ㄱㄴㄷ 정렬
     } else if (sort === "낮은 금액순") {
       // ㅇㅋ 굳
       modifiedEvents.sort((a, b) => a.price - b.price);
+
+      return a.title.localeCompare(b.title); // ㄱㄴㄷ 정렬
     } else if (sort === "가까운 거리순" && userLocation) {
       modifiedEvents.sort((a, b) => {
-        // 프론트에서 유저 위치를 받아서 해야하는 것 같아요.
-        const distanceA = getDistance(
-          { latitude: userLocation.lat, longitude: userLocation.lng },
-          {
-            latitude: a.eventLocation.coordinates[1],
-            longitude: a.eventLocation.coordinates[0],
-          }
-        );
-        const distanceB = getDistance(
-          { latitude: userLocation.lat, longitude: userLocation.lng },
-          {
-            latitude: b.eventLocation.coordinates[1],
-            longitude: b.eventLocation.coordinates[0],
-          }
-        );
-        return distanceA - distanceB;
+        // 보니까 이벤트 위치가 없는 이벤트가 있음.... 해당 부분을 고려하지 못했음...
+        const hasCoordinatesA = a.eventLocation?.coordinates?.length >= 2;
+        const hasCoordinatesB = b.eventLocation?.coordinates?.length >= 2;
+
+        if (hasCoordinatesA && hasCoordinatesB) {
+          const distanceA = getDistance(
+            { latitude: userLocation.lat, longitude: userLocation.lng },
+            {
+              latitude: a.eventLocation.coordinates[1],
+              longitude: a.eventLocation.coordinates[0],
+            }
+          );
+          const distanceB = getDistance(
+            { latitude: userLocation.lat, longitude: userLocation.lng },
+            {
+              latitude: b.eventLocation.coordinates[1],
+              longitude: b.eventLocation.coordinates[0],
+            }
+          );
+          return distanceA - distanceB;
+        }
+
+        return a.title.localeCompare(b.title); // ㄱㄴㄷ 정렬
       });
     }
   }
 
   // 제목으로 가나다순 정렬
-  modifiedEvents.sort((a, b) => {
-    if (a.title === b.title) {
-      return a.title.localeCompare(b.title);
-    }
-    return 0;
-  });
+  // modifiedEvents.sort((a, b) => {
+  //   if (a.title === b.title) {
+  //     return a.title.localeCompare(b.title);
+  //   }
+  //   return 0;
+  // });
 
   // BE에서 sort 해서 준다는 전제 하에
   // 제목, location infos, 금액, images (thumbnail), category
